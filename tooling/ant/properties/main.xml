@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-properties-main" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<property environment="env"/>
+
+	<property name="metrics.enable" value="false"                   if:true="${env.MP_TOOLING_DISABLE_METRICS}" />
+	<property name="metrics.enable" value="${server.enableMetrics}" if:set="server.enableMetrics"               />
+	<property name="metrics.enable" value="false"                                                               />
+
+	<property file="build-state.properties.local"/>
+
+	<property file="build.properties.local"/>
+	<property file="build.properties"/>
+
+	<property name="dir.home" value="${env.HOME}"        if:set="env.HOME" />
+	<property name="dir.home" value="${env.USERPROFILE}" if:set="env.USERPROFILE" />
+
+	<condition property="os.isWindows" value="true" else="false">
+		<os family="windows" />
+	</condition>
+
+	<condition property="os.isLinux" value="true" else="false">
+		<and>
+			<not>
+				<os family="mac" />
+			</not>
+			<os family="unix" />
+		</and>
+	</condition>
+
+	<condition property="os.isMac" value="true" else="false">
+		<os family="mac" />
+	</condition>
+
+	<condition property="os.isWindows.is64Bit" value="true" else="false">
+		<and>
+			<istrue value="${os.isWindows}" />
+			<isset  property="env.ProgramFiles(x86)" />
+		</and>
+	</condition>
+
+	<condition property="os.isWindows.is32Bit" value="true" else="false">
+		<and>
+			<istrue  value="${os.isWindows}" />
+			<isfalse value="${os.isWindows.is64Bit}" />
+		</and>
+	</condition>
+
+	<available 
+		property = "git.isGitRepo"
+		file     = ".git"
+		type     = "dir" />
+
+	<property name="dir.globalMPDevOps"   value="${dir.home}/.mp-dev-ops" />
+	<property name="dir.globalMPPackages" value="${dir.globalMPDevOps}/packages" />
+
+	<property file="${dir.toolingBase}/default.properties.local"/>
+	<property file="${dir.toolingBase}/default.properties"/>
+
+	<property name="file.exec.sfdx" value="sfdx.cmd" if:true="${os.isWindows}" />
+	<property name="file.exec.sfdx" value="sfdx" unless:true="${os.isWindows}" />
+
+	<property file="${dir.home}/mptooling.properties" />
+
+	<property name="tooling.runningVersion" value="${running.version.installed}" if:set="running.version.installed" />
+	<property name="tooling.runningVersion" value="unversioned"                                                     />
+
+	<condition property="tooling.mode.isSfdx" value="true" else="false">
+		<equals arg1="${tooling.mode}" arg2="sfdx"/>
+	</condition>
+
+	<condition property="tooling.mode.isMigrationTool" value="true" else="false">
+		<not>
+			<istrue value="${tooling.mode.isSfdx}" />
+		</not>
+	</condition>
+
+	<condition property="tooling.mode.folder" value="sfdx" else="migration-tool">
+		<istrue value="${tooling.mode.isSfdx}"/>
+	</condition>
+
+	<condition property="tooling.source.isSfdx" value="true" else="false">
+		<equals arg1="${tooling.source}" arg2="sfdx"/>
+	</condition>
+
+	<condition property="tooling.source.isHybrid" value="true" else="false">
+		<or>
+			<equals arg1="${tooling.source}" arg2="hybrid"/>
+			<and>
+				<not>
+					<istrue value="${tooling.source.isSfdx}" />
+				</not>
+				<not>
+					<equals arg1="${tooling.source}" arg2="md"/>
+				</not>
+				<istrue value="${tooling.enableSfdxObjects}" />
+			</and>
+		</or>
+	</condition>
+
+	<condition property="tooling.source.isMd" value="true" else="false">
+		<not>
+			<or>
+				<istrue value="${tooling.source.isSfdx}" />
+				<istrue value="${tooling.source.isHybrid}" />
+			</or>
+		</not>
+	</condition>
+
+	<!-- Deprecated: replaced by tooling.source.* properties -->
+	<condition property="tooling.sfdxObjects.enabled" value="true" else="false">
+		<or>
+			<istrue value="${tooling.source.isSfdx}" />
+			<istrue value="${tooling.source.isHybrid}" />
+		</or>
+	</condition>
+
+	<condition property="main.propertyMode" value="sfdx" else="md">
+		<istrue value="${tooling.source.isSfdx}" />
+	</condition>
+
+	<macrodef name="setModeSpecificPaths">
+		<attribute name="mode"   default="md" />
+		<attribute name="prefix" default=""   />
+		<sequential>
+			<property name="@{prefix}dir.sourceDir"               value="${dir.@{mode}.sourceDir}"               />
+			<property name="@{prefix}file.mainPackage"            value="${file.@{mode}.mainPackage}"            />
+			<property name="@{prefix}file.destructiveChangesPre"  value="${file.@{mode}.destructiveChangesPre}"  />
+			<property name="@{prefix}file.destructiveChangesPost" value="${file.@{mode}.destructiveChangesPost}" />
+			<property name="@{prefix}file.boilerplatePackage"     value="${file.@{mode}.boilerplatePackage}"     />
+		</sequential>
+	</macrodef>
+
+	<setModeSpecificPaths mode="${main.propertyMode}" />
+
+	<condition property="tooling.hooks.exist">
+		<available file="${dir.buildHooks}" type="dir" />
+	</condition>
+
+	<fileset dir="${dir.buildHooks}" casesensitive="yes" id="fileset.buildHooks">
+		<include name="**/*.xml" />
+	</fileset>
+
+	<pathconvert
+		refid      = "fileset.buildHooks"
+		property   = "fileset.buildHooks.hasFiles"
+		setonempty = "false"
+		if:true    = "${tooling.hooks.exist}" />
+
+	<!-- Setup environment: 
+		1) Check for property by name i.e. specified as command line parameter -Dsf_username
+		2) Check for property by environment variable
+		3) Check for property by environment variable for a given environment name with underscores i.e. -De=qa will get properties env.qa__sf_username, etc
+		4) Check for property by property file for a given environment name i.e. -De=qa will get properties qa.sf_username, qa.sf_password, etc
+		5) Apply defaults
+	-->
+	<scriptdef 
+		name        = "setupEnvironmentProperties" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/setupEnvironmentProperties.js" />
+
+	<setupEnvironmentProperties />
+
+</project>

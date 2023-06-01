@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-utils" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<macrodef name="copyNoOverride">
+		<attribute name="file" />
+		<attribute name="tofile" />
+
+		<sequential>
+			<!-- Copy will overwrite older files even with overwrite=false, to get around this we
+				 use granularity which is used to give leeway in determing whether a file is out
+				 of date - we just stick in a really high number and so the file will never get
+				 overwritten (well that's the theory) -->
+			<copy 
+				file        = "@{file}"
+				tofile      = "@{toFile}"
+				overwrite   = "false"
+				granularity = "9223372036854" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="openssl">
+		<attribute name="command" />
+		<attribute name="options"         default="" />
+		<attribute name="dir"             default="" />
+		<attribute name="failerror"       default="true" />
+		<attribute name="logError"        default="true" />
+		<attribute name="outputcommand"   default="false" />
+		<attribute name="outputproperty"  default="outputproperty" />
+		<attribute name="resultproperty"  default="resultproperty" />
+		<attribute name="errorproperty"   default="errorproperty" />
+		<element   name="args"            optional="true" />
+		<sequential>
+			<echo message="openssl @{command} @{options}" if:true="@{outputcommand}" />
+			<opensslCheck unless:true="${execCheck.openssl.disabled}" />
+			<exec 
+				executable     = "${file.exec.openssl}" 
+				dir            = "@{dir}" 
+				outputproperty = "@{outputproperty}" 
+				failonerror    = "@{failerror}" 
+				resultproperty = "@{resultproperty}" 
+				logError       = "@{logError}" 
+				errorproperty  = "@{errorproperty}">
+
+				<arg 
+					line       = "@{command} @{options}" />
+				<args />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="git">
+		<attribute name="command" />
+		<attribute name="options"         default="" />
+		<attribute name="dir"             default="" />
+		<attribute name="outputcommand"   default="false" />
+		<attribute name="failerror"       default="true" />
+		<attribute name="logerror"        default="true" />
+		<attribute name="outputproperty"  default="outputproperty" />
+		<attribute name="resultproperty"  default="resultproperty" />
+		<attribute name="errorproperty"   default="errorproperty" />
+		<element name="args" optional="true" />
+		<sequential>
+			<echo message="git @{command} @{options}" if:true="@{outputcommand}" />
+			<gitCheck failOnError="@{failerror}" unless:true="${execCheck.git.disabled}" />
+			<exec 
+				executable     = "${file.exec.git}" 
+				dir            = "@{dir}" 
+				outputproperty = "@{outputproperty}"
+				failonerror    = "@{failerror}"
+				resultproperty = "@{resultproperty}" 
+				logError       = "@{logerror}" 
+				errorproperty  = "@{errorproperty}">
+
+				<arg
+					line       = "@{command} @{options}" />
+				<args />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="resetSrcDir">
+		<attribute name="dir" />
+
+		<sequential>
+			<condition property="dir.exists">
+				<available file="@{dir}" type="dir"/>
+			</condition>
+
+			<resetSrcDirThatExists dir="@{dir}" if:true="${dir.exists}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="resetSrcDirThatExists">
+		<attribute name="dir" />
+
+		<sequential>
+			<echo>Resetting @{dir} directory...</echo>
+
+			<condition property="dangerous.dir">
+				<or>
+					<equals arg1="@{dir}" arg2="/" />
+					<equals arg1="@{dir}" arg2="." />
+					<equals arg1="@{dir}" arg2="./" />
+					<equals arg1="@{dir}" arg2=".." />
+					<equals arg1="@{dir}" arg2="../" />
+					<equals arg1="@{dir}" arg2="~" />
+					<equals arg1="@{dir}" arg2="~/" />
+				</or>
+			</condition>
+
+			<fail message="The directory you are trying to reset looks a bit risky!" if:true="${dangerous.dir}" />
+
+			<delete includeemptydirs="true">
+				<fileset dir="@{dir}">
+					<include name="**/*" />
+					<exclude name="package.xml" />
+					<exclude name="destructiveChanges.xml" />
+					<exclude name="destructiveChangesPre.xml" />
+					<exclude name="destructiveChangesPost.xml" />
+				</fileset>
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="deleteBakFiles">
+		<attribute name="directory" />
+
+		<sequential>
+			<delete if:true="${util.autoDeleteBakFiles}">
+				<fileset dir="@{directory}" includes="**/*.bak" erroronmissingdir="false"/>
+			</delete>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="subsituteVersion">
+		<attribute name="dir" />
+
+		<sequential>
+			<replace
+				dir         = "@{dir}"
+				token       = "[VERSION]" 
+				value       = "${sf.version}">
+				<include name="**"/>
+			</replace>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sfdx">
+		<attribute name="command" />
+		<attribute name="dir"               default="" />
+		<attribute name="outputcommand"     default="false" />
+		<attribute name="failerror"         default="true" />
+		<element   name="args"              optional="true" />
+		<sequential>
+			<echo message="sfdx @{command}" if:true="@{outputcommand}" />
+			<sfdxCheck unless:true="${execCheck.sfdx.disabled}" />
+			<exec 
+				executable     = "${file.exec.sfdx}" 
+				dir            = "@{dir}" 
+				failonerror    = "@{failerror}">
+				<arg line="@{command}" />
+				<arg line="--dev-debug" if:true="${sfdx.debug}" />
+				<args />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sfdxJson">
+		<attribute name="command" />
+		<attribute name="dir"               default="" />
+		<attribute name="outputcommand"     default="false" />
+		<attribute name="failerror"         default="true" />
+		<attribute name="outputproperty"    default="" />
+		<attribute name="errorcodeproperty" default="" />
+		<attribute name="errorproperty"     default="" />
+		<element   name="args"              optional="true" />
+		<sequential>
+			<echo message="sfdx @{command}" if:true="@{outputcommand}" />
+			<sfdxCheck unless:true="${execCheck.sfdx.disabled}" />
+			<exec 
+				executable     = "${file.exec.sfdx}" 
+				dir            = "@{dir}" 
+				failonerror    = "@{failerror}"
+				resultproperty = "@{errorcodeproperty}" 
+				outputproperty = "@{outputproperty}"
+				errorproperty  = "@{errorproperty}">
+				<arg line="@{command}" />
+				<args />
+				<arg line="--json" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sfdxCommandCheck">
+		<attribute name="command" />
+		<attribute name="successProperty" />
+		<sequential>
+			<local name="sfdx.command.result" />
+			<local name="sfdx.command.output" />
+			<local name="sfdx.command.error" />
+
+			<exec 
+				executable     = "${file.exec.sfdx}"
+				failonerror    = "false"
+				resultproperty = "sfdx.command.result"
+				outputproperty = "sfdx.command.output"
+				errorproperty  = "sfdx.command.error">
+				<arg line="@{command}" />
+				<arg line="--help" />
+			</exec>
+
+			<condition property="@{successProperty}" value="true" else="false">
+				<equals arg1="${sfdx.command.result}" arg2="0" />
+			</condition>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="execCheck">
+		<attribute name="exec" />
+		<attribute name="testArgs" />
+		<attribute name="successProperty" />
+		<sequential>
+			<local name="execCheck.result" />
+			<local name="execCheck.output" />
+			<local name="execCheck.error" />
+
+			<exec 
+				executable           = "@{exec}"
+				failonerror          = "false"
+				failifexecutionfails = "false"
+				resultproperty       = "execCheck.result"
+				outputproperty       = "execCheck.output"
+				errorproperty        = "execCheck.error">
+				<arg line="@{testArgs}" />
+			</exec>
+
+			<condition property="@{successProperty}" value="true" else="false">
+				<equals arg1="${execCheck.result}" arg2="0" />
+			</condition>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="nodeCheck">
+		<sequential>
+			<execCheck
+				exec            = "${file.exec.node}"
+				testArgs        = "-v"
+				successProperty = "util.nodeCheck.success"
+				unless:set      = "util.nodeCheck.success" />
+
+			<property
+				name  = "util.nodeCheck.message"
+				value = "NodeJS not found - download and install the latest LTS version from the website https://nodejs.org/en/download/" />
+
+			<fail message="${util.nodeCheck.message}" unless:true="${util.nodeCheck.success}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sfdxCheck">
+		<sequential>
+			<execCheck
+				exec            = "${file.exec.sfdx}"
+				testArgs        = "-v"
+				successProperty = "util.sfdxCheck.success"
+				unless:set      = "util.sfdxCheck.success" />
+
+			<property
+				name  = "util.sfdxCheck.message"
+				value = "SFDX not found - download and install the latest version from the website https://developer.salesforce.com/tools/sfdxcli" />
+
+			<fail message="${util.sfdxCheck.message}" unless:true="${util.sfdxCheck.success}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="opensslCheck">
+		<sequential>
+			<execCheck
+				exec            = "${file.exec.openssl}"
+				testArgs        = "version"
+				successProperty = "util.opensslCheck.success"
+				unless:set      = "util.opensslCheck.success" />
+
+			<property
+				name  = "util.opensslCheck.message"
+				value = "OpenSSL not found - download and install the latest version" />
+
+			<fail message="${util.opensslCheck.message}" unless:true="${util.opensslCheck.success}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="gitCheck">
+		<attribute name="failOnError" default="true" />
+		<sequential>
+			<local name="util.gitCheck.fail" />
+
+			<execCheck
+				exec            = "${file.exec.git}"
+				testArgs        = "version"
+				successProperty = "util.gitCheck.success"
+				unless:set      = "util.gitCheck.success" />
+
+			<condition property="util.gitCheck.fail" value="true" else="false">
+				<and>
+					<isfalse value="${util.gitCheck.success}" />
+					<istrue value="@{failOnError}" />
+				</and>
+			</condition>
+
+			<property
+				name  = "util.gitCheck.message"
+				value = "Git not found - install XCode command line tools on Mac / download and install the latest version from the website on Windows" />
+
+			<fail message="${util.gitCheck.message}"              if:true="${util.gitCheck.fail}"    />
+			<echo message="Warning: ${util.gitCheck.message}" unless:true="${util.gitCheck.success}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="vlocityCheck">
+		<sequential>
+			<execCheck
+				exec            = "${file.exec.vlocity}"
+				testArgs        = "--version"
+				successProperty = "util.vlocityCheck.success"
+				unless:set      = "util.vlocityCheck.success" />
+
+			<property
+				name  = "util.vlocityCheck.message"
+				value = "Vlocity build tool not found - see https://github.com/vlocityinc/vlocity_build for installation instructions" />
+
+			<fail message="${util.vlocityCheck.message}" unless:true="${util.vlocityCheck.success}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="getCachedSessionInfo">
+		<sequential>
+			<getSessionInfo unless:true="${utils.sessionInfoSet}" />
+			<property name="utils.sessionInfoSet" value="true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="node">
+		<attribute name="file" />
+		<attribute name="failerror" default="true" />
+		<element   name="nodeArgs"  optional="true" />
+		<sequential>
+			<local name="nodePropertyArgs" />
+
+			<importNode />
+
+			<nodeCheck unless:true="${execCheck.node.disabled}" />
+
+			<antPropertiesToNodeArgs prefix="node" type="node" property="nodePropertyArgs" />
+
+			<exec 
+				executable     = "${file.exec.node}" 
+				failonerror    = "@{failerror}"
+				logError       = "@{logerror}">
+				<arg value="@{file}" />
+				<nodeArgs />
+				<arg line="${nodePropertyArgs}" if:set="nodePropertyArgs" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="mpdx">
+		<attribute name="command" />
+		<attribute name="includeSession" default="false" />
+		<element   name="mpdxArgs"       optional="true" />
+		<sequential>
+			<local name="mdpxPropertyArgs" />
+
+			<importMpdx />
+
+			<getCachedSessionInfo if:true="@{includeSession}" />
+
+			<antPropertiesToNodeArgs prefix="node.mpdx" type="mpdx" property="mdpxPropertyArgs" />
+
+			<node file="${file.node.package.mpdx}">
+				<nodeArgs>
+					<arg line="@{command}" />
+					<mpdxArgs />
+					<arg line="--apiVersion  &quot;${sf.version}&quot;"                                   />
+					<arg line="--environment &quot;${sf_envName_lower}&quot;" if:set="sf_envName_lower"   />
+					<arg line="--sessionId   &quot;${sf_sessionId}&quot;"     if:true="@{includeSession}" />
+					<arg line="--instanceUrl &quot;${sf_instanceUrl}&quot;"   if:true="@{includeSession}" />
+					<arg line="${mdpxPropertyArgs}"                           if:set="mdpxPropertyArgs"   />
+				</nodeArgs>
+			</node>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="plugin">
+		<attribute name="name" />
+		<attribute name="includeSession" default="true"  />
+		<attribute name="args"           default=""      />
+		<element   name="pluginArgs"     optional="true" />
+		<sequential>
+			<local name="pluginPropertyArgs" />
+			<local name="pluginFilePropertyArgs" />
+
+			<property name="arg.node.mpdx.plugin.sourceDir"   value="${dir.sourceDir}"        />
+			<property name="arg.node.mpdx.plugin.deployDir"   value="${dir.tempDeployMain}"   />
+			<property name="arg.node.mpdx.plugin.retrieveDir" value="${dir.tempRetrieveMain}" />
+
+			<antPropertiesToNodeArgs prefix="node.mpdx.plugin"         type="plugin" property="pluginPropertyArgs"     />
+			<antPropertiesToNodeArgs prefix="node.mpdx.plugin.@{name}" type="plugin" property="pluginFilePropertyArgs" />
+
+			<mpdx command="plugin:run" includeSession="@{includeSession}">
+				<mpdxArgs>
+					<arg line="--file &quot;${dir.plugins}/@{name}.js&quot;" />
+					<arg line="@{args}" />
+					<pluginArgs />
+					<arg line="${pluginFilePropertyArgs}" if:set="pluginFilePropertyArgs" />
+					<arg line="${pluginPropertyArgs}"     if:set="pluginPropertyArgs"     />
+				</mpdxArgs>
+			</mpdx>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="mpdxScript">
+		<attribute name="name"                                 />
+		<attribute name="includeSession"       default="true"  />
+		<attribute name="includeScriptArgs"    default="false" />
+		<attribute name="resultPropertyPrefix" default="none"  />
+		<element   name="args"                 optional="true" />
+		<sequential>
+			<local name="scriptFilePropertyArgs" />
+			<local name="saveResults" />
+			<local name="resultsFile" />
+
+			<antPropertiesToNodeArgs prefix="node.mpdx.script.@{name}" type="plugin" property="scriptFilePropertyArgs" if:true="@{includeScriptArgs}" />
+
+			<mpdx command="plugin:run" includeSession="@{includeSession}">
+				<mpdxArgs>
+					<arg line="--hide-plugin-wrapper" />
+					<arg line="--file &quot;${dir.mpdxScripts}/@{name}.js&quot;" />
+					<args />
+					<arg line="${scriptFilePropertyArgs}" if:set="scriptFilePropertyArgs" />
+				</mpdxArgs>
+			</mpdx>
+
+			<property name="resultsFile" value="${dir.temp}/mpdx/@{name}.json" />
+
+			<condition property="saveResults">
+				<and>
+					<not>
+						<equals arg1="resultPropertyPrefix" arg2="none" />
+					</not>
+					<available file="${resultsFile}" />
+				</and>
+			</condition>
+
+			<loadMpdxScriptResults resultsFile="${resultsFile}" propertyPrefix="@{resultPropertyPrefix}" if:true="${saveResults}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="loadMpdxScriptResults">
+		<attribute name="resultsFile" />
+		<attribute name="propertyPrefix" />
+		<sequential>
+			<local name="resultsJson" />
+
+			<loadfile srcFile="@{resultsFile}" property="resultsJson" />
+
+			<jsonToProperties json="${resultsJson}" propertyprefix="@{propertyPrefix}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sobeit">
+		<attribute name="config" />
+		<attribute name="includeSession" default="true" />
+		<element   name="sobeitArgs"     optional="true" />
+		<sequential>
+			<local name="sobeitPropertyArgs" />
+
+			<antPropertiesToNodeArgs prefix="node.mpdx.sobeit" type="sobeit" property="sobeitPropertyArgs" />
+
+			<mpdx command="sobeit:run" includeSession="@{includeSession}">
+				<mpdxArgs>
+					<arg line="--config &quot;@{config}&quot;" />
+					<arg line="--dataDirectory &quot;${dir.sobeitData}&quot;" />
+					<sobeitArgs />
+					<arg line="${sobeitPropertyArgs}" if:set="sobeitPropertyArgs" />
+				</mpdxArgs>
+			</mpdx>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="openBrowser">
+		<attribute name="url" />
+		<sequential>
+			<openBrowserMac   url="@{url}" if:true="${os.isMac}"     />
+			<openBrowserWin   url="@{url}" if:true="${os.isWindows}" />
+			<openBrowserLinux url="@{url}" if:true="${os.isLinux}"   />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="openBrowserMac">
+		<attribute name="url" />
+		<sequential>
+			<exec executable="open">
+				<arg line="@{url}" />
+			</exec>
+			<echo>If your web browser didn't open - go to: @{url}</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="openBrowserWin">
+		<attribute name="url" />
+		<sequential>
+			<exec executable="cmd.exe">
+				<arg line="/c start @{url}" />
+			</exec>
+			<echo>If your web browser didn't open - go to: @{url}</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="openBrowserLinux">
+		<attribute name="url" />
+		<sequential>
+			<exec executable="xdg-open">
+				<arg line="@{url}" />
+			</exec>
+			<echo>If your web browser didn't open - go to: @{url}</echo>
+		</sequential>
+	</macrodef>
+
+	<scriptdef 
+		name        = "jsonKeyToProperty" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/jsonKeyToProperty.js">
+
+		<attribute name="json" />
+		<attribute name="key" />
+		<attribute name="property" />
+		<attribute name="hidewarnings" />
+	</scriptdef>
+
+	<scriptdef 
+		name        = "jsonToProperties" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/jsonToProperties.js">
+
+		<attribute name="json" />
+		<attribute name="propertyprefix" />
+	</scriptdef>
+
+	<scriptdef 
+		name        = "antPropertiesToNodeArgs" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/antPropertiesToNodeArgs.js">
+
+		<attribute name="prefix" />
+		<attribute name="type" />
+		<attribute name="property" />
+	</scriptdef>
+
+</project>

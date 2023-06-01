@@ -1,0 +1,17 @@
+<apex:page controller="ConfigInitializerController" contentType="text/xml" showHeader="false" sidebar="false">
+    <products skipConfiguration="{!skip}">
+    <apex:repeat var="product" value="{!products}">
+        <product id="{!product.Id}">
+            <apex:repeat var="opt" value="{!product.SBQQ__Options__r}">
+                <option id="{!opt.Id}" 
+                    selected="{!opt.SBQQ__Selected__c}" 
+                    quantity="{!ROUND(opt.SBQQ__Quantity__c, 2)}"
+                    QuantityEditable__c="false"
+                    QuoteLineVisbility__c="{!opt.SBQQ__QuoteLineVisibility__c}"
+                    ProductName__c="Test Name"
+                />
+            </apex:repeat>
+        </product>
+    </apex:repeat>
+    </products>
+</apex:page>

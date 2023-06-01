@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-auth" xmlns:if="ant:if" xmlns:unless="ant:unless">
+	
+	<macrodef name="login">
+		<sequential>
+			<sfdxLogin unless:set="sf_alias" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sfdxLogin">
+		<sequential>
+			<jwtLogin if:true="${sf_isAuthModeJwt}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="jwtLogin">
+		<sequential>
+			<property name="auth.alias" value="${tooling.sfdx.aliasPrefix}:jwt:${sf_envName}" />
+
+			<echo>Logging in via JWT. Creating alias: ${auth.alias}...</echo>
+			
+			<decryptSslKey 
+				in  = "${sf_keyFile}" 
+				out = "${sf_keyFile}.dec.key" 
+				k   = "${sf_decryptKey}" 
+				iv  = "${sf_decryptIV}" />
+
+			<sfdx 
+				command="force:auth:jwt:grant">
+				<args>
+					<arg line="--username=${sf_username}" />
+					<arg line="--jwtkeyfile=${sf_keyFile}.dec.key" />
+					<arg line="--clientid=${sf_clientId}" />
+					<arg line="--instanceurl=${sf_serverUrl}" />
+					<arg line="--setalias=${auth.alias}" />
+				</args>
+			</sfdx>
+
+			<property name="sf_alias" value="${auth.alias}" />
+
+			<setLogLevel level="1" />
+
+			<propertyfile file="build.properties.local">
+				<entry key="${sf_envName}.sf_alias" value="${auth.alias}" />
+			</propertyfile>
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="getSessionInfo">
+		<sequential>
+
+			<metricTimestamp name="sfdx-auth-get-session-start" />
+			
+			<validateEnvironmentProperties />
+
+			<login />
+
+			<sfdxJson 
+				command        = "force:org:display"
+				outputproperty = "auth.session">
+				<args>
+					<arg line="-u=${sf_alias}" />
+				</args>
+			</sfdxJson>
+
+			<jsonKeyToProperty
+				json           = "${auth.session}"
+				key            = "result.accessToken"
+				property       = "sf_sessionId" />
+
+			<jsonKeyToProperty
+				json           = "${auth.session}"
+				key            = "result.instanceUrl"
+				property       = "sf_instanceUrl" />
+
+			<metricTimestamp name="sfdx-auth-get-session-stop" />
+
+		</sequential>
+	</macrodef>
+
+</project>

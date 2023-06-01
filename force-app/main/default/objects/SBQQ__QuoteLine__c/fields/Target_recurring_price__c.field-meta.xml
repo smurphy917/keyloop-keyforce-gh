@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Target_recurring_price__c</fullName>
+    <externalId>false</externalId>
+    <formula>((SBQQ__ListTotal__c/SBQQ__Quote__r.List_Total_Recurring_Products__c) * ((SBQQ__Quote__r.List_Total_Recurring_Products__c - 
+ SBQQ__Quote__r.AdditionalDiscountTargetRecurring__c)/SBQQ__ListTotal__c)) * 100</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Target recurring price</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>12</scale>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

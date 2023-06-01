@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-list" xmlns:if="ant:if">
+
+	<macrodef name="listMetadataCommand">
+		<sequential>
+			<login />
+
+			<sfdxJson 
+				command           = "force:mdapi:listmetadata" 
+				outputproperty    = "list.metadataList" 
+				errorcodeproperty = "list.errorCode" 
+				errorproperty     = "list.error" 
+				failerror         = "false">
+
+				<args>
+					<arg line="--apiversion=${sf.version}" />
+					<arg line="--targetusername=${sf_alias}" />
+					<arg line="--metadatatype=${sf_metadataType}" />
+					<arg line="--folder=${sf_folder}" if:set="sf_folder" />
+				</args>
+			</sfdxJson>
+
+			<printListMetadata json="${list.metadataList}" />
+		</sequential>
+	</macrodef>
+
+	<scriptdef 
+		name        = "printListMetadata" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/printListMetadata.js">
+
+		<attribute name="json" />
+	</scriptdef>
+
+</project>

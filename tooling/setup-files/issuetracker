@@ -1,0 +1,7 @@
+# Integration with Issue Tracker
+#
+# (note that '\' need to be escaped).
+
+[issuetracker "makepositive Jira"]
+  regex = "([A-Z][A-Z0-9]{1,10})-(\\d+)"
+  url = "https://makepositive.atlassian.net/browse/$1-$2"

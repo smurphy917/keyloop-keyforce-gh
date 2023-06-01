@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SBQQ__LookupField__c</fullName>
+    <deprecated>false</deprecated>
+    <description>API Name of the custom field used in the query.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>API Name of the custom field used in the query.</inlineHelpText>
+    <label>Lookup Field</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>SBQQ__Category__c</fullName><default>false</default><label>SBQQ__Category__c</label></value>
+            <value><fullName>PriceList__r.Customer__c</fullName><default>false</default><label>PriceList__r.Customer__c</label></value>
+            <value><fullName>PriceList__r.Brand__c</fullName><default>false</default><label>PriceList__r.Brand__c</label></value>
+            <value><fullName>PriceList__r.OEM__c</fullName><default>false</default><label>PriceList__r.OEM__c</label></value>
+            <value><fullName>PriceList__r.Country__c</fullName><default>false</default><label>PriceList__r.Country__c</label></value>
+            <value><fullName>PriceList__r.Region__c</fullName><default>false</default><label>PriceList__r.Region__c</label></value>
+            <value><fullName>Product__c</fullName><default>false</default><label>Product__c</label></value>
+            <value><fullName>PriceListCountry__c</fullName><default>false</default><label>PriceListCountry__c</label></value>
+            <value><fullName>PriceListCustomer__c</fullName><default>false</default><label>PriceListCustomer__c</label></value>
+            <value><fullName>LowerBound__c</fullName><default>false</default><label>LowerBound__c</label></value>
+            <value><fullName>UpperBound__c</fullName><default>false</default><label>UpperBound__c</label></value>
+            <value><fullName>PriceType__c</fullName><default>false</default><label>PriceType__c</label></value>
+            <value><fullName>HighestTier__c</fullName><default>false</default><label>HighestTier__c</label></value>
+            <value><fullName>MandatoryFor__c</fullName><default>false</default><label>MandatoryFor__c</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

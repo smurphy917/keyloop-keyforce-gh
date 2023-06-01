@@ -1,0 +1,77 @@
+[
+  {
+    "target" : "repository",
+    "action" : {
+      "waitForExit" : true,
+      "showOutput" : false,
+      "type" : "sh",
+      "script" : "if [ \"$OS\" == \"Windows_NT\" ]\nthen\n\t.\/tooling\/scripts\/custom-actions\/open.sh\nelse\n\t\/bin\/bash -l .\/tooling\/scripts\/custom-actions\/open.sh\nfi"
+    },
+    "name" : "Project - Open Salesforce"
+  },
+  {
+    "name" : "Project - Reset and Clean Working Directory",
+    "target" : "repository",
+    "ui" : {
+      "title" : "Reset and Clean Working Directory",
+      "description" : "Are you sure you want to delete *ALL* local changes?",
+      "buttons" : [
+        {
+          "title" : "Yes",
+          "action" : {
+            "script" : "if [ \"$OS\" == \"Windows_NT\" ]\nthen\n\t.\/tooling\/scripts\/custom-actions\/resetAndCleanWorkingDirectory.sh\nelse\n\t\/bin\/bash -l .\/tooling\/scripts\/custom-actions\/resetAndCleanWorkingDirectory.sh\nfi",
+            "type" : "sh",
+            "showOutput" : false,
+            "waitForExit" : true
+          }
+        },
+        {
+          "title" : "Cancel",
+          "action" : {
+            "type" : "cancel"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name" : "Project - Retrieve",
+    "target" : "repository",
+    "action" : {
+      "waitForExit" : true,
+      "showOutput" : false,
+      "type" : "sh",
+      "script" : "if [ \"$OS\" == \"Windows_NT\" ]\nthen\n\t.\/tooling\/scripts\/custom-actions\/retrieve.sh\nelse\n\t\/bin\/bash -l .\/tooling\/scripts\/custom-actions\/retrieve.sh\nfi"
+    }
+  },
+  {
+    "name" : "Project - Post Retrieve",
+    "target" : "repository",
+    "action" : {
+      "waitForExit" : true,
+      "showOutput" : false,
+      "type" : "sh",
+      "script" : "if [ \"$OS\" == \"Windows_NT\" ]\nthen\n\t.\/tooling\/scripts\/custom-actions\/postRetrieve.sh\nelse\n\t\/bin\/bash -l .\/tooling\/scripts\/custom-actions\/postRetrieve.sh\nfi"
+    }
+  },
+  {
+    "name" : "Project - Export Configuration Data",
+    "target" : "repository",
+    "action" : {
+      "waitForExit" : true,
+      "showOutput" : false,
+      "type" : "sh",
+      "script" : "if [ \"$OS\" == \"Windows_NT\" ]\nthen\n\t.\/tooling\/scripts\/custom-actions\/dataExport.sh\nelse\n\t\/bin\/bash -l .\/tooling\/scripts\/custom-actions\/dataExport.sh\nfi"
+    }
+  },
+  {
+    "name" : "Project - Setup connection to Salesforce",
+    "target" : "repository",
+    "action" : {
+      "showOutput" : false,
+      "type" : "sh",
+      "script" : "if [ \"$OS\" == \"Windows_NT\" ]\nthen\n\t.\/tooling\/scripts\/custom-actions\/configure.sh -d\nelse\n\t\/bin\/bash -l .\/tooling\/scripts\/custom-actions\/configure.sh -d\nfi",
+      "waitForExit" : true
+    }
+  }
+]

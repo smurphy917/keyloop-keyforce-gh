@@ -1,0 +1,41 @@
+name: Template Deployment
+
+on:
+  workflow_call:
+    inputs:
+      environment: 
+        required: true
+        type: string
+    secrets:
+      SF_DECRYPTKEY:
+        required: true
+      SF_DECRYPTIV:
+        required: true
+
+jobs:
+
+  deployment:
+    name: Deployment
+  
+    runs-on: ubuntu-latest
+
+    environment: ${{ inputs.environment }}
+    
+    container:
+      image: makepositive/sfdx-ant:latest
+      env:
+        SF_DECRYPTKEY: ${{ secrets.SF_DECRYPTKEY }}
+        SF_DECRYPTIV: ${{ secrets.SF_DECRYPTIV }}
+        SF_ENVNAME: ${{ inputs.environment }}
+        SF_AUTHMODE: jwt
+        SF_CHECKONLY: false
+
+    steps:
+      - name: Work around Git permission issue
+        run: git config --global --add safe.directory /__w/keyloop-lead-to-cash/keyloop-lead-to-cash
+      # See https://github.com/actions/checkout/issues/760 TODO: read whole thread to see if there is an updated workaround/fix
+
+      - uses: actions/checkout@v3
+
+      - name: Deploy
+        run: ant deploy

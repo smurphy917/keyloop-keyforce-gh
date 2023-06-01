@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-help" xmlns:if="ant:if">
+
+	<target name="help">
+		<openBrowser url="${dir.toolingBase}/docs/index.html" />
+	</target>
+
+</project>

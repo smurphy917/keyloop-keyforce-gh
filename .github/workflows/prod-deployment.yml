@@ -1,0 +1,13 @@
+name: Production Deployment
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+
+  PROD:
+    uses: ./.github/workflows/template-deployment.yml
+    with:
+      environment: PROD
+    secrets: inherit

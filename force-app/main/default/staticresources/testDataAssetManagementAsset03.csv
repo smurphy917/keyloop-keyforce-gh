@@ -1,0 +1,3 @@
+Id,Product2Id,AccountId,Name,HasLifecycleManagement,ParentId,RootAssetId,Aggregate_Asset__c,LifecycleStartDate,LifecycleEndDate,CurrentQuantity,CurrentAmount,CurrentMrr,Revision__c,SBQQ__ChargeType__c,SBQQ__BillingType__c,Status
+AS2,C1,A2,APEX TEST - Child Item 1,true,AS1,AS1,ASA2,2024-01-01T00:00:00Z,2026-12-31T23:59:59Z,1,800,8.33,1,One-Time,,Installed
+AS3,C2,A2,APEX TEST - Child Item 2,true,AS1,AS1,ASA3,2024-01-01T00:00:00Z,2026-12-31T23:59:59Z,1,400,0,1,Recurring,Advance,Installed

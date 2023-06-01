@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>CPQ User</label>
+    <permissionSets>API_Access</permissionSets>
+    <permissionSets>Custom_Salesforce_CPQ_User</permissionSets>
+    <permissionSets>Product_Data_Read_Access</permissionSets>
+    <permissionSets>SBQQ__SalesforceCPQUserAccess</permissionSets>
+    <permissionSets>SBQQ__SteelBrickCPQUser</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

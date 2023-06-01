@@ -1,0 +1,64 @@
+Referenced Packages
+.project
+salesforce.schema
+.settings/com.salesforce.ide.core.prefs
+*.bak
+*.orig
+*.sublime-project
+*.sublime-settings
+*.sublime-workspace
+temp
+
+# Build
+*.properties.local
+buildfile*.zip
+public.pem
+public.pem.base64
+signature
+signature.sha256
+tooling.zip
+*.key
+
+# Salesforce cache
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
+
+# LWC VSCode autocomplete
+**/lwc/jsconfig.json
+
+# LWC Jest coverage reports
+coverage/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# Eslint cache
+.eslintcache
+
+# OS
+__MACOSX
+.DS_Store
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Local environment variables
+.env
+
+
+# Tooling Install
+
+# Local scripts
+scripts

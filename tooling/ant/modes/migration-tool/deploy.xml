@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-deploy" xmlns:sf="antlib:com.salesforce">
+	
+	<macrodef name="deployCommand">
+		<attribute name="checkOnly" />
+		<attribute name="src" />
+		<attribute name="zip" />
+		<attribute name="ignoreWarnings" />
+
+		<sequential>
+			<importSalesforceLibrary />
+
+			<condition property="deploy.runSpecifiedTests" value="true" else="false">
+				<equals arg1="${sf_testLevel}" arg2="RunSpecifiedTests" />
+			</condition>
+
+			<fail if="${deploy.runSpecifiedTests}">
+				Run specified tests not supported by migration-tool mode (recommend using SFDX mode for this feature)
+			</fail>
+
+			<zip destfile="@{zip}" basedir="@{src}" includes="*.*, **/*.*" />
+
+			<sf:deploy 
+				username        = "${sf_username}"
+				password        = "${sf_password}${sf_token}"
+				serverurl       = "${sf_serverUrl}" 
+				maxPoll         = "${deploy.maxPoll}" 
+				pollWaitMillis  = "${deploy.pollWaitMillis}"
+				zipFile         = "@{zip}"
+				testLevel       = "${sf_testLevel}"
+				checkOnly       = "@{checkOnly}"
+				ignoreWarnings  = "@{ignoreWarnings}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="quickDeployCommand">
+		<sequential>
+			<importSalesforceLibrary />
+
+			<sf:deployRecentValidation 
+				username           = "${sf_username}"
+				password           = "${sf_password}${sf_token}"
+				serverurl          = "${sf_serverUrl}" 
+				maxPoll            = "${deploy.maxPoll}" 
+				pollWaitMillis     = "${deploy.pollWaitMillis}"
+				recentValidationId = "${deploy.lastDeployId}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setLastDeployId">
+		<sequential>
+			<importAntContribLibrary />
+
+			<loadfile srcFile="${dir.logs}/deploy.txt" property="deploy.log"> 
+				<filterchain>
+					<tokenfilter>
+						<stringtokenizer suppressdelims="true" />
+						<containsregex pattern="0Af[a-zA-Z0-9]{15}" />
+					</tokenfilter>
+				</filterchain> 
+			</loadfile>
+
+			<propertyregex
+				property   = "deploy.lastDeployId.updated"
+				input      = "${deploy.log}"
+				regexp     = "(0Af[a-zA-Z0-9]{15})"
+				select     = "\1"
+				global     = "false" />
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-resources" xmlns:if="ant:if">
+
+	<macrodef name="unpackStaticResources">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<attribute name="resetDir"  default="true" />
+		<sequential>
+			<setLogLevel level="1" />
+
+			<echo>============================================</echo>
+			<echo>Unpack static resources...</echo>
+			<echo>============================================</echo>
+
+			<importAntContribLibrary />
+
+			<condition property="resources.staticresources.exist">
+				<available file="@{sourceDir}/staticresources" type="dir"/>
+			</condition>
+
+			<condition property="resources.unpack.resetRequired">
+				<and>
+					<istrue value="@{resetDir}" />
+					<available file="${dir.resourceBundles}" type="dir" />
+					<istrue value="${resources.unpack.resetResourceBundlesDirectory}" />
+				</and>
+			</condition>
+
+			<resetSrcDir 
+				dir        = "${dir.resourceBundles}" 
+				if:true    = "${resources.unpack.resetRequired}" />
+
+			<foreach 
+				target     = "unpackStaticResource" 
+				param      = "metaFile" 
+				inheritall = "true"
+				parallel   = "true"
+				if:true    = "${resources.staticresources.exist}">
+
+				<path>
+					<fileset 
+						dir            = "@{sourceDir}/staticresources" 
+						casesensitive  = "yes" 
+						includes       = "*.resource-meta.xml" />
+				</path>
+			</foreach>
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="packStaticResources">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<sequential>
+			<setLogLevel level="1" />
+
+			<echo>============================================</echo>
+			<echo>Pack static resources...</echo>
+			<echo>============================================</echo>
+
+			<importAntContribLibrary />
+			
+			<condition property="resources.resourceBundles.exist">
+				<available file="${dir.resourceBundles}" type="dir"/>
+			</condition>
+
+			<property name="resources.packSourceDir" value="@{sourceDir}" />
+
+			<foreach 
+				target     = "packStaticResource" 
+				param      = "staticResourceFile"
+				inheritall = "true" 
+				parallel   = "true"
+				if:true    = "${resources.resourceBundles.exist}">
+
+				<path>
+					<dirset 
+						dir            = "${dir.resourceBundles}" 
+						casesensitive  = "yes"
+						includes       = "*" />
+				</path>
+			</foreach>
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<target name="unpackStaticResource">
+		<if>
+			<resourcecontains resource="${metaFile}" substring="application/zip"/>
+			
+			<then>
+				<setLogLevel level="1" />
+
+				<propertyregex
+					property   = "staticResourceFile"
+					input      = "${metaFile}"
+					regexp     = "-meta.xml"
+					replace    = ""
+					global     = "false" />
+
+				<basename 
+					property   = "staticResourceFilename" 
+					file       = "${staticResourceFile}" />
+
+				<if>
+					<available file="${staticResourceFile}" />
+					
+					<then>
+						<echo>Unpacking ${staticResourceFilename}...</echo>
+
+						<unzip 
+							src        = "${staticResourceFile}" 
+							dest       = "${dir.resourceBundles}/${staticResourceFilename}" />
+
+						<delete
+							file       = "${staticResourceFile}"
+							if:true    = "${resources.unpack.removeStaticResource}" />
+					</then>
+				</if>
+
+				<setLogLevel level="2" />
+			</then>
+		</if>
+	</target>
+
+	<target name="packStaticResource">
+		<setLogLevel level="1" />
+
+		<basename 
+			property    = "staticResourceFilename" 
+			file        = "${staticResourceFile}" />
+
+		<echo>Packing ${staticResourceFilename}...</echo>
+
+		<delete
+			file        = "${staticResourceFile}"
+			failonerror = "false" />
+
+		<zip 
+			basedir     = "${staticResourceFile}" 
+			destfile    = "${resources.packSourceDir}/staticresources/${staticResourceFilename}" />
+
+		<setLogLevel level="2" />
+	</target>
+
+</project>

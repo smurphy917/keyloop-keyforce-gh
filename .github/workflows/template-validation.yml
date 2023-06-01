@@ -1,0 +1,35 @@
+name: Template Validation
+
+on:
+  workflow_call:
+    inputs:
+      environment: 
+        required: true
+        type: string
+    secrets:
+      SF_DECRYPTKEY:
+        required: true
+      SF_DECRYPTIV:
+        required: true
+
+jobs:
+
+  validation:
+    name: Validation
+  
+    runs-on: ubuntu-latest
+    
+    container:
+      image: makepositive/sfdx-ant:latest
+      env:
+        SF_DECRYPTKEY: ${{ secrets.SF_DECRYPTKEY }}
+        SF_DECRYPTIV: ${{ secrets.SF_DECRYPTIV }}
+        SF_ENVNAME: ${{ inputs.environment }}
+        SF_AUTHMODE: jwt
+        CHECKBRANCH: false
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Validate
+        run: ant test

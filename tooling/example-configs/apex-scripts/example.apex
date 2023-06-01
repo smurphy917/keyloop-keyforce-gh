@@ -1,0 +1,1 @@
+system.debug('I am an Apex script! By the way, I can use properties from the tooling e.g. sf_username is ${sf_username}.');

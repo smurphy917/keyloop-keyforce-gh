@@ -1,0 +1,2 @@
+Id,Asset__c,SBQQ__Quote__c,SBQQ__Product__c,SBQQ__Quantity__c,SBQQ__PriorQuantity__c,InternalId__c,SBQQ__StartDate__c,SBQQ__EndDate__c,SBQQ__PricebookEntryId__c,CurrencyIsoCode
+QLI1,AS1,Q02,B1,2,1,ASP1,2024-01-01,2024-12-31,PBE1,GBP

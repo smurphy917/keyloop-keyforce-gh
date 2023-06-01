@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-plugin">
+
+	<target name="plugin">
+		<echo>=========================================</echo>
+		<echo>Running plugin ${name}...</echo>
+		<echo>=========================================</echo>
+
+		<metricTimestamp name="plugin-start" />
+
+		<hook target="hook-plugin-pre" />
+
+		<condition property="plugin.includeSession" value="true" else="false">
+			<and>
+				<isset property="e" />
+				<not>
+					<istrue value="${nosession}" />
+				</not>
+			</and>
+		</condition>
+
+		<plugin name="${name}" includeSession="${plugin.includeSession}" />
+
+		<hook target="hook-plugin-post" />
+
+		<metricTimestamp name="plugin-stop" />
+	</target>
+
+</project>

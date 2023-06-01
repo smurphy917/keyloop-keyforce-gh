@@ -1,0 +1,1 @@
+module.exports = ({ data }) => data.replace(/\r\n|\r/g, '\n');

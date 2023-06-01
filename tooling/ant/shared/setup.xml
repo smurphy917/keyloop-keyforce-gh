@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-setup" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<target name="setup">
+		<echo>=========================================</echo>
+		<echo>Initial Tooling User Setup...</echo>
+		<echo>=========================================</echo>
+
+		<echo />
+		<echo>The following prompts will guide you through first time user setup.</echo>
+		<echo />
+		<echo>Suggested defaults will be presented in [square brackets], press return to accept default value.</echo>
+		<echo />
+
+		<setup />
+	</target>
+
+	<target name="configure">
+		<echo>=========================================</echo>
+		<echo>Configure Salesforce Connection...</echo>
+		<echo>=========================================</echo>
+
+		<echo />
+		<echo>The following prompts will guide you through connecting the tooling to a Salesforce Org.</echo>
+		<echo />
+		<echo>Suggested defaults will be presented in [square brackets], press return to accept default value.</echo>
+		<echo />
+
+		<configure />
+	</target>
+
+	<macrodef name="setup">
+		<sequential>
+			<hook target="hook-setup-pre" />
+
+			<setLogLevel level="1" />
+
+			<createBuildPropertiesLocal />
+
+			<setLogLevel level="2" />
+
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>First time user setup complete</echo>
+			<echo />
+
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Would you like to configure a connection to a Salesforce Org?</echo>
+			<echo />
+			<echo>This will guide you in authenticating the tooling with Salesforce.</echo>
+			<echo>You'll usually want to proceed. If not, you can configure an environment later by running `ant configure`.</echo>
+			<echo />
+
+			<input 
+				message      = "Configure connection? (press return for yes)" 
+				addproperty  = "setup.configureEnvironmentYN" 
+				validargs    = "y,n" 
+				defaultvalue = "y"
+				unless:set   = "setup.configureEnvironment" />
+
+			<condition property="setup.configureEnvironment">
+				<equals 
+					arg1            = "${setup.configureEnvironmentYN}" 
+					arg2            = "y" 
+					casesensitive   = "false" />
+			</condition>
+			
+			<configure if:true="${setup.configureEnvironment}" />
+
+			<hook target="hook-setup-post" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="configure">
+		<sequential>
+			<hook target="hook-configure-pre" />
+
+			<environmentNamePrompt />
+			<environmentCredentialPrompt />
+			<buildPropertiesSavedNotice />
+
+			<hook target="hook-configure-post" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="environmentNamePrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>What is the name of this environment?</echo>
+			<echo />
+			<echo>The tooling can be configured to connect to multiple environments.</echo>
+			<echo>This name will be used to reference the environment in commands e.g. `ant retrieve -De={environment-name}`</echo>
+			<echo />
+			<echo>Recommended environment name</echo>
+			<echo> - Production : Use 'prod'</echo>
+			<echo> - Sandbox    : Use Sandbox Name, this is visible in the URL - https://[My-Domain]--[** Sandbox-Name **].lightning.force.com</echo>
+			<echo />
+
+			<input 
+				message      = "Environment name (press return to accept default):" 
+				addproperty  = "setup.envName" 
+				defaultvalue = "config"
+				unless:set   = "setup.envName" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="serverUrlPrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Salesforce Server URL</echo>
+			<echo />
+			<echo> - Sandboxes               : https://test.salesforce.com  - ** Default **</echo>
+			<echo> - Production and Dev Orgs : https://login.salesforce.com</echo>
+			<echo />
+
+			<input 
+				message      = "Salesforce Server URL (press return to accept default):" 
+				addproperty  = "setup.serverUrl" 
+				defaultvalue = "https://test.salesforce.com"
+				unless:set   = "setup.serverUrl" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="defaultEnvironmentPrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Should this be set as the default tooling environment?</echo>
+			<echo />
+			<echo>If yes, tooling commands e.g. `ant retrieve` will auto connect to this Salesforce Org without the need to specify `-De={environment-name}`.</echo>
+			<echo />
+			<echo>If this is the only environment or most common environment being used - setting as default is recommended.</echo>
+			<echo />
+			<echo>** Avoid setting production environments as default - it's a bit risky **</echo>
+			<echo />
+
+			<input 
+				message      = "Set as default environment? (press return to accept default)" 
+				addproperty  = "setup.setDefaultYN" 
+				validargs    = "y,n" 
+				defaultvalue = "y"
+				unless:set   = "setup.setDefault" />
+
+			<condition property="setup.setDefault">
+				<equals 
+					arg1            = "${setup.setDefaultYN}" 
+					arg2            = "y" 
+					casesensitive   = "false" />
+			</condition>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="buildPropertiesSavedNotice">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Environment configuration saved</echo>
+			<echo />
+			<echo>Additional environments can be added by running `ant configure` or manually updating build.properties.local</echo>
+			<echo />
+		</sequential>
+	</macrodef>
+
+</project>

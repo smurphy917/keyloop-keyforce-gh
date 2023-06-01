@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Availability__c</fullName>
+    <externalId>false</externalId>
+    <label>Availability</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>New Sales</fullName><default>true</default><label>New Sales</label></value>
+            <value><fullName>Amendments Only</fullName><default>false</default><label>Amendments Only</label></value>
+            <value><fullName>Renewals Only</fullName><default>false</default><label>Renewals Only</label></value>
+            <value><fullName>Not Available</fullName><default>false</default><label>Not Available</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

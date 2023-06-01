@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-deploy" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<target name="test">
+		<validateEnvironmentProperties />
+		<validateBranch if:true="${deploy.branchCheck.enabled}" />
+		<deployMain
+			checkOnly       = "true"
+			hookName        = "main-test" />
+	</target>
+
+	<target name="deploy">
+		<validateEnvironmentProperties />
+		<validateBranch if:true="${deploy.branchCheck.enabled}" />
+		<deployMain
+			checkOnly       = "${sf_checkOnly}"
+			hookName        = "main-deploy" />
+	</target>
+
+	<target name="quickDeploy">
+		<metricTimestamp name="deploy-quick-deploy-start" />
+		
+		<validateEnvironmentProperties />
+
+		<hook target="hook-quick-deploy-pre" />
+
+		<quickDeploy />
+
+		<postDeploySteps />
+
+		<!--
+			Warning: This hook intentionally does not get called on deploy, you probably want
+			to hook into postDeploySteps instead!
+		-->
+		<hook target="hook-quick-deploy-post" />
+		
+		<metricTimestamp name="deploy-quick-deploy-stop" />
+	</target>
+
+	<target name="preDeploySteps">
+		<preDeploySteps />
+	</target>
+
+	<target name="postDeploySteps">
+		<postDeploySteps />
+	</target>
+
+	<macrodef name="deployMain">
+		<attribute name="checkOnly" />
+		<attribute name="hookName" />
+
+		<sequential>
+			<metricTimestamp name="deploy-deploy-@{hookName}-start" />
+			
+			<hook target="hook-deploy-@{hookName}-pre" />
+
+			<preDeploySteps />
+
+			<mkdir 
+				dir             = "${dir.logs}"
+				if:true         = "${deploy.enableSaveBuildState}" />
+
+			<record 
+				name            = "${dir.logs}/deploy.txt" 
+				action          = "start" 
+				if:true         = "${deploy.enableSaveBuildState}" />
+
+			<deploy 
+				type            = "Main Package" 
+				checkOnly       = "@{checkOnly}" 
+				hookName        = "@{hookName}" 
+				src             = "${dir.tempDeployMain}" 
+				zip             = "${file.mainZip}" 
+				ignoreWarnings  = "${deploy.mainIgnoreWarnings}" />
+
+			<record 
+				name            = "${dir.logs}/deploy.txt" 
+				action          = "stop" 
+				if:true         = "${deploy.enableSaveBuildState}" />
+
+			<saveBuildState 
+				if:true         = "${deploy.enableSaveBuildState}" />
+
+			<postDeploySteps
+				unless:true     = "@{checkOnly}" />
+
+			<!--
+				Warning: This hook intentionally does not get called on quickDeploy, you probably want
+				to hook into postDeploySteps instead!
+			-->
+			<hook target="hook-deploy-@{hookName}-post" />
+			
+			<metricTimestamp name="deploy-deploy-@{hookName}-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="preDeploySteps">
+		<sequential>
+			<metricTimestamp name="deploy-pre-deploy-steps-start" />
+			
+			<hook target="hook-pre-deploy-steps-pre" />
+
+			<checkAndConvertToolingSourceToMd sourceDir="${dir.sourceDir}" targetDir="${dir.tempDeployMain}" />
+
+			<applyDeployModifications if:true="${deploy.enableMetadataModifications}" />
+
+			<missingProfileHandler />
+
+			<runApexScriptsPre
+				if:true         = "${deploy.enableApexScriptsPre}" />
+
+			<hook target="hook-pre-deploy-steps-post" />
+			
+			<metricTimestamp name="deploy-pre-deploy-steps-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="postDeploySteps">
+		<sequential>
+			<hook target="hook-post-deploy-steps-pre" />
+
+			<postDeployScripts />
+			<postDeployImport />
+
+			<hook target="hook-post-deploy-steps-post" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="postDeployScripts">
+		<sequential>
+			<metricTimestamp name="deploy-post-deploy-steps-start" />
+			
+			<hook target="hook-post-deploy-scripts-pre" />
+
+			<runApexScriptsPost
+				if:true         = "${deploy.enableApexScriptsPost}" />
+
+			<hook target="hook-post-deploy-scripts-post" />
+
+			<metricTimestamp name="deploy-post-deploy-steps-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="postDeployImport">
+		<sequential>
+			<metricTimestamp name="deploy-post-deploy-import-start" />
+
+			<hook target="hook-post-deploy-import-pre" />
+
+			<sobeitImport    if:true="${deploy.enableDataImport}" />
+
+			<hook target="hook-post-deploy-import-post" />
+			
+			<metricTimestamp name="deploy-post-deploy-import-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="deploy">
+		<attribute name="type" />
+		<attribute name="checkOnly" />
+		<attribute name="hookName" />
+		<attribute name="src" />
+		<attribute name="zip" />
+		<attribute name="ignoreWarnings" />
+
+		<sequential>
+			<echo>=========================================</echo>
+			<echo unless:true="@{checkOnly}">Deploying @{type}...</echo>
+			<echo if:true="@{checkOnly}">Validating @{type}...</echo>
+			<echo>=========================================</echo>
+
+			<echo>Environment:  ${sf_envName}</echo>
+			<echo>Username:     ${sf_username}</echo>
+			<echo>Check Only:   @{checkOnly}</echo>
+			<echo>Test Level:   ${sf_testLevel}</echo>
+			
+			<metricTimestamp name="deploy-@{hookName}-sf-start" />
+			
+			<hook target="hook-deploy-@{hookName}-sf-pre" />
+			
+			<deployCommand 
+				src            = "@{src}"
+				zip            = "@{zip}" 
+				checkOnly      = "@{checkOnly}" 
+				ignoreWarnings = "@{ignoreWarnings}" />
+
+			<hook target="hook-deploy-@{hookName}-sf-post" />
+			
+			<metricTimestamp name="deploy-@{hookName}-sf-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="quickDeploy">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>Quick Deploy</echo>
+			<echo>=========================================</echo>
+
+			<echo>Environment:  ${sf_envName}</echo>
+			<echo>Username:     ${sf_username}</echo>
+			<echo>ID:           ${deploy.lastDeployId}</echo>
+
+			<metricTimestamp name="deploy-quick-deploy-@{hookName}-sf-start" />
+
+			<hook target="hook-quick-deploy-sf-pre" />
+
+			<quickDeployCommand />
+
+			<hook target="hook-quick-deploy-sf-post" />
+			
+			<metricTimestamp name="deploy-quick-deploy-@{hookName}-sf-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="validateBranch">
+		<sequential>
+			<setupBranchProperties />
+
+			<condition property="deploy.branchCheck.matches">
+				<matches pattern="^${deploy.branchCheck.allowedBranch}$" string="${git.currentBranch}"/>
+			</condition>
+
+			<fail unless="${deploy.branchCheck.matches}">
+Branch check failed!
+
+Branch ${git.currentBranch} does not match pattern ${deploy.branchCheck.allowedBranch}.
+			</fail>
+
+			<echo>Branch check passed: ${git.currentBranch} matches pattern ${deploy.branchCheck.allowedBranch}</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="saveBuildState">
+		<sequential>
+			<setLogLevel level="1" />
+
+			<setLastDeployId />
+
+			<echo>Saving build state...</echo>
+			<propertyfile file="build-state.properties.local">
+				<entry 
+					key     = "deploy.lastDeployId"
+					value   = "${deploy.lastDeployId.updated}" />
+			</propertyfile>
+
+			<property 
+				name           = "deploy.lastDeployId" 
+				value          = "${deploy.lastDeployId.updated}" />
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+	
+</project>

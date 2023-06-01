@@ -1,0 +1,126 @@
+[
+	{
+		"reference": "profiles",
+		"description": "Compress profiles",
+		"patterns": [
+			"**/*.profile-meta.xml",
+			"**/*.profile"
+		]
+	},
+	{
+		"reference": "permissionsets",
+		"description": "Compress permission sets",
+		"patterns": [
+			"**/*.permissionset-meta.xml",
+			"**/*.permissionset"
+		]
+	},
+	{
+		"reference": "mutingpermissionsets",
+		"description": "Compress muting permission sets",
+		"patterns": [
+			"**/*.mutingpermissionset-meta.xml",
+			"**/*.mutingpermissionset"
+		]
+	},
+	{
+		"reference": "layouts",
+		"description": "Compress layout items and buttons",
+		"patterns": [
+			"**/*.layout-meta.xml",
+			"**/*.layout"
+		],
+		"tags": [
+			"layoutItems",
+			"platformActionListItems"
+		]
+	},
+	{
+		"reference": "globalValueSets",
+		"description": "Compress global picklists",
+		"patterns": [
+			"**/*.globalValueSet-meta.xml",
+			"**/*.globalValueSet"
+		],
+		"tags": [
+			"customValue"
+		]
+	},
+	{
+		"reference": "standardValueSets",
+		"description": "Compress standard picklists",
+		"patterns": [
+			"**/*.standardValueSet-meta.xml",
+			"**/*.standardValueSet"
+		],
+		"tags": [
+			"standardValue"
+		]
+	},
+	{
+		"reference": "quickActions",
+		"description": "Compress quick action layout items",
+		"patterns": [
+			"**/*.quickAction-meta.xml",
+			"**/*.quickAction"
+		],
+		"tags": [
+			"quickActionLayoutItems"
+		]
+	},
+	{
+		"reference": "objects",
+		"description": "Compress object picklists and field sets",
+		"patterns": [
+			"**/*.object"
+		],
+		"tags": [
+			"value",
+			"values",
+			"availableFields",
+			"displayedFields"
+		]
+	},
+	{
+		"reference": "fields",
+		"description": "Compress field picklists",
+		"patterns": [
+			"**/*.field-meta.xml"
+		],
+		"tags": [
+			"value"
+		]
+	},
+	{
+		"reference": "recordTypes",
+		"description": "Compress recordtype picklists",
+		"patterns": [
+			"**/*.recordType-meta.xml"
+		],
+		"tags": [
+			"values"
+		]
+	},
+	{
+		"reference": "fieldSets",
+		"description": "Compress field sets",
+		"patterns": [
+			"**/*.fieldSet-meta.xml"
+		],
+		"tags": [
+			"availableFields",
+			"displayedFields"
+		]
+	},
+	{
+		"reference": "applications",
+		"description": "Compress application actions",
+		"patterns": [
+			"**/*.app",
+			"**/*.app-meta.xml"
+		],
+		"tags": [
+			"profileActionOverrides"
+		]
+	}
+]

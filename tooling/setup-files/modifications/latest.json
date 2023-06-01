@@ -1,0 +1,113 @@
+{
+	"groups": {
+		"deploy": [
+			{
+				"reference": "addLayoutSortOrder"
+			}
+		],
+		"retrieve": [
+			{
+				"config": {
+					"objects": {
+						"Location": [
+							"All_Locations",
+							"My_Locations"
+						],
+						"ServiceAppointment": [
+							"All_ServiceAppointments",
+							"My_ServiceAppointments"
+						],
+						"ServiceResource": [
+							"All_ServiceResources",
+							"My_ServiceResources"
+						],
+						"ServiceTerritory": [
+							"All_ServiceTerritories",
+							"My_ServiceTerritories"
+						],
+						"WorkOrder": [
+							"All_WorkOrders",
+							"My_WorkOrders"
+						],
+						"WorkType": [
+							"All_WorkTypes",
+							"My_WorkTypes"
+						]
+					}
+				},
+				"reference": "removeListViews"
+			},
+			{
+				"config": {
+					"regex": "standard__LightningInstrumentation"
+				},
+				"reference": "removeStandardApps"
+			},
+			{
+				"reference": "removeObjectLevelFieldHistoryTracking"
+			},
+			{
+				"reference": "removeObjectLevelFeedHistoryTracking"
+			},
+			{
+				"reference": "removeFieldLevelFieldHistoryTracking"
+			},
+			{
+				"reference": "removeFieldLevelFeedHistoryTracking"
+			},
+			{
+				"reference": "removeLayoutSortOrder"
+			},
+			{
+				"config": {
+					"userPermissions": [
+						"EditBillingInfo",
+						"ManageSandboxes"
+					]
+				},
+				"reference": "removePermissionSetUserPermissions"
+			},
+			{
+				"config": {
+					"userPermissions": [
+						"EditBillingInfo",
+						"ManageSandboxes"
+					]
+				},
+				"reference": "removeProfileUserPermissions"
+			},
+			{
+				"config": {
+					"layouts": [
+						"SocialPost-Social Post Layout"
+					]
+				},
+				"reference": "removeLayoutAssignments"
+			},
+			{
+				"reference": "removeWorkflowLineBreaks"
+			},
+			{
+				"config": {
+					"sortOrder": [
+						"pageOrSobjectType", 
+						"recordType", 
+						"actionName", 
+						"formFactor", 
+						"profile"
+					]
+				},
+				"reference": "orderApplicationActions"
+			},
+			{
+				"reference": "orderEntitlementTimeTriggers"
+			},
+			{
+				"reference": "orderLeadConvertSettings"
+			},
+			{
+				"reference": "normaliseLineEndings"
+			}
+		]
+	}
+}

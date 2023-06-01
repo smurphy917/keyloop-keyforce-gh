@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <description>Allows for the specification that certain categories of processes (E.g. All Workflow Rules, All Processes) should be switched off for a given User, Profile or the whole Organisation</description>
+    <label>Process Deactivation</label>
+    <visibility>Public</visibility>
+</CustomObject>

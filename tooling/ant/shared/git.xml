@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-git" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<target name="reset">
+		<echo>=========================================</echo>
+		<echo>Reset working directory...</echo>
+		<echo>=========================================</echo>
+
+		<hook target="hook-git-reset-pre" />
+
+		<echo>*** WARNING: This will hard reset and clean source directories! ***</echo>
+
+		<condition property="git.reset.skipWarning">
+			<equals
+				arg1 = "${f}"
+				arg2 = "true" />
+		</condition>
+
+		<input 
+			unless:true  = "${git.reset.skipWarning}"
+			message      = "Confirm?" 
+			addproperty  = "git.confirmed" 
+			defaultvalue = "n"
+			validargs    = "y,n" />
+
+		<fail message="Cancelled">
+			<condition>
+				<equals
+					arg1 = "${git.confirmed}"
+					arg2 = "n" />
+			</condition>
+		</fail>
+
+		<git command="reset" options="--hard"                          outputcommand="true" failerror="false"                                              />
+		<git command="clean" options="-d -f -x ${dir.sourceDir}"       outputcommand="true" failerror="false"                                              />
+		<git command="clean" options="-d -f -x ${dir.resourceBundles}" outputcommand="true" failerror="false" if:true="${resources.enableResourceBundles}" />
+
+		<hook target="hook-git-reset-post" />
+	</target>
+
+</project>

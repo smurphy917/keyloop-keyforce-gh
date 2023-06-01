@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-list" xmlns:sf="antlib:com.salesforce">
+
+	<macrodef name="listMetadataCommand">
+		<sequential>
+			<importSalesforceLibrary />
+			<sf:listMetadata 
+				username        = "${sf_username}" 
+				password        = "${sf_password}${sf_token}" 
+				serverurl       = "${sf_serverUrl}" 
+				metadataType    = "${sf_metadataType}"
+				folder          = "${sf_folder}" />
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue><fullName>TEL CTI</fullName><default>false</default><label>TEL CTI</label></customValue>
+    <customValue><fullName>NETW MPLS</fullName><default>false</default><label>NETW MPLS</label></customValue>
+    <customValue><fullName>NETW</fullName><default>false</default><label>NETW</label></customValue>
+    <customValue><fullName>NETW Router</fullName><default>false</default><label>NETW Router</label></customValue>
+    <customValue><fullName>NETW Lan</fullName><default>false</default><label>NETW Lan</label></customValue>
+    <customValue><fullName>NETW VPN</fullName><default>false</default><label>NETW VPN</label></customValue>
+    <customValue><fullName>OTHER</fullName><default>false</default><label>OTHER</label></customValue>
+    <customValue><fullName>3PA</fullName><default>false</default><label>3PA</label></customValue>
+    <customValue><fullName>BI</fullName><default>false</default><label>BI</label></customValue>
+    <customValue><fullName>SMS Gateway</fullName><default>false</default><label>SMS Gateway</label></customValue>
+    <customValue><fullName>OTHER HSP</fullName><default>false</default><label>OTHER HSP</label></customValue>
+    <customValue><fullName>OTHER Hosting</fullName><default>false</default><label>OTHER Hosting</label></customValue>
+    <customValue><fullName>AL Contact Mgmt</fullName><default>false</default><label>AL Contact Mgmt</label></customValue>
+    <customValue><fullName>DEAL BRI</fullName><default>false</default><label>DEAL BRI</label></customValue>
+    <customValue><fullName>DRIVE</fullName><default>false</default><label>DRIVE</label></customValue>
+    <customValue><fullName>OTHER Drive Camp Mng</fullName><default>false</default><label>OTHER Drive Camp Mng</label></customValue>
+    <customValue><fullName>OTHER Drive Call Mng</fullName><default>false</default><label>OTHER Drive Call Mng</label></customValue>
+    <customValue><fullName>PRINT Manager</fullName><default>false</default><label>PRINT Manager</label></customValue>
+    <customValue><fullName>VHC Touch</fullName><default>false</default><label>VHC Touch</label></customValue>
+    <customValue><fullName>3PA Drive Fin Integ</fullName><default>false</default><label>3PA Drive Fin Integ</label></customValue>
+    <customValue><fullName>DEAL BRI MGMT REP</fullName><default>false</default><label>DEAL BRI MGMT REP</label></customValue>
+    <customValue><fullName>VHC</fullName><default>false</default><label>VHC</label></customValue>
+    <customValue><fullName>OTHER Netgroup</fullName><default>false</default><label>OTHER Netgroup</label></customValue>
+    <customValue><fullName>3PA Adv Parts</fullName><default>false</default><label>3PA Adv Parts</label></customValue>
+    <customValue><fullName>3PA Adv Parts Dealer</fullName><default>false</default><label>3PA Adv Parts Dealer</label></customValue>
+    <customValue><fullName>3PA Adv Parts Stock Check</fullName><default>false</default><label>3PA Adv Parts Stock Check</label></customValue>
+    <customValue><fullName>3PA Stock Check</fullName><default>false</default><label>3PA Stock Check</label></customValue>
+    <customValue><fullName>IMS</fullName><default>false</default><label>IMS</label></customValue>
+    <customValue><fullName>SOL</fullName><default>false</default><label>SOL</label></customValue>
+    <customValue><fullName>SMS</fullName><default>false</default><label>SMS</label></customValue>
+    <customValue><fullName>BI D+</fullName><default>false</default><label>BI D+</label></customValue>
+    <customValue><fullName>TEL HWR</fullName><default>false</default><label>TEL HWR</label></customValue>
+    <customValue><fullName>AL</fullName><default>false</default><label>AL</label></customValue>
+    <customValue><fullName>CONTACT</fullName><default>false</default><label>CONTACT</label></customValue>
+    <customValue><fullName>OTHER Lookup</fullName><default>false</default><label>OTHER Lookup</label></customValue>
+    <customValue><fullName>FLEET</fullName><default>false</default><label>FLEET</label></customValue>
+    <customValue><fullName>TAL</fullName><default>false</default><label>TAL</label></customValue>
+    <customValue><fullName>TIG</fullName><default>false</default><label>TIG</label></customValue>
+    <customValue><fullName>ODMS Giga</fullName><default>false</default><label>ODMS Giga</label></customValue>
+    <customValue><fullName>AMA</fullName><default>false</default><label>AMA</label></customValue>
+    <customValue><fullName>AMA Tyre Hotel</fullName><default>false</default><label>AMA Tyre Hotel</label></customValue>
+    <customValue><fullName>AMA eService</fullName><default>false</default><label>AMA eService</label></customValue>
+    <customValue><fullName>D+ Opt 21</fullName><default>false</default><label>D+ Opt 21</label></customValue>
+    <customValue><fullName>D+</fullName><default>false</default><label>D+</label></customValue>
+    <customValue><fullName>DOC DOCUBIZZ</fullName><default>false</default><label>DOC DOCUBIZZ</label></customValue>
+    <customValue><fullName>3PA Carsoft</fullName><default>false</default><label>3PA Carsoft</label></customValue>
+    <customValue><fullName>3PA Autodesk</fullName><default>false</default><label>3PA Autodesk</label></customValue>
+    <customValue><fullName>ASYS</fullName><default>false</default><label>ASYS</label></customValue>
+    <customValue><fullName>DOC Easy Archive</fullName><default>false</default><label>DOC Easy Archive</label></customValue>
+    <customValue><fullName>ODMS AGNOSTIC</fullName><default>false</default><label>ODMS AGNOSTIC</label></customValue>
+    <customValue><fullName>D+ TMCS</fullName><default>false</default><label>D+ TMCS</label></customValue>
+    <customValue><fullName>WDK</fullName><default>false</default><label>WDK</label></customValue>
+    <customValue><fullName>WDK 2.0</fullName><default>false</default><label>WDK 2.0</label></customValue>
+    <customValue><fullName>ASW</fullName><default>false</default><label>ASW</label></customValue>
+    <customValue><fullName>EVA</fullName><default>false</default><label>EVA</label></customValue>
+    <customValue><fullName>EVA Plus</fullName><default>false</default><label>EVA Plus</label></customValue>
+    <customValue><fullName>PC</fullName><default>false</default><label>PC</label></customValue>
+    <customValue><fullName>PERIPH</fullName><default>false</default><label>PERIPH</label></customValue>
+    <customValue><fullName>PRINT</fullName><default>false</default><label>PRINT</label></customValue>
+    <customValue><fullName>SERV</fullName><default>false</default><label>SERV</label></customValue>
+    <customValue><fullName>OHW</fullName><default>false</default><label>OHW</label></customValue>
+    <customValue><fullName>PRINT Plan</fullName><default>false</default><label>PRINT Plan</label></customValue>
+    <customValue><fullName>AMA Cabas</fullName><default>false</default><label>AMA Cabas</label></customValue>
+    <customValue><fullName>VHC ROAD</fullName><default>false</default><label>VHC ROAD</label></customValue>
+    <customValue><fullName>WDK Helios</fullName><default>false</default><label>WDK Helios</label></customValue>
+    <customValue><fullName>WDK Aster</fullName><default>false</default><label>WDK Aster</label></customValue>
+    <customValue><fullName>WDK Galaxy</fullName><default>false</default><label>WDK Galaxy</label></customValue>
+    <customValue><fullName>OHW Transparent Workshop</fullName><default>false</default><label>OHW Transparent Workshop</label></customValue>
+    <customValue><fullName>E-INV</fullName><default>false</default><label>E-INV</label></customValue>
+    <customValue><fullName>D+ TYRE HOTEL</fullName><default>false</default><label>D+ TYRE HOTEL</label></customValue>
+    <customValue><fullName>D+ Cabas</fullName><default>false</default><label>D+ Cabas</label></customValue>
+    <customValue><fullName>OTHER Servcare</fullName><default>false</default><label>OTHER Servcare</label></customValue>
+    <customValue><fullName>VHC MSA</fullName><default>false</default><label>VHC MSA</label></customValue>
+    <customValue><fullName>ODMS Autodata</fullName><default>false</default><label>ODMS Autodata</label></customValue>
+    <customValue><fullName>AMA TRAFI</fullName><default>false</default><label>AMA TRAFI</label></customValue>
+    <customValue><fullName>DOC</fullName><default>false</default><label>DOC</label></customValue>
+    <customValue><fullName>AMA CRM</fullName><default>false</default><label>AMA CRM</label></customValue>
+    <customValue><fullName>VHC MST</fullName><default>false</default><label>VHC MST</label></customValue>
+    <customValue><fullName>PAR SERVICE</fullName><default>false</default><label>PAR SERVICE</label></customValue>
+    <customValue><fullName>AMA Parts Upd Serv</fullName><default>false</default><label>AMA Parts Upd Serv</label></customValue>
+    <customValue><fullName>3PA AMA KASSA</fullName><default>false</default><label>3PA AMA KASSA</label></customValue>
+    <customValue><fullName>TEL Hosted</fullName><default>false</default><label>TEL Hosted</label></customValue>
+    <customValue><fullName>DOC Digidoc</fullName><default>false</default><label>DOC Digidoc</label></customValue>
+    <customValue><fullName>WDK Digital</fullName><default>false</default><label>WDK Digital</label></customValue>
+    <customValue><fullName>3PA Plan-IT</fullName><default>false</default><label>3PA Plan-IT</label></customValue>
+    <customValue><fullName>3PA Parts OL</fullName><default>false</default><label>3PA Parts OL</label></customValue>
+    <customValue><fullName>ASW Smart Data</fullName><default>false</default><label>ASW Smart Data</label></customValue>
+    <customValue><fullName>3PA Mob App</fullName><default>false</default><label>3PA Mob App</label></customValue>
+    <customValue><fullName>3PA Adv Parts POL</fullName><default>false</default><label>3PA Adv Parts POL</label></customValue>
+    <customValue><fullName>3PA Smartpay</fullName><default>false</default><label>3PA Smartpay</label></customValue>
+    <customValue><fullName>WDK Analytics</fullName><default>false</default><label>WDK Analytics</label></customValue>
+    <customValue><fullName>3PA Adv Parts POL API</fullName><default>false</default><label>3PA Adv Parts POL API</label></customValue>
+    <customValue><fullName>TEL Voice Connect</fullName><default>false</default><label>TEL Voice Connect</label></customValue>
+    <customValue><fullName>AMA Mob Tech</fullName><default>false</default><label>AMA Mob Tech</label></customValue>
+    <customValue><fullName>3PA SAMTYKKE</fullName><default>false</default><label>3PA SAMTYKKE</label></customValue>
+    <customValue><fullName>Consolidated by product</fullName><default>false</default><label>Consolidated by product</label></customValue>
+    <customValue><fullName>WDK SHOWANY</fullName><default>false</default><label>WDK SHOWANY</label></customValue>
+    <customValue><fullName>WDK DIGITAL HSP</fullName><default>false</default><label>WDK DIGITAL HSP</label></customValue>
+    <customValue><fullName>VHC CitNow</fullName><default>false</default><label>VHC CitNow</label></customValue>
+    <customValue><fullName>AL ANALYTICS</fullName><default>false</default><label>AL ANALYTICS</label></customValue>
+    <customValue><fullName>ASW GAR</fullName><default>false</default><label>ASW GAR</label></customValue>
+    <customValue><fullName>PAR OTHER</fullName><default>false</default><label>PAR OTHER</label></customValue>
+    <customValue><fullName>D+ DIG TYRE</fullName><default>false</default><label>D+ DIG TYRE</label></customValue>
+    <customValue><fullName>SOL SAB</fullName><default>false</default><label>SOL SAB</label></customValue>
+    <customValue><fullName>EVA E-INV</fullName><default>false</default><label>EVA E-INV</label></customValue>
+    <customValue><fullName>PRINT PLAN V2</fullName><default>false</default><label>PRINT PLAN V2</label></customValue>
+    <customValue><fullName>AMA STORAGE</fullName><default>false</default><label>AMA STORAGE</label></customValue>
+    <customValue><fullName>AMA KLARNA</fullName><default>false</default><label>AMA KLARNA</label></customValue>
+    <customValue><fullName>TEL PBX Connect</fullName><default>false</default><label>TEL PBX Connect</label></customValue>
+    <customValue><fullName>AMA API</fullName><default>false</default><label>AMA API</label></customValue>
+    <customValue><fullName>TEL</fullName><default>false</default><label>TEL</label></customValue>
+    <customValue><fullName>WDK BARCODE</fullName><default>false</default><label>WDK BARCODE</label></customValue>
+    <customValue><fullName>AMA KASSA</fullName><default>false</default><label>AMA KASSA</label></customValue>
+    <customValue><fullName>BI VISUAL</fullName><default>false</default><label>BI VISUAL</label></customValue>
+    <customValue><fullName>API</fullName><default>false</default><label>API</label></customValue>
+    <customValue><fullName>ePAY WP PBL</fullName><default>false</default><label>ePAY WP PBL</label></customValue>
+    <customValue><fullName>ePAY NEW-WP PBL</fullName><default>false</default><label>ePAY NEW-WP PBL</label></customValue>
+    <customValue><fullName>XXXX</fullName><default>false</default><label>XXXX</label></customValue>
+    <customValue><fullName>PAR VIDEO</fullName><default>false</default><label>PAR VIDEO</label></customValue>
+    <customValue><fullName>PAR SHOWROOM</fullName><default>false</default><label>PAR SHOWROOM</label></customValue>
+    <customValue><fullName>DOC DIGIDOC ARX</fullName><default>false</default><label>DOC DIGIDOC ARX</label></customValue>
+    <customValue><fullName>PAR F&amp;I</fullName><default>false</default><label>PAR F&amp;I</label></customValue>
+    <customValue><fullName>DOC DIGIDOC LITE ARX</fullName><default>false</default><label>DOC DIGIDOC LITE ARX</label></customValue>
+    <customValue><fullName>MSG CNCT</fullName><default>false</default><label>MSG CNCT</label></customValue>
+    <customValue><fullName>RAPID LEAD MNGR STD</fullName><default>false</default><label>RAPID LEAD MNGR STD</label></customValue>
+    <customValue><fullName>RAPID LEAD MNGR ENHNCD</fullName><default>false</default><label>RAPID LEAD MNGR ENHNCD</label></customValue>
+    <customValue><fullName>RAPID LEAD MNGR PREM</fullName><default>false</default><label>RAPID LEAD MNGR PREM</label></customValue>
+    <customValue><fullName>EMAX BASIC</fullName><default>false</default><label>EMAX BASIC</label></customValue>
+    <customValue><fullName>EMAX ESSENTIALS</fullName><default>false</default><label>EMAX ESSENTIALS</label></customValue>
+    <customValue><fullName>EMAX PLUS</fullName><default>false</default><label>EMAX PLUS</label></customValue>
+    <customValue><fullName>EMAX TRAINING</fullName><default>false</default><label>EMAX TRAINING</label></customValue>
+    <customValue><fullName>EMAX SMS</fullName><default>false</default><label>EMAX SMS</label></customValue>
+    <customValue><fullName>EMAX CORP</fullName><default>false</default><label>EMAX CORP</label></customValue>
+    <customValue><fullName>AMA DIGISIGN</fullName><default>false</default><label>AMA DIGISIGN</label></customValue>
+    <customValue><fullName>SH WKSHOP</fullName><default>false</default><label>SH WKSHOP</label></customValue>
+    <customValue><fullName>EPAY WL PBL</fullName><default>false</default><label>EPAY WL PBL</label></customValue>
+    <customValue><fullName>EMAX LH OEM</fullName><default>false</default><label>EMAX LH OEM</label></customValue>
+    <customValue><fullName>VOICE ADV</fullName><default>false</default><label>VOICE ADV</label></customValue>
+    <customValue><fullName>RAP CHAT</fullName><default>false</default><label>RAP CHAT</label></customValue>
+    <customValue><fullName>VOICE PRO</fullName><default>false</default><label>VOICE PRO</label></customValue>
+    <customValue><fullName>VOICE</fullName><default>false</default><label>VOICE</label></customValue>
+    <masterLabel>Marketing Category</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

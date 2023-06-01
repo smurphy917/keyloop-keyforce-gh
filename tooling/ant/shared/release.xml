@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-release">
+
+	<target name="createMajorRelease">
+		<setupBranchAndVersionProperties />
+		<createReleaseBranch nextVersion="${release.nextMajorVersion}" hook="major" />
+	</target>
+
+	<target name="createMinorRelease">
+		<setupBranchAndVersionProperties />
+		<createReleaseBranch nextVersion="${release.nextMinorVersion}" hook="minor" />
+	</target>
+
+	<target name="createPatchRelease">
+		<setupBranchAndVersionProperties />
+		<createReleaseBranch nextVersion="${release.nextPatchVersion}" hook="patch" />
+	</target>
+
+	<target name="fetchReleaseBranches">
+		<git command="remote" options="set-branches --add origin release/*" outputcommand="true" failerror="false" />
+		<git command="fetch"  options="--all"                               outputcommand="true" failerror="false" />
+	</target>
+
+	<macrodef name="setupBranchAndVersionProperties">
+		<sequential>
+			<setupBranchProperties />
+			<setupVersionProperties />
+		</sequential>
+	</macrodef>
+
+	<scriptdef 
+		name        = "setupVersionProperties" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/setupVersionProperties.js" />
+
+	<macrodef name="createReleaseBranch">
+		<attribute name="nextVersion" />
+		<attribute name="hook" />
+
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>Create Release Branch...</echo>
+			<echo>=========================================</echo>
+			<echo>Version: @{nextVersion}</echo>
+			<echo>Branch:  release/@{nextVersion}</echo>
+
+			<hook target="hook-release-@{hook}-pre" />
+
+			<echo>Create release branch release/@{nextVersion}...</echo>
+			<git command="checkout" options="-b release/@{nextVersion}" />
+
+			<echo>Push release branch to origin...</echo>
+			<git command="push"     options="-u origin release/@{nextVersion}" />
+
+			<hook target="hook-release-@{hook}-post" />
+		</sequential>
+	</macrodef>
+
+</project>

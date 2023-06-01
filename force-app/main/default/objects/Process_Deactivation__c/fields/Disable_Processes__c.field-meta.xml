@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Disable_Processes__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>If checked, disables all automation process in the Org provided they have been built correctly to spec with a first node that checks the value of this field</description>
+    <externalId>false</externalId>
+    <label>Disable Processes</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-modes-org" xmlns:if="ant:if">
+
+	<macrodef name="openOrg">
+		<sequential>
+			<getSessionInfo />
+			<openBrowser url="${sf_instanceUrl}/secur/frontdoor.jsp?sid=${sf_sessionId}" />
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-session">
+
+	<target name="session">
+		<echo>=========================================</echo>
+		<echo>Session Info...</echo>
+		<echo>=========================================</echo>
+
+		<validateEnvironmentProperties />
+		<getCachedSessionInfo />
+
+		<echo>Session Id:   ${sf_sessionId}</echo>
+		<echo>Instance URL: ${sf_instanceUrl}</echo>
+	</target>
+
+</project>

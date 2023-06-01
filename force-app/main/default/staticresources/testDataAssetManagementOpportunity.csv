@@ -1,0 +1,3 @@
+Id,Name,AccountId,StageName,CloseDate,Pricebook2Id,CurrencyIsoCode
+OP1,Apex Test Opp,A1,Proposal,2024-12-31,PB1,GBP
+OP2,Apex Test Opp 2,A1,Proposal,2024-12-31,PB1,GBP

@@ -1,0 +1,365 @@
+[
+	{
+		"configOptions": [
+			{
+				"description": "List of objects where field history tracking should be removed. Default: not specified therefore all objects",
+				"name": "Objects",
+				"reference": "objects"
+			}
+		],
+		"description": "Remove object level field history tracking",
+		"file": "removeObjectLevelFieldHistoryTracking",
+		"patterns": [
+			"**/*.object-meta.xml",
+			"**/*.object"
+		],
+		"reference": "removeObjectLevelFieldHistoryTracking",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of objects where feed history tracking should be removed. Default: not specified therefore all objects",
+				"name": "Objects",
+				"reference": "objects"
+			}
+		],
+		"description": "Remove object level feed history tracking",
+		"file": "removeObjectLevelFeedHistoryTracking",
+		"patterns": [
+			"**/*.object-meta.xml",
+			"**/*.object"
+		],
+		"reference": "removeObjectLevelFeedHistoryTracking",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of objects where field history tracking should be removed. Default: not specified therefore all objects",
+				"name": "Objects",
+				"reference": "objects"
+			}
+		],
+		"description": "Remove field level field history tracking",
+		"file": "removeFieldLevelFieldHistoryTracking",
+		"patterns": [
+			"**/*.field-meta.xml",
+			"**/*.object"
+		],
+		"reference": "removeFieldLevelFieldHistoryTracking",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of objects where feed history tracking should be removed. Default: not specified therefore all objects",
+				"name": "Objects",
+				"reference": "objects"
+			}
+		],
+		"description": "Remove field level feed history tracking",
+		"file": "removeFieldLevelFeedHistoryTracking",
+		"patterns": [
+			"**/*.field-meta.xml",
+			"**/*.object"
+		],
+		"reference": "removeFieldLevelFeedHistoryTracking",
+		"type": "modify"
+	},
+	{
+		"description": "Remove sort order from layout buttons",
+		"file": "removeLayoutSortOrder",
+		"patterns": [
+			"**/*.layout-meta.xml",
+			"**/*.layout"
+		],
+		"reference": "removeLayoutSortOrder",
+		"type": "modify"
+	},
+	{
+		"description": "Add sort order to layout buttons",
+		"file": "addLayoutSortOrder",
+		"patterns": [
+			"**/*.layout-meta.xml",
+			"**/*.layout"
+		],
+		"reference": "addLayoutSortOrder",
+		"type": "modify"
+	},
+	{
+		"description": "Remove false field permissions from permission sets",
+		"file": "removeFalseFieldPermissions",
+		"patterns": [
+			"**/*.permissionset-meta.xml",
+			"**/*.permissionset"
+		],
+		"reference": "removeFalseFieldPermissions",
+		"type": "modify"
+	},
+	{
+		"description": "Remove false field permissions from muting permission sets",
+		"file": "removeFalseFieldPermissions",
+		"patterns": [
+			"**/*.mutingpermissionset-meta.xml",
+			"**/*.mutingpermissionset"
+		],
+		"reference": "removeFalseFieldPermissionsFromMutingPermissionSets",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of user permissions to be removed from permission sets. Default: none",
+				"name": "User Permissions",
+				"reference": "userPermissions"
+			}
+		],
+		"description": "Remove user permissions from permission sets",
+		"file": "removeUserPermissions",
+		"patterns": [
+			"**/*.permissionset-meta.xml",
+			"**/*.permissionset"
+		],
+		"reference": "removePermissionSetUserPermissions",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of user permissions to be removed from profiles. Default: none",
+				"name": "User Permissions",
+				"reference": "userPermissions"
+			}
+		],
+		"description": "Remove user permissions from profiles",
+		"file": "removeUserPermissions",
+		"patterns": [
+			"**/*.profile-meta.xml",
+			"**/*.profile"
+		],
+		"reference": "removeProfileUserPermissions",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of layout assignments to be removed from profiles. Default: none",
+				"name": "Layout Assignments",
+				"reference": "layouts"
+			}
+		],
+		"description": "Remove layout assignments from profiles",
+		"file": "removeLayoutAssignments",
+		"patterns": [
+			"**/*.profile-meta.xml",
+			"**/*.profile"
+		],
+		"reference": "removeLayoutAssignments",
+		"type": "modify"
+	},
+	{
+		"description": "Remove login IP ranges from profiles",
+		"file": "removeLoginIPRanges",
+		"patterns": [
+			"**/*.profile-meta.xml",
+			"**/*.profile"
+		],
+		"reference": "removeLoginIPRanges",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "Regex pattern to be used when matching members to be removed from package.xml. Default: none",
+				"name": "Members Regular Expression",
+				"reference": "regex"
+			}
+		],
+		"description": "Remove members from package.xml",
+		"file": "removePackageMembers",
+		"patterns": [
+			"package.xml"
+		],
+		"reference": "removePackageMembers",
+		"type": "modify"
+	},
+	{
+		"description": "Remove line breaks from workflow rule formulas",
+		"file": "removeWorkflowLineBreaks",
+		"patterns": [
+			"**/*.workflow",
+			"**/*.workflow-meta.xml"
+		],
+		"reference": "removeWorkflowLineBreaks",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of action attributes in the order they should be sorted. Default: pageOrSobjectType, recordType, actionName, formFactor, profile",
+				"name": "Sort Order",
+				"reference": "sortOrder"
+			}
+		],
+		"description": "Order actions in applications",
+		"file": "orderApplicationActions",
+		"patterns": [
+			"**/applications/*.app",
+			"**/applications/*.app-meta.xml"
+		],
+		"reference": "orderApplicationActions",
+		"type": "modify"
+	},
+	{
+		"description": "Order time triggers in entitlement processes",
+		"file": "orderEntitlementTimeTriggers",
+		"patterns": [
+			"**/*.entitlementProcess",
+			"**/*.entitlementProcess-meta.xml"
+		],
+		"reference": "orderEntitlementTimeTriggers",
+		"type": "modify"
+	},
+	{
+		"description": "Order field mappings in lead convert settings",
+		"file": "orderLeadConvertSettings",
+		"patterns": [
+			"**/*.LeadConvertSetting",
+			"**/*.LeadConvertSetting-meta.xml"
+		],
+		"reference": "orderLeadConvertSettings",
+		"type": "modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of profiles to exclude (or include if list type is set to: include)",
+				"name": "Profiles",
+				"reference": "profiles"
+			},
+			{
+				"description": "Options: exclude or include i.e. remove permissions from all profiles except those listed or only remove permissions from listed profiles. Default: exclude",
+				"name": "List type",
+				"reference": "listType"
+			},
+			{
+				"description": "Remove permissions from custom profiles only? Default: false",
+				"name": "Custom only?",
+				"reference": "customOnly"
+			}
+		],
+		"description": "Remove field permissions from profile",
+		"file": "removeProfileFieldPermissions",
+		"patterns": [
+			"**/*.profile",
+			"**/*.profile-meta.xml"
+		],
+		"reference": "removeProfileFieldPermissions",
+		"type": "advanced-modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of profiles to exclude (or include if list type is set to: include)",
+				"name": "Profiles",
+				"reference": "profiles"
+			},
+			{
+				"description": "Options: exclude or include i.e. remove permissions from all profiles except those listed or only remove permissions from listed profiles. Default: exclude",
+				"name": "List type",
+				"reference": "listType"
+			},
+			{
+				"description": "Remove permissions from custom profiles only? Default: false",
+				"name": "Custom only?",
+				"reference": "customOnly"
+			}
+		],
+		"description": "Remove object permissions from profile",
+		"file": "removeProfileObjectPermissions",
+		"patterns": [
+			"**/*.profile",
+			"**/*.profile-meta.xml"
+		],
+		"reference": "removeProfileObjectPermissions",
+		"type": "advanced-modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List of profiles to exclude (or include if list type is set to: include)",
+				"name": "Profiles",
+				"reference": "profiles"
+			},
+			{
+				"description": "Options: exclude or include i.e. remove permissions from all profiles except those listed or only remove permissions from listed profiles. Default: exclude",
+				"name": "List type",
+				"reference": "listType"
+			},
+			{
+				"description": "Remove permissions from custom profiles only? Default: false",
+				"name": "Custom only?",
+				"reference": "customOnly"
+			}
+		],
+		"description": "Remove tab visibilities from profile",
+		"file": "removeProfileTabVisibilities",
+		"patterns": [
+			"**/*.profile",
+			"**/*.profile-meta.xml"
+		],
+		"reference": "removeProfileTabVisibilities",
+		"type": "advanced-modify"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "List views to be removed from all objects (in the format of a list). Can be a regular expression e.g. /[a-z]/. Can be negative i.e. remove except e.g. !/KeepThis/. Default: none",
+				"name": "All List Views",
+				"reference": "all"
+			},
+			{
+				"description": "List views to be removed (in the format of an Object to List View map). Can be a regular expression e.g. /[a-z]/. Can be negative i.e. remove except e.g. !/KeepThis/. Default: none",
+				"name": "Object > List Views",
+				"reference": "objects"
+			}
+		],
+		"description": "Remove list views",
+		"file": "removeListViews",
+		"patterns": [
+			"**/*.listView-meta.xml"
+		],
+		"reference": "removeListViews",
+		"type": "delete"
+	},
+	{
+		"configOptions": [
+			{
+				"description": "Regex pattern to be used when matching application files to be removed. Default: none",
+				"name": "Applications Regular Expression",
+				"reference": "regex"
+			}
+		],
+		"description": "Remove standard apps",
+		"file": "removeStandardApps",
+		"patterns": [
+			"**/applications/*.app-meta.xml",
+			"**/applications/*.app"
+		],
+		"reference": "removeStandardApps",
+		"type": "delete"
+	},
+	{
+		"description": "Normalise line endings to LF",
+		"file": "normaliseLineEndings",
+		"patterns": [
+			"**/*.cls",
+			"**/*.css",
+			"**/*.js",
+			"**/*.xml"
+		],
+		"reference": "normaliseLineEndings",
+		"type": "modify-string"
+	}
+]

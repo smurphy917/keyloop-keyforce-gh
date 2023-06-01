@@ -1,0 +1,172 @@
+image: makepositive/sfdx-ant
+
+definitions:
+  caches:
+    mp-lib: ~/.mp-dev-ops
+    mp-tooling: tooling
+  steps:
+    - step: &validate
+        name: 'Validation'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant test
+        artifacts:
+          - logs/*
+          - build-state.properties.local
+    - step: &ci-validate
+        name: 'CI Validation'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant test -De=CI
+        artifacts:
+          - logs/*
+          - build-state.properties.local
+    - step: &staging-validate
+        name: 'Staging Validation'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant test -De=STAGING
+        artifacts:
+          - logs/*
+          - build-state.properties.local
+    - step: &prod-validate
+        name: 'Production Validation'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant test -De=PROD
+        artifacts:
+          - logs/*
+          - build-state.properties.local
+    - step: &deploy
+        name: 'Deployment'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant deploy
+        artifacts:
+          - logs/*
+          - build-state.properties.local
+    - step: &quick-deploy
+        name: 'Quick Deployment'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant quickDeploy
+        artifacts:
+          - logs/*
+          - build-state.properties.local
+    - step: &create-major-release
+        name: 'Create Major Release'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant fetchReleaseBranches
+          - ant createMajorRelease
+    - step: &create-minor-release
+        name: 'Create Minor Release'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant fetchReleaseBranches
+          - ant createMinorRelease
+    - step: &create-patch-release
+        name: 'Create Patch Release'
+        caches:
+          - mp-lib
+          - mp-tooling
+        script:
+          - ant fetchReleaseBranches
+          - ant createPatchRelease
+
+pipelines:
+  custom:
+    create-major-release:
+      - step: *create-major-release
+    create-minor-release:
+      - step: *create-minor-release
+    create-patch-release:
+      - step: *create-patch-release
+    validate:
+      - variables:
+          - name: SF_ENVNAME
+      - step: *validate
+# Deployments should be triggered from branches but it can be useful to trigger deployments
+# to dev sandboxes on demand - uncomment to enable
+#    deploy:
+#      - variables:
+#          - name: WARNING_USE_WITH_DEV_SANDBOXES_ONLY
+#          - name: SF_ENVNAME
+#          - name: SF_CHECKONLY
+#      - step: *deploy
+
+  pull-requests:
+    '**':
+      - step: *ci-validate
+
+  branches:
+    develop:
+      - step:
+          <<: *deploy
+          name: 'QA Deployment'
+          deployment: qa
+# Alternatively require merge to deploy/QA before deployment to QA environment
+#    develop:
+#      - step: *ci-validation
+#    deploy/QA:
+#      - step: 
+#          <<: *deploy
+#          name: 'QA Deployment'
+#          deployment: qa
+    deploy/UAT:
+      - step: 
+          <<: *deploy
+          name: 'UAT Deployment'
+          deployment: uat
+    deploy/STAGING:
+      - step: *staging-validate
+      - step: 
+          <<: *quick-deploy
+          name: 'Staging Quick Deploy'
+          deployment: staging
+# Staging should have the same deployment process as production (albeit in this example without the 
+# manual button presses)
+#      - step: 
+#          <<: *deploy
+#          name: 'Staging Deployment'
+#          deployment: staging
+    master:
+      - step:
+          name: 'No Automated Build'
+          script:
+            - echo "Do nothing - wait for manual trigger"
+      - step: 
+          <<: *prod-validate
+          trigger: manual
+      - step: 
+          <<: *quick-deploy
+          name: 'Production Quick Deployment'
+          deployment: prod
+          trigger: manual
+# Alternatively there can be one step with a single deploy (instead of validate + quick deploy)
+#      - step: 
+#          <<: *deploy
+#          name: 'Production Deployment'
+#          deployment: prod
+#          trigger: manual
+      - step: 
+          <<: *deploy
+          name: 'CI Deployment'
+          deployment: ci
+          trigger: manual

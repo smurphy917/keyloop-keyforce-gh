@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Project_Defined__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>LTC-2: Boolean that determines whether a project has been identified.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Has a project been defined?</inlineHelpText>
+    <label>Project Defined</label>
+    <type>Checkbox</type>
+</CustomField>

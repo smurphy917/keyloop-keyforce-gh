@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-scripts" xmlns:if="ant:if">
+
+	<macrodef name="runApex">
+		<attribute 
+			name        = "title" 
+			default     = "Running Apex Script..." />
+		<text 
+			name        = "code" />
+
+		<sequential>
+
+			<validateEnvironmentProperties />
+			
+			<echo file="${dir.temp}/prepared-script.apex">@{code}</echo>
+
+			<runPreparedApexFile title="@{title}" sourceFile="${dir.temp}/prepared-script.apex" />
+
+			<setLogLevel level="1" />
+			<delete file="${dir.temp}/prepared-script.apex" />
+			<setLogLevel level="2" />
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="runApexFile">
+		<attribute 
+			name        = "sourceFile" />
+		<attribute 
+			name        = "title" 
+			default     = "Running Apex Script..." />
+
+		<sequential>
+			
+			<validateEnvironmentProperties />
+
+			<setLogLevel level="1" />
+			<delete file="${dir.temp}/prepared-script.apex" />
+			<copy file="@{sourceFile}" tofile="${dir.temp}/prepared-script.apex">
+				<filterchain>
+					<expandproperties/>
+				</filterchain>
+			</copy>
+			<setLogLevel level="2" />
+
+			<runPreparedApexFile title="@{title}" sourceFile="${dir.temp}/prepared-script.apex" />
+
+			<setLogLevel level="1" />
+			<delete file="${dir.temp}/prepared-script.apex" />
+			<setLogLevel level="2" />
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="runPreparedApexFile">
+		<attribute 
+			name        = "sourceFile" />
+		<attribute 
+			name        = "title" 
+			default     = "Running Apex Script..." />
+
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>@{title}</echo>
+			<echo>=========================================</echo>
+			
+			<validateEnvironmentProperties />
+
+			<login />
+
+			<mpdxScript name="runApexScript" includeSession="false">
+				<args>
+					<arg line="--arg-apiVersion &quot;${sf.version}&quot;"                                      />
+					<arg line="--arg-alias &quot;${sf_alias}&quot;"                                             />
+					<arg line="--arg-file &quot;@{sourceFile}&quot;"                                            />
+					<arg line="--arg-parseLogs"                            if:true="${scripts.enableParseLogs}" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+</project>

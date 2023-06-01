@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FieldSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Standard</fullName>
+    <description>Used as a Standard Field Set</description>
+    <displayedFields><field>SBQQ__Quantity__c</field><isFieldManaged>false</isFieldManaged><isRequired>false</isRequired></displayedFields>
+    <displayedFields><field>SBQQ__Product__c</field><isFieldManaged>false</isFieldManaged><isRequired>false</isRequired></displayedFields>
+    <displayedFields><field>QuantityUnitOfMeasure__c</field><isFieldManaged>false</isFieldManaged><isRequired>false</isRequired></displayedFields>
+    <displayedFields><field>One_Time_Unit_Price__c</field><isFieldManaged>false</isFieldManaged><isRequired>false</isRequired></displayedFields>
+    <displayedFields><field>Monthly_Recurring_Fees_Unit_Price__c</field><isFieldManaged>false</isFieldManaged><isRequired>false</isRequired></displayedFields>
+    <displayedFields><field>SBQQ__AdditionalDiscount__c</field><isFieldManaged>false</isFieldManaged><isRequired>false</isRequired></displayedFields>
+    <displayedFields><field>One_Time_Net_Total__c</field><isFieldManaged>false</isFieldManaged><isRequired>false</isRequired></displayedFields>
+    <displayedFields><field>Monthly_Recurring_Fees_Net_Total__c</field><isFieldManaged>false</isFieldManaged><isRequired>false</isRequired></displayedFields>
+    <label>Standard</label>
+</FieldSet>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NurtureReasonRequiredForNurture</fullName>
+    <active>true</active>
+    <description>forces capture of nurture reason when selecting the stage &apos;Nurture&apos;</description>
+    <errorConditionFormula>AND(NOT($Setup.Process_Deactivation__c.Disable_All_Validation_Rules__c),
+ISPICKVAL(Status,&quot;Nurture&quot;), ISBLANK(TEXT(Nurture_Reason__c))
+)</errorConditionFormula>
+    <errorDisplayField>Nurture_Reason__c</errorDisplayField>
+    <errorMessage>Please ensure that you choose a Nurture Reason when setting the status of the lead to &apos;Nurture&apos;</errorMessage>
+</ValidationRule>

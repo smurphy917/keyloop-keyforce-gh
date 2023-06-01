@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue><fullName>Office</fullName><default>false</default><label>Office</label></customValue>
+    <customValue><fullName>DMS</fullName><default>false</default><label>DMS</label></customValue>
+    <customValue><fullName>Service</fullName><default>false</default><label>Service</label></customValue>
+    <customValue><fullName>Hardware</fullName><default>false</default><label>Hardware</label></customValue>
+    <customValue><fullName>Accounting</fullName><default>false</default><label>Accounting</label></customValue>
+    <customValue><fullName>Showroom</fullName><default>false</default><label>Showroom</label></customValue>
+    <customValue><fullName>Sales</fullName><default>false</default><label>Sales</label></customValue>
+    <masterLabel>Sub-Domain</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

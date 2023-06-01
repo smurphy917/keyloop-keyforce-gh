@@ -1,0 +1,2 @@
+Id,Product2Id,AccountId,Name,HasLifecycleManagement,ParentId,RootAssetId,Aggregate_Asset__c,LifecycleStartDate,LifecycleEndDate,CurrentQuantity,CurrentAmount,CurrentMrr,CurrencyIsoCode,Revision__c,SBQQ__ChargeType__c,Status
+ASA1,B1,A1,Apex TEST - Aggregate Bundle,true,,,,2024-01-01T00:00:00Z,2026-12-31T23:59:59Z,1,1200,8.33,GBP,1,,Installed

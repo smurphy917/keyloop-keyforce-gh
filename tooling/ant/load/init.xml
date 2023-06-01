@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-load-init">
+
+	<scriptdef name="setLogLevel" language="javascript">
+		<attribute name="level" />
+		<![CDATA[
+			var logger = project.getBuildListeners().firstElement();
+			logger.setMessageOutputLevel(attributes.get('level'));
+		]]>
+	</scriptdef>
+
+	<scriptdef name="metricTimestamp" language="javascript">
+		<attribute name="name" />
+		<![CDATA[
+			project.setProperty('metrics.timestamps.' + attributes.get('name'), new Date().getTime());
+		]]>
+	</scriptdef>
+	
+</project>

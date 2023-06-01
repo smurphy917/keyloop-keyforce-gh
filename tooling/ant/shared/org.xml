@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-org">
+
+	<target name="open">
+		<validateEnvironmentProperties />
+		
+		<openOrg />
+	</target>
+
+</project>

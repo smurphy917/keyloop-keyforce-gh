@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue><fullName>Office &amp; Communications</fullName><default>false</default><label>Office &amp; Communications</label></customValue>
+    <customValue><fullName>HardwarePD</fullName><default>false</default><label>HardwarePD</label></customValue>
+    <customValue><fullName>Core (DMS)</fullName><default>false</default><label>Core (DMS)</label></customValue>
+    <customValue><fullName>Aftersales</fullName><default>false</default><label>Aftersales</label></customValue>
+    <customValue><fullName>Sales&amp;Omni-Channel</fullName><default>false</default><label>Sales&amp;Omni-Channel</label></customValue>
+    <masterLabel>Domain</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

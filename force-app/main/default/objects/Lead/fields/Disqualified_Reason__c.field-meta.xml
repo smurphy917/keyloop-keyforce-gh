@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Disqualified_Reason__c</fullName>
+    <description>LTC-2: Captures the reason the lead was disqualified.</description>
+    <externalId>false</externalId>
+    <label>Disqualified Reason</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Poor Data Quality</fullName><default>false</default><label>Poor Data Quality</label></value>
+            <value><fullName>Not Our Target Market</fullName><default>false</default><label>Not Our Target Market</label></value>
+            <value><fullName>Product Does Not Match Needs</fullName><default>false</default><label>Product Does Not Match Needs</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

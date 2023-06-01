@@ -1,0 +1,7 @@
+<apex:page controller="SearchExecutorController">
+    <products error="{!error}">
+        <apex:repeat var="product" value="{!products}">
+            <product id="{!product.Id}"/>
+        </apex:repeat>
+    </products>
+</apex:page>

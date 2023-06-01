@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-configure-ci" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<target name="configureCI">
+		<configureCI />
+	</target>
+
+	<target name="setupCI">
+		<configureCI />
+	</target>
+
+	<macrodef name="configureCI">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>Configure CI Environment...</echo>
+			<echo>=========================================</echo>
+
+			<echo />
+			<echo>The following prompts will guide you through configuring a CI environment.</echo>
+			<echo />
+			<echo>Suggested defaults will be presented in [square brackets], press return to accept default value.</echo>
+			<echo />
+
+			<validateEnvironmentProperties />
+			<deleteMpdxTempDir />
+
+			<hook target="hook-configure-ci-pre" />
+
+			<ciEnvironmentNamePrompt />
+			<ciLoadEnvironment />
+			<ciCertificateCheck />
+			<ciJwtSetupPrompt />
+			<ciReviewUserSetup />
+			<ciBuildSettingsPrompts />
+			<ciFinaliseConfigure />
+
+			<hook target="hook-configure-ci-post" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciEnvironmentNamePrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>What is the name of this environment?</echo>
+			<echo />
+			<echo>The name of the environment should match the name of the sandbox.</echo>
+			<echo />
+			<echo>Recommended environment name</echo>
+			<echo> - Production : Use 'prod'</echo>
+			<echo> - Sandbox    : Use Sandbox Name, this is visible in the URL - https://[My-Domain]--[** Sandbox-Name **].lightning.force.com</echo>
+			<echo />
+
+			<input 
+				message      = "Environment name (press return to accept default):" 
+				addproperty  = "configureCI.envName" 
+				defaultvalue = "${sf_envName}"
+				unless:set   = "configureCI.envName" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciLoadEnvironment">
+		<sequential>
+			<condition property="configureCI.build.bitbucket.enableIntegration" value="true" else="false">
+				<and>
+					<equals 
+						arg1            = "${tooling.build}" 
+						arg2            = "bitbucket" 
+						casesensitive   = "false" />
+					<not>
+						<istrue value="${configureCI.bitbucketIntegrationDisabled}" />
+					</not>
+				</and>
+			</condition>
+
+			<ciLoadEnvironmentBitbucket if:true="${configureCI.build.bitbucket.enableIntegration}" />
+
+			<condition property="configureCI.build.bitbucket.configError" value="true" else="false">
+				<and>
+					<istrue value="${configureCI.build.bitbucket.enableIntegration}" />
+					<or>
+						<not>
+							<isset property="server.bitbucket.clientId" />
+						</not>
+						<not>
+							<isset property="server.bitbucket.secret" />
+						</not>
+					</or>
+				</and>
+			</condition>
+
+			<fail if="${configureCI.build.bitbucket.configError}">
+				Missing Bitbucket oauth settings. Set server.bitbucket.clientId=[clientId] and server.bitbucket.secret=[secret] or disable Bitbucket integration configureCI.bitbucketIntegrationDisabled=true in build.properties.local.
+			</fail>
+
+			<echo>Gathering environment information, this may take a moment...</echo>
+			<getCIEnvironmentProperties
+				environment    = "${configureCI.envName}"
+				checkBitbucket = "${configureCI.build.bitbucket.enableIntegration}" />
+			<echo />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciLoadEnvironmentBitbucket">
+		<sequential>
+			<local name="bitbucketPropertiesSet" />
+
+			<condition property="bitbucketPropertiesSet">
+				<and>
+					<isset property="bitbucket.workspace" />
+					<isset property="bitbucket.repository" />
+				</and>
+			</condition>
+
+			<ciSetBitbucketProperties unless:true="${bitbucketPropertiesSet}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciSetBitbucketProperties">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>Bitbucket Connection Configuration</echo>
+			<echo>=========================================</echo>
+			<echo />
+			<echo>The following prompts will collect details required to connect to the Bitbucket API.</echo>
+			<echo />
+
+			<getGitRepoInfo unless:true="${bitbucketPropertiesSet}" />
+
+			<ciBitbucketWorkspacePrompt  unless:set="bitbucket.workspace"  />
+			<ciBitbucketRepositoryPrompt unless:set="bitbucket.repository" />
+
+			<setLogLevel level="1" />
+			<propertyfile file="build.properties">
+				<entry key="bitbucket.workspace"  value="${bitbucket.workspace}"  />
+				<entry key="bitbucket.repository" value="${bitbucket.repository}" />
+			</propertyfile>
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciBitbucketWorkspacePrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>What is the name of the Bitbucket workspace?</echo>
+			<echo />
+			<echo>You can find this in the repository URL e.g. www.bitbucket.org/[** WORKSPACE **]/[repository]</echo>
+			<echo />
+
+			<condition property="configureCI.gitRepoInfo.workspace.default" value="${configureCI.gitRepoInfo.workspace}" else="">
+				<isset property="configureCI.gitRepoInfo.workspace" />
+			</condition>
+
+			<input
+				message      = "Bitbucket workspace:" 
+				addproperty  = "bitbucket.workspace"
+				defaultvalue = "${configureCI.gitRepoInfo.workspace.default}"
+				unless:set   = "bitbucket.workspace" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciBitbucketRepositoryPrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>What is the name of the Bitbucket repository?</echo>
+			<echo />
+			<echo>You can find this in the repository URL e.g. www.bitbucket.org/[workspace]/[** REPOSITORY **]</echo>
+			<echo />
+
+			<condition property="configureCI.gitRepoInfo.repository.default" value="${configureCI.gitRepoInfo.repository}" else="">
+				<isset property="configureCI.gitRepoInfo.repository" />
+			</condition>
+
+			<input
+				message      = "Bitbucket repository:" 
+				addproperty  = "bitbucket.repository"
+				defaultvalue = "${configureCI.gitRepoInfo.repository.default}"
+				unless:set   = "bitbucket.repository" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciCertificateCheck">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>SSL Key and Certificate Configuration</echo>
+			<echo>=========================================</echo>
+			<echo />
+			<echo>A certificate file and encrypted private key will now be created.</echo>
+			<echo />
+			<ciRecreateCertificatePrompt if:true="${configureCI.ciEnvironmentProperties.certificate.exists}" />
+			<ciCreateCertificate     unless:true="${configureCI.ciEnvironmentProperties.certificate.exists}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciRecreateCertificatePrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Should the certificate be recreated?</echo>
+			<echo />
+			<echo>A certificate already exists for this environment. Should the certificate and key file be deleted and recreated?</echo>
+			<echo />
+			<echo>If selecting no, the existing certificate and key will be re-used.</echo>
+			<echo />
+
+			<condition property="configureCI.recreateCertificateDefault" value="y" else="n">
+				<istrue value= "${configureCI.ciEnvironmentProperties.certificate.recommendRecreate}" />
+			</condition>
+
+			<input 
+				message      = "Recreate certificate? (press return for yes)" 
+				addproperty  = "configureCI.recreateCertificateYN" 
+				validargs    = "y,n" 
+				defaultvalue = "${configureCI.recreateCertificateDefault}"
+				unless:set   = "configureCI.recreateCertificate" />
+
+			<condition property="configureCI.recreateCertificate">
+				<equals 
+					arg1            = "${configureCI.recreateCertificateYN}" 
+					arg2            = "y" 
+					casesensitive   = "false" />
+			</condition>
+
+			<ciRecreateCertificate if:true="${configureCI.recreateCertificate}" />
+			<reuseCertificateAndKey
+				name        = "${configureCI.ciEnvironmentProperties.name.lower}"
+				unless:true = "${configureCI.recreateCertificate}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciRecreateCertificate">
+		<sequential>
+			<deleteCertificateAndKey name="${configureCI.ciEnvironmentProperties.name.lower}" />
+			<ciCreateCertificate />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciCreateCertificate">
+		<sequential>
+			<echo>Creating certificate...</echo>
+			<echo />
+			<createCertificate name="${configureCI.ciEnvironmentProperties.name.lower}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciJwtSetupPrompt">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>JWT Authentication Setup</echo>
+			<echo>=========================================</echo>
+			<echo />
+			<echo>The org will now be checked for existing JWT components.</echo>
+			<echo />
+			<echo>Reviewing JWT setup...</echo>
+			<echo />
+
+			<reviewJwtSetup />
+
+			<echo />
+			<echo>Would you like to proceed with changes to the org?</echo>
+			<echo />
+			<echo>** Note ** - changes to connected apps can take up to 10 minutes to apply!</echo>
+			<echo />
+
+			<input 
+				message      = "Proceed? (press y then return for yes)" 
+				addproperty  = "configureCI.setupJwtAccessYN" 
+				validargs    = "y,n" 
+				unless:set   = "configureCI.setupJwtAccess" />
+
+			<condition property="configureCI.setupJwtAccess">
+				<equals 
+					arg1            = "${configureCI.setupJwtAccessYN}" 
+					arg2            = "y" 
+					casesensitive   = "false" />
+			</condition>
+
+			<setupJwtAccess if:true="${configureCI.setupJwtAccess}" />
+			<echo />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciReviewUserSetup">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>User Setup</echo>
+			<echo>=========================================</echo>
+			<echo />
+			<echo>The following prompts will collect details required to create or update the DevOps service account.</echo>
+			<echo />
+
+			<ciBaseUsernamePrompt unless:set="configureCI.baseUsername" />
+			<ciOrgEmailPrompt />
+
+			<echo />
+			<echo>Reviewing User setup...</echo>
+			<echo />
+
+			<reviewUserSetup
+				environment  = "${configureCI.ciEnvironmentProperties.name.lower}"
+				baseUsername = "${configureCI.baseUsername}"
+				email        = "${configureCI.orgEmail}" />
+
+			<echo if:true="${configureCI.reviewUserSetup.noChanges}">No changes required</echo>
+			<ciUserSetupPrompt unless:true="${configureCI.reviewUserSetup.noChanges}" />
+
+			<echo />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciUserSetupPrompt">
+		<sequential>
+			<echo>Would you like to proceed with changes to the org?</echo>
+			<echo />
+
+			<input 
+				message      = "Proceed? (press y then return for yes)" 
+				addproperty  = "configureCI.setupUserAccessYN" 
+				validargs    = "y,n" 
+				unless:set   = "configureCI.setupUserAccess" />
+
+			<condition property="configureCI.setupUserAccess">
+				<equals 
+					arg1            = "${configureCI.setupUserAccessYN}" 
+					arg2            = "y" 
+					casesensitive   = "false" />
+			</condition>
+
+			<setupUserAccess if:true="${configureCI.setupUserAccess}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciBaseUsernamePrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>What is the base username?</echo>
+			<echo />
+			<echo>Specify the username for the PRODUCTION environment i.e. the username of the DevOps service account WITHOUT an environment appended.</echo>
+			<echo />
+			<echo>Examples: deployment.user@makepositive.com.clienta, devops@clienta.com</echo>
+			<echo />
+			<echo>** Do NOT append with .prod or similar **</echo>
+			<echo />
+
+			<condition property="configureCI.baseUsernameDefault" value="${configureCI.ciEnvironmentProperties.ci.suggestedBaseUsername}" else="">
+				<isset property="configureCI.ciEnvironmentProperties.ci.suggestedBaseUsername" />
+			</condition>
+
+			<input 
+				message      = "Base username? (press return for default)" 
+				addproperty  = "configureCI.baseUsername" 
+				defaultvalue = "${configureCI.baseUsernameDefault}"
+				unless:set   = "configureCI.baseUsername" />
+
+			<setLogLevel level="1" />
+			<propertyfile file="build.properties">
+				<entry key="configureCI.baseUsername" value="${configureCI.baseUsername}" />
+			</propertyfile>
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciOrgEmailPrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Org email address?</echo>
+			<echo />
+			<echo>Email address that will be assigned to the DevOps service account.</echo>
+			<echo />
+			<echo>Recommend using Slack email addresses to a private channel (proj-clienta-sfdc).</echo>
+			<echo />
+
+			<condition property="configureCI.orgEmailDefault" value="${configureCI.ciEnvironmentProperties.orgEmailDefault}" else="">
+				<isset property="configureCI.ciEnvironmentProperties.orgEmailDefault" />
+			</condition>
+
+			<input 
+				message      = "Email address? (press return to accept default)" 
+				addproperty  = "configureCI.orgEmail" 
+				defaultvalue = "${configureCI.orgEmailDefault}"
+				unless:set   = "configureCI.orgEmail" />
+
+			<setLogLevel level="1" />
+			<propertyfile file="build.properties">
+				<entry key="${configureCI.ciEnvironmentProperties.name.lower}.orgEmail" value="${configureCI.orgEmail}" />
+			</propertyfile>
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciBuildSettingsPrompts">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>Build Configuration</echo>
+			<echo>=========================================</echo>
+			<echo />
+			<echo>The following prompts will collect additional build configuration details.</echo>
+			<echo />
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Salesforce Server URL?</echo>
+			<echo />
+			<echo> - Sandboxes               : https://test.salesforce.com</echo>
+			<echo> - Production and Dev Orgs : https://login.salesforce.com</echo>
+			<echo />
+
+			<input 
+				message      = "Server URL? (press return for default)" 
+				addproperty  = "configureCI.serverUrl" 
+				defaultvalue = "${configureCI.ciEnvironmentProperties.serverUrlDefault}"
+				unless:set   = "configureCI.serverUrl" />
+
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Enable branch checking?</echo>
+			<echo />
+			<echo>The tooling has a feature to check current branch name before deploying metadata. This protects against accidental deployment of the wrong branch to an environment.</echo>
+			<echo />
+			<echo>Enabling this feature is STRONGLY recommended!</echo>
+			<echo />
+
+			<condition property="configureCI.enableBranchCheckingDefault" value="y" else="n">
+				<istrue value= "${configureCI.ciEnvironmentProperties.branchCheckingDefault}" />
+			</condition>
+
+			<input 
+				message      = "Enable branch checking? (press return for yes)" 
+				addproperty  = "configureCI.enableBranchCheckingYN" 
+				validargs    = "y,n" 
+				defaultvalue = "${configureCI.enableBranchCheckingDefault}"
+				unless:set   = "configureCI.enableBranchChecking" />
+
+			<condition property="configureCI.enableBranchChecking" value="true" else="false">
+				<equals 
+					arg1            = "${configureCI.enableBranchCheckingYN}" 
+					arg2            = "y" 
+					casesensitive   = "false" />
+			</condition>
+
+			<ciAllowedBranchPrompt if:true="${configureCI.enableBranchChecking}" />
+
+			<setLogLevel level="1" />
+			<propertyfile file="build.properties">
+				<entry
+					key         = "${configureCI.ciEnvironmentProperties.name.lower}.sf_serverUrl"  
+					value       = "${configureCI.serverUrl}" />
+				<entry
+					key         = "${configureCI.ciEnvironmentProperties.name.lower}.checkBranch"  
+					value       = "${configureCI.enableBranchChecking}" />
+				<entry
+					key         = "${configureCI.ciEnvironmentProperties.name.lower}.allowedBranch"
+					value       = "${configureCI.allowedBranch}"
+					if:true     = "${configureCI.enableBranchChecking}" />
+			</propertyfile>
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciAllowedBranchPrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>What branch is allowed to deploy this environment?</echo>
+			<echo />
+			<echo>This property is a regular expression therefore each of the following are valid examples:</echo>
+			<echo> - master</echo>
+			<echo> - deploy/UAT</echo>
+			<echo> - (develop|master)</echo>
+			<echo> - feature/(.*)</echo>
+			<echo />
+
+			<input 
+				message      = "Allowed branch? (press return for yes)" 
+				addproperty  = "configureCI.allowedBranch" 
+				defaultvalue = "${configureCI.ciEnvironmentProperties.allowedBranchDefault}"
+				unless:set   = "configureCI.allowedBranch" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciFinaliseConfigure">
+		<sequential>
+			<ciReviewBitbucketSetup           if:true="${configureCI.build.bitbucket.enableIntegration}" />
+			<ciPrintConfigureCIProperties unless:true="${configureCI.build.bitbucket.enableIntegration}" />
+
+			<echo />
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Setup complete!</echo>
+			<echo if:true="${configureCI.build.bitbucket.enableIntegration}">Remember to update bitbucket-pipelines.yml</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciPrintConfigureCIProperties">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>Environment Variables</echo>
+			<echo>=========================================</echo>
+			<echo />
+
+			<printConfigureCIProperties />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciReviewBitbucketSetup">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>Bitbucket Pipelines Configuration</echo>
+			<echo>=========================================</echo>
+			<echo />
+			<echo>Bitbucket Pipelines will now be checked for existing configuration.</echo>
+			<echo />
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Reviewing Bitbucket setup...</echo>
+			<echo />
+
+			<reviewBitbucketSetup />
+
+			<echo />
+			<echo if:true="${configureCI.reviewBitbucketSetup.noChanges}">No changes required</echo>
+			<ciFinaliseConfigureBitbucketPrompt unless:true="${configureCI.reviewBitbucketSetup.noChanges}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciFinaliseConfigureBitbucketPrompt">
+		<sequential>
+			<echo>Would you like to proceed with changes to Bitbucket Pipelines configuration?</echo>
+			<echo />
+
+			<input 
+				message      = "Proceed? (press y then return for yes)" 
+				addproperty  = "configureCI.setupBitbucketPropertiesYN" 
+				validargs    = "y,n" 
+				unless:set   = "configureCI.setupBitbucketProperties" />
+
+			<condition property="configureCI.setupBitbucketProperties">
+				<equals 
+					arg1            = "${configureCI.setupBitbucketPropertiesYN}" 
+					arg2            = "y" 
+					casesensitive   = "false" />
+			</condition>
+
+			<condition property="configureCI.promptForEnvironmentType">
+				<and>
+					<istrue value="${configureCI.setupBitbucketProperties}" />
+					<not>
+						<istrue value="${configureCI.ciEnvironmentProperties.ci.environmentExists}" />
+					</not>
+				</and>
+			</condition>
+
+			<ciBitbucketEnvironmentTypePrompt if:true="${configureCI.promptForEnvironmentType}" />
+
+			<setupBitbucket
+				environmentType = "${configureCI.bitbucketEnvironmentType}"
+				if:true         = "${configureCI.setupBitbucketProperties}" />
+			<ciPrintConfigureCIProperties unless:true="${configureCI.setupBitbucketProperties}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ciBitbucketEnvironmentTypePrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>What type of deployment environment?</echo>
+			<echo />
+			<echo>Bitbucket categorises environments as test, staging or production.</echo>
+			<echo />
+			<echo>Choose the most applicable for the environment being created.</echo>
+			<echo />
+			<echo>Note - CI sandboxes should be set as production (since they replicate production)</echo>
+			<echo />
+
+			<input 
+				message      = "Environment type? (press return to accept default)" 
+				addproperty  = "configureCI.bitbucketEnvironmentType" 
+				validargs    = "test,staging,production" 
+				defaultvalue = "${configureCI.ciEnvironmentProperties.ci.suggestedEnvironmentType}"
+				unless:set   = "configureCI.bitbucketEnvironmentType" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="deleteMpdxTempDir">
+		<sequential>
+			<mpdxScript name="deleteMpdxTempDir" includeSession="false" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="getGitRepoInfo">
+		<sequential>
+			<local name="configureCI.gitRepoInfo" />
+
+			<mpdxScript name="getGitRepoInfo" includeSession="false" resultPropertyPrefix="configureCI.gitRepoInfo" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="getCIEnvironmentProperties">
+		<attribute name="environment"    />
+		<attribute name="checkBitbucket" />
+		<sequential>
+			<local name="configureCI.ciEnvironmentProperties" />
+
+			<mpdxScript name="getCIEnvironmentProperties" resultPropertyPrefix="configureCI.ciEnvironmentProperties">
+				<args>
+					<arg line="--arg-name &quot;@{environment}&quot;"                                               />
+					<arg line="--arg-checkBitbucket"                                    if:true="@{checkBitbucket}" />
+					<arg line="--arg-clientId &quot;${server.bitbucket.clientId}&quot;"                             />
+					<arg line="--arg-secret &quot;${server.bitbucket.secret}&quot;"                                 />
+					<arg line="--arg-workspace &quot;${bitbucket.workspace}&quot;"                                  />
+					<arg line="--arg-repository &quot;${bitbucket.repository}&quot;"                                />
+					<arg line="--arg-certificateDir &quot;${dir.certificates}&quot;"                                />
+					<arg line="--arg-permissionSetName &quot;${configureCI.permissionSetName}&quot;"                />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="deleteCertificateAndKey">
+		<attribute name="name" />
+		<sequential>
+			<mpdxScript name="deleteCertificateAndKey" includeSession="false">
+				<args>
+					<arg line="--arg-name &quot;@{name}&quot;" />
+					<arg line="--arg-directory &quot;${dir.certificates}&quot;" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="reuseCertificateAndKey">
+		<attribute name="name" />
+		<sequential>
+			<mpdxScript name="reuseCertificateAndKey" includeSession="false">
+				<args>
+					<arg line="--arg-name &quot;@{name}&quot;" />
+					<arg line="--arg-directory &quot;${dir.certificates}&quot;" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="reviewJwtSetup">
+		<sequential>
+			<mpdxScript name="reviewJwtSetup">
+				<args>
+					<arg line="--arg-permissionSetLabel &quot;${configureCI.permissionSetLabel}&quot;" />
+					<arg line="--arg-permissionSetName &quot;${configureCI.permissionSetName}&quot;"   />
+					<arg line="--arg-connectedAppLabel &quot;${configureCI.connectedAppLabel}&quot;"   />
+					<arg line="--arg-connectedAppName &quot;${configureCI.connectedAppName}&quot;"     />
+					<arg line="--arg-connectedAppEmail &quot;${configureCI.connectedAppEmail}&quot;"   />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setupJwtAccess">
+		<sequential>
+			<mpdxScript name="setupJwtAccess">
+				<args>
+					<arg line="--arg-permissionSetLabel &quot;${configureCI.permissionSetLabel}&quot;" />
+					<arg line="--arg-permissionSetName &quot;${configureCI.permissionSetName}&quot;"   />
+					<arg line="--arg-connectedAppLabel &quot;${configureCI.connectedAppLabel}&quot;"   />
+					<arg line="--arg-connectedAppName &quot;${configureCI.connectedAppName}&quot;"     />
+					<arg line="--arg-connectedAppEmail &quot;${configureCI.connectedAppEmail}&quot;"   />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="reviewUserSetup">
+		<attribute name="environment" />
+		<attribute name="baseUsername" />
+		<attribute name="email" />
+		<sequential>
+			<mpdxScript name="reviewUserSetup" resultPropertyPrefix="configureCI.reviewUserSetup">
+				<args>
+					<arg line="--arg-permissionSetLabel &quot;${configureCI.permissionSetLabel}&quot;" />
+					<arg line="--arg-permissionSetName &quot;${configureCI.permissionSetName}&quot;" />
+					<arg line="--arg-baseUsername &quot;@{baseUsername}&quot;"   />
+					<arg line="--arg-environment &quot;@{environment}&quot;"   />
+					<arg line="--arg-userEmail &quot;@{email}&quot;"   />
+					<arg line="--arg-userProfile &quot;${configureCI.userProfile}&quot;"     />
+					<arg line="--arg-userFirstName &quot;${configureCI.userFirstName}&quot;"   />
+					<arg line="--arg-userLastName &quot;${configureCI.userLastName}&quot;"   />
+					<arg line="--arg-userAlias &quot;${configureCI.userAlias}&quot;"   />
+					<arg line="--arg-userNickname &quot;${configureCI.userNickname}&quot;"   />
+					<arg line="--arg-userTimeZone &quot;${configureCI.userTimeZone}&quot;"   />
+					<arg line="--arg-userLocale &quot;${configureCI.userLocale}&quot;"   />
+					<arg line="--arg-userEmailEncoding &quot;${configureCI.userEmailEncoding}&quot;"   />
+					<arg line="--arg-userLangLocale &quot;${configureCI.userLangLocale}&quot;"   />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setupUserAccess">
+		<sequential>
+			<mpdxScript name="setupUserAccess" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="printConfigureCIProperties">
+		<sequential>
+			<mpdxScript name="printConfigureCIProperties" includeSession="false">
+				<args>
+					<arg line="--arg-build &quot;${tooling.build}&quot;" if:set="tooling.build" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="reviewBitbucketSetup">
+		<sequential>
+			<mpdxScript name="reviewBitbucketSetup" includeSession="false" resultPropertyPrefix="configureCI.reviewBitbucketSetup" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setupBitbucket">
+		<attribute name="environmentType" />
+		<sequential>
+			<mpdxScript name="setupBitbucket" includeSession="false">
+				<args>
+					<arg line="--arg-clientId &quot;${server.bitbucket.clientId}&quot;" />
+					<arg line="--arg-secret &quot;${server.bitbucket.secret}&quot;"     />
+					<arg line="--arg-workspace &quot;${bitbucket.workspace}&quot;"      />
+					<arg line="--arg-repository &quot;${bitbucket.repository}&quot;"    />
+					<arg line="--arg-environmentType &quot;@{environmentType}&quot;"    />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+</project>

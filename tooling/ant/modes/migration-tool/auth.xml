@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-auth" xmlns:ff="antlib:com.spaceheroes">
+	
+	<macrodef name="getSessionInfo">
+		<sequential>
+
+			<metricTimestamp name="migration-auth-get-session-start" />
+
+			<validateEnvironmentProperties />
+
+			<importForceFlowLibrary />
+
+			<ff:sessionInfo 
+				username            = "${sf_username}" 
+				password            = "${sf_password}${sf_token}" 
+				serverurl           = "${sf_serverUrl}"
+				sessionIdProperty   = "sf_sessionId"
+				instanceUrlProperty = "sf_instanceUrl" />
+
+			<metricTimestamp name="migration-auth-get-session-stop" />
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="login">
+		<sequential>
+			<!-- Do nothing - migration-tool mode doesn't require a login function -->
+		</sequential>
+	</macrodef>
+
+</project>

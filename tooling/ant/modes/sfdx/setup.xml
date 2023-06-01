@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-setup" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<macrodef name="createBuildPropertiesLocal">
+		<sequential>
+			<copyNoOverride 
+				file         = "${dir.setupFiles}/build-properties/sfdx-local" 
+				toFile       = "build.properties.local" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="environmentCredentialPrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Create a new SFDX login or use an existing one?</echo>
+			<echo />
+			<echo>SFDX can only have one login per username. If a connection has already been established using another tool</echo>
+			<echo>e.g. VSCode the login will already exist and therefore should be re-used (else the other tool will lose its connection).</echo>
+			<echo />
+			<echo>If configuring VSCode later, use the ${tooling.sfdx.aliasPrefix}:${setup.envName} alias to connect using this SFDX login.</echo>
+			<echo />
+			<echo>Options:</echo>
+			<echo> - Create a *new* SFDX authentication - ** Default **</echo>
+			<echo> - Re-use an *existing* SFDX authentication</echo>
+			<echo />
+
+			<input 
+				message      = "Configure new sfdx login or use existing? (press return to accept default)" 
+				addproperty  = "setup.createNewLoginNewExisting" 
+				validargs    = "new,existing" 
+				defaultvalue = "new"
+				unless:set   = "setup.createNewLogin" />
+
+			<condition property="setup.createNewLogin">
+				<equals 
+					arg1            = "${setup.createNewLoginNewExisting}" 
+					arg2            = "new" 
+					casesensitive   = "false" />
+			</condition>
+
+			<newLoginPrompt
+				if:true      = "${setup.createNewLogin}" />
+
+			<existingLoginPrompt
+				unless:true  = "${setup.createNewLogin}" />
+
+			<defaultEnvironmentPrompt />
+
+			<condition property="setup.setDefaultSfdxEnvironment">
+				<and>
+					<istrue value="${tooling.enableSfdxDefaultUsername}" />
+					<istrue value="${setup.setDefault}"                  />
+					<istrue value="${tooling.source.isSfdx}"             />
+				</and>
+			</condition>
+
+			<setDefaultSfdxEnvironment
+				if:true      = "${setup.setDefaultSfdxEnvironment}" />
+
+			<setLogLevel level="1" />
+
+			<propertyfile file="build.properties.local">
+				<entry key="e"                             value="${setup.envName}"   if:true="${setup.setDefault}" />
+				<entry key="${setup.envName}.sf_username"  value="${setup.username}"  if:set="setup.username"       />
+				<entry key="${setup.envName}.sf_serverUrl" value="${setup.serverUrl}" if:set="setup.serverUrl"      />
+				<entry key="${setup.envName}.sf_alias"     value="${setup.alias}"     if:set="setup.alias"          />
+			</propertyfile>
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="newLoginPrompt">
+		<sequential>
+
+			<serverUrlPrompt />
+
+			<echo />
+			<echo>*******************************************************************************</echo>
+			<echo>*** Check browser for Salesforce login prompt, login and return to terminal ***</echo>
+			<echo>*******************************************************************************</echo>
+
+			<property name="setup.alias" value="${tooling.sfdx.aliasPrefix}:${setup.envName}" />
+
+			<sfdxJson 
+				command        = "force:auth:web:login"
+				outputproperty = "setup.loginResult">
+				<args>
+					<arg line="--instanceurl=${setup.serverUrl}" />
+					<arg line="--setalias=${setup.alias}" />
+				</args>
+			</sfdxJson>
+
+			<jsonKeyToProperty
+				json           = "${setup.loginResult}"
+				key            = "result.username"
+				property       = "setup.username" />
+
+			<echo />
+			<echo>Salesforce login successful!</echo>
+			<echo />
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="existingLoginPrompt">
+		<sequential>
+
+			<echo>Loading existing SFDX logins...</echo>
+
+			<sfdx command="force:org:list" unless:set="setup.alias">
+				<args>
+					<arg line="--all" />
+				</args>
+			</sfdx>
+
+			<echo />
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Which login should be used for the connection to Salesforce?</echo>
+			<echo />
+			<echo>Enter an alias name from the table above.</echo>
+			<echo />
+
+			<input 
+				message        = "Enter selected alias:" 
+				addproperty    = "setup.alias"
+				unless:set     = "setup.alias" />
+			
+			<echo>Logging into to Salesforce...</echo>
+
+			<sfdxJson 
+				command        = "force:org:display"
+				outputproperty = "setup.orgResult">
+				<args>
+					<arg line="-u=${setup.alias}" />
+				</args>
+			</sfdxJson>
+
+			<jsonKeyToProperty
+				json           = "${setup.orgResult}"
+				key            = "result.username"
+				property       = "setup.username" />
+
+			<jsonKeyToProperty
+				json           = "${setup.orgResult}"
+				key            = "result.instanceUrl"
+				property       = "setup.serverUrl" />
+
+			<echo />
+			<echo>Salesforce login successful!</echo>
+			<echo />
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setDefaultSfdxEnvironment">
+		<sequential>
+			<echo>Setting default SFDX alias...</echo>
+
+			<sfdxJson
+				command        = "config:set"
+				outputproperty = "setup.setDefaultSfdxEnvironment.result">
+				<args>
+					<arg line="defaultusername=${setup.alias}" />
+				</args>
+			</sfdxJson>
+		</sequential>
+	</macrodef>
+
+</project>

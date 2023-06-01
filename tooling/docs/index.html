@@ -1,0 +1,2292 @@
+<html><head><base href="../"><link rel="stylesheet" href="docs/styles/bootstrap.min.css"><style type="text/css">body { margin: 20px 50px; }</style></head><body><h1 id="readme">README</h1>
+<p>Ant-SF-Build is developed by <a href="http://makepositive.com">makepositive</a></p>
+<h1 id="gettingstarted">Getting Started</h1>
+<h2 id="ossupport">OS Support</h2>
+<p>Tooling is designed to be cross platform and will run on any Operating System that can run Apache Ant which in turn requires the Java Development Kit (JDK) v11.</p>
+<p>The tooling is known to work on: macOS 10.12+, Windows 7+ and Linux</p>
+<p><strong>Note</strong> - most makepositive consultants use macOS therefore documentation and setup is focused on this platform. Setup steps may need to be adapted and additional dependencies may be required for Windows.</p>
+<h3 id="prerequisites">Pre-requisites</h3>
+<ul>
+<li>JDK</li>
+<li>Ant</li>
+<li>OpenSSL</li>
+</ul>
+<h2 id="installationfirsttimeinitialisation">Installation - First time initialisation</h2>
+<ol>
+<li>Create a new source code repository</li>
+<li>Download the latest installer from <a href="https://tooling.makepositive.com/installer/build.xml">https://tooling.makepositive.com/installer/build.xml</a></li>
+<li>Install and initialise the tooling by opening a terminal/command prompt and running: (then follow the prompts)</li>
+</ol>
+<pre><code>    ant init
+</code></pre>
+<ol start="4">
+<li>Adjust the following files as required by the project:</li>
+</ol>
+<ul>
+<li><code>manifest/package.xml</code> / <code>src/package.xml</code> - Define metadata to be tracked</li>
+<li><code>build.properties</code> - Override any build tooling properties to enable/disable features for everyone on the project</li>
+<li><code>bitbucket-pipelines.yml</code> - Adjust default Bitbucket Pipelines configuration to fit branching model of project (if using Pipelines)</li>
+</ul>
+<ol start="4">
+<li><p>Retrieve metadata from Production Salesforce org as baseline</p></li>
+<li><p>Commit tooling and metadata files to the repository.</p>
+<ul>
+<li>Do not check-in the tooling directory or <code>*.local</code> files.</li>
+<li>If using Git the tooling will create a <code>.gitignore</code> file to ensure that these files are excluded.</li></ul></li>
+<li><p>Enable Pipelines, configure repository and deployment variables - see environment variables section below (if using Pipelines)</p></li>
+</ol>
+<h2 id="setuponetimeforeachteammember">Setup - One-time for each team member</h2>
+<ol>
+<li>Checkout source code repository</li>
+<li>Open a terminal/command prompt and run: (then follow the prompts)</li>
+</ol>
+<pre><code>    ant setup
+</code></pre>
+<h1 id="installationautomaticupdatesandversioning">Installation, Automatic Updates and Versioning</h1>
+<p>The tooling is a collection of Ant build scripts that are used to retrieve and deploy Salesforce metadata.</p>
+<p>It has two components:</p>
+<ul>
+<li><code>Installer</code> - a standalone <code>build.xml</code> file that contains all the required code and configuration to download, install, update and run the tooling</li>
+<li><code>Core Tooling</code> - a collection of build xml files that is the tooling</li>
+</ul>
+<p>The tooling is designed to operate with automatic installation and updates but can also be used standalone i.e. the core tooling component can be downloaded, installed and updated by the installer component or simply used on it's own.</p>
+<p>By default, Ant will try to find and load <code>build.xml</code> in the current working directory. Both components have their own <code>build.xml</code> file so that the tooling can operate with automated installation or standalone.</p>
+<p>The installer <code>build.xml</code> references the core tooling <code>build.xml</code> file so Ant commands run against the installer are in effect proxied to the core tooling.</p>
+<p>Ant files are loaded as follows:</p>
+<p><strong>Automated installation</strong></p>
+<pre><code>    ant [target] -&gt; build.xml (installer) -&gt; build.xml (core tooling) -&gt; ant/*.xml (core tooling xml files)
+</code></pre>
+<p><strong>Standalone installation</strong></p>
+<pre><code>    ant [target] -&gt; build.xml (core tooling) -&gt; ant/*.xml (core tooling xml files)
+</code></pre>
+<p>In the above examples <code>[target]</code> can exist in any of the loaded Ant configuration files.</p>
+<p>Where the installer component is in use, the core tooling component does not need to be checked into source control - the correct version will be downloaded at runtime as required. Standalone mode will require check-in of all files.</p>
+<p>Standalone use of the tooling is designed for use by clients after projects have completed i.e. so clients can continue to use the tooling without automated updates. See <code>Standalone Version</code> section of this document for instructions on converting an installation to standalone.</p>
+<p>Active projects should not use the standalone mode.</p>
+<h2 id="installer">Installer</h2>
+<p>The installer <code>build.xml</code> file is a single file that can be used to download, install, update and run the tooling. It works by connecting to <a href="https://tooling.makepositive.com">https://tooling.makepositive.com</a> to download the selected tooling version, unpacking the core tooling files and finally loading the tooling.</p>
+<p>This is the only Ant build XML file that needs to be checked into the source code repository - the rest of the tooling installation and updating will be taken care of by the installer <code>build.xml</code> file.</p>
+<p>The latest version of the installer can be downloaded from here: <a href="https://tooling.makepositive.com/installer/build.xml">https://tooling.makepositive.com/installer/build.xml</a> (requires credentials - see below).</p>
+<p><strong>Important Note</strong> - Never make any changes to the installer <code>build.xml</code> file or any files in the tooling installation directory - they will be overwritten on the next tooling update. See <code>Build Hooks</code> section for customisation options.</p>
+<h3 id="installationdirectory">Installation Directory</h3>
+<p>During installation there will be a prompt for an installation directory - this is where the core tooling will be unpacked. This must be a subdirectory of the current working directory (alphanumeric with no spaces) and not already exist (to protect against potentially overwriting files).</p>
+<p>This directory will contain the downloaded version of the core tooling and should not be checked into source control.</p>
+<p>The recommended install location is <code>tooling</code> (there shouldn't be a need to change this).</p>
+<h3 id="versions">Versions</h3>
+<p>The installer will prompt for a version i.e. the version of the core tooling that should be installed. The version can be a <code>fixed</code> version or <code>tagged</code> version.</p>
+<p><strong>Examples:</strong>
+Fixed <code>4.0.2</code> - will install version <code>4.0.2</code> and not receive any automatic updates
+Tagged <code>4.0.x</code> - will install the latest version of version <code>4.0</code> and receive automatic <code>patch</code> updates
+Tagged <code>4.x.x</code> - will install the latest version of version <code>4</code> and receive automatic <code>minor</code> and <code>patch</code> updates</p>
+<p><strong>Note</strong> - <code>x.x.x</code> is not supported</p>
+<p>New installations should use the most recent version available. Use of a tagged version is recommended over a fixed version.</p>
+<p>The installer defaults to the most recent tagged version. If in doubt, check with the DevOps team.</p>
+<p>The version can be changed later, see <code>Installer Properties</code> section below.</p>
+<h3 id="credentials">Credentials</h3>
+<p>All makepositive DevOps tooling is published to <a href="https://tooling.makepositive.com">https://tooling.makepositive.com</a>, this site is password protected so you will need credentials to access.</p>
+<p>Internal makepositive users can generate credentials in Salesforce using the following link: <a href="https://makepositive.my.salesforce.com/apex/mpTooling">https://makepositive.my.salesforce.com/apex/mpTooling</a>.</p>
+<p>Credentials for clients can be generated by the DevOps team.</p>
+<p><strong>Never share credentials or use internal credentials for a client build server</strong></p>
+<p>The tooling will prompt for these credentials the first time it needs to download a version from <a href="https://tooling.makepositive.com">https://tooling.makepositive.com</a>.</p>
+<p>Credentials will be cached to the following properties in the home directory of the machine:</p>
+<pre><code>    ~/mptooling.properties
+</code></pre>
+<h4 id="resetcredentials">Reset Credentials</h4>
+<p>Tooling credentials can be reset by running the following command:</p>
+<pre><code>    ant -Dtooling.username={new-username} -Dtooling.password={new-password}
+</code></pre>
+<p>Alternatively, credentials can be manually changed in <code>~/mptooling.properties</code> using a text editor.</p>
+<h4 id="toolingcredentialsenvironmentvariables">Tooling Credentials Environment Variables</h4>
+<p>Build servers will also need to connect to <a href="https://tooling.makepositive.com">https://tooling.makepositive.com</a>, credentials can be set using the following environment variables:</p>
+<pre><code>    MP_TOOLING_USERNAME
+    MP_TOOLING_PASSWORD
+</code></pre>
+<p><strong>Note</strong> - these environment variables are configured at an account level for the makepositive Bitbucket account therefore don't need to be setup for each project.</p>
+<h3 id="autoupdating">Auto Updating</h3>
+<p>The installer will automatically check for and install new versions of the core tooling when an Ant command is run (so long as there hasn't been an update check in the last 4 hours).</p>
+<p>Installation will also occur if the version tag in install.properties doesn't match the installed version i.e. the builder manager has changed the version of tooling being used therefore all users should be changed to the new version.</p>
+<p>A tooling re-installation can be forced by running the following command:</p>
+<pre><code>    ant -Dtooling.forceInstall=true
+</code></pre>
+<h3 id="installerselfupdate">Installer Self Update</h3>
+<p>The last step of a tooling installation is to update the installer <code>build.xml</code> file. This installer file is shipped with the core tooling and the installer will overwrite itself with the new version. This functionality allows updates to the installer <code>build.xml</code> file to be pushed out at the same time as tooling versions.</p>
+<p>Installer <code>build.xml</code> updates are rare but when they occur be sure to check-in any changes to this file to source control.</p>
+<p><strong>It is always safe and recommended to check-in all changes to the installer <code>build.xml</code> file as a result of a tooling update.</strong></p>
+<h3 id="installerproperties">Installer Properties</h3>
+<p>Ant properties pertaining to the installer <code>build.xml</code> are stored in <code>install.properties</code>. This file is used to tell the installer which version to install and where, it must be checked into source control.</p>
+<p><strong>This file should only ever contain installation properties:</strong></p>
+<pre><code>    dir.toolingBase={tooling-installation-directory}
+    tooling.version={tooling-version-tag}
+</code></pre>
+<p>Core tooling properties should be stored in <code>build.properties</code> and <code>build.properties.local</code> - see <code>Properties</code> section of this document.</p>
+<h3 id="signing">Signing</h3>
+<p>Tooling versions are signed using OpenSSL with a private key - the installer checks builds downloaded from <a href="https://tooling.makepositive.com">https://tooling.makepositive.com</a> have a signature and that the signature has been signed by the makepositive build server. The installer will not install builds where signature verification fails.</p>
+<h1 id="usage">Usage</h1>
+<h2 id="initialise">Initialise</h2>
+<pre><code>    ant init
+</code></pre>
+<p>First time <strong>project</strong> initialisation of the tooling:</p>
+<ul>
+<li>Define key project configuration settings - the tooling will guide through the available options</li>
+<li>Create <code>manifest</code>, <code>force-app</code> and <code>destructiveChanges</code> directories or <code>src</code> directory with <code>package.xml</code>, <code>destructiveChangesPre.xml</code> and <code>destructiveChangesPost.xml</code> templates</li>
+<li>Create <code>build.properties</code> file</li>
+<li>Create <code>.gitignore</code> and <code>.gitattributes</code> files (if installed to a Git repository)</li>
+<li>Create <code>compression.json</code> and <code>modification.json</code> files</li>
+<li>Create <code>.fork</code> directory with <code>custom-commands.json</code> templates</li>
+<li>Create <code>.issuetracker</code> file</li>
+<li>Create <code>bitbucket-pipelines.yml</code> file (if Bitbucket Pipelines is the selected build server)</li>
+</ul>
+<h2 id="setup">Setup</h2>
+<pre><code>    ant setup
+</code></pre>
+<p>First time <strong>user</strong> initialisation of the tooling:</p>
+<ul>
+<li>Create <code>build.properties.local</code> file</li>
+<li>Create first Salesforce environment connection in <code>build.properties.local</code></li>
+</ul>
+<hr />
+<pre><code>    ant configure
+</code></pre>
+<p>Subsequent Salesforce environment connections:</p>
+<ul>
+<li>Create additional Salesforce environment connection in <code>build.properties.local</code></li>
+</ul>
+<hr />
+<pre><code>    ant configureCI [-De={environment}]
+</code></pre>
+<p>Configure Salesforce CI environment connections:</p>
+<ul>
+<li>Create certificate and encrypted key (see Certificate Creation for details)</li>
+<li>Configure JWT access in Salesforce for certificate based authentication (create Connected App and Permission Set)</li>
+<li>Create Salesforce user login and assign Permission Set</li>
+<li>Configure additional build settings<ul>
+<li>Salesforce Server URL (for authentication)</li>
+<li>Branch checking</li></ul></li>
+<li>If applicable, create variables in Bitbucket Pipelines</li>
+</ul>
+<h3 id="certificatecreation">Certificate Creation</h3>
+<pre><code>    ant createCertificate [-Dssl.name={certificate-name}]
+</code></pre>
+<p>Create an SSL certificate and encrypted private key that can be used for SFDX JWT authentication.</p>
+<p>Certificates will be saved to the <code>certificates</code> folder (which will be created if it doesn't exist).</p>
+<p>It is important to keep a note of the decryption key and initialisation vector output during certificate creation - these will be needed to decrypt the key at build time, these values are not recoverable.</p>
+<p>Both encrypted private key and public certificate can be checked into source control - <strong>do not check-in the decryption key or initialisation vector</strong>.</p>
+<p>Use of different keys and certificates for different environments is recommended.</p>
+<h2 id="retrieve">Retrieve</h2>
+<pre><code>    ant retrieve [-De={environment}]
+</code></pre>
+<p>Retrieve metadata from Salesforce as per the metadata types defined in <code>manifest/package.xml</code> / <code>src/package.xml</code>.</p>
+<p>Use <code>-De={environment-name}</code> to specify the source environment, if not specified changes will be retrieved from the default environment.</p>
+<p>The tooling will:</p>
+<ul>
+<li>Retrieve Main Package<ul>
+<li>Retrieve metadata from Salesforce as per manifest <code>manifest/package.xml</code> / <code>src/package.xml</code></li>
+<li>Convert objects metadata to SFDX format (if enabled)</li>
+<li>Compress XML metadata</li>
+<li>Modify metadata to ensure it can be deployed back to Salesforce</li>
+<li>Unpack any static resources to the resource-bundles directory</li>
+<li>Export any configuration data as per <code>SoBeIt</code> configurations in <code>sobeit-config/export</code></li></ul></li>
+</ul>
+<h2 id="testdeploy">Test / Deploy</h2>
+<pre><code>    ant test [-De={environment}]
+</code></pre>
+<p>Validate metadata in the <code>force-app</code> / <code>src</code> directory with the <code>manifest/package.xml</code> / <code>src/package.xml</code> manifest against a target Salesforce org.</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified changes will be validated against the default environment.</p>
+<p>This command will always run a check-only test deployment (doesn't actually deploy the metadata). The <code>sf_checkOnly</code> property is ignored when using this command.</p>
+<p>The tooling will:</p>
+<ul>
+<li>Pack any static resources from the <code>resource-bundles</code> directory (MD / Hybrid modes)</li>
+<li>Modify metadata to ensure it can be deployed to Salesforce</li>
+<li>Run any pre-deploy Apex scripts (all scripts in <code>apex-scripts-pre</code> directory)</li>
+<li>Validate metadata in the <code>force-app</code> / <code>src</code> directory with <code>manifest/package.xml</code> / <code>src/package.xml</code></li>
+</ul>
+<hr />
+<pre><code>    ant deploy [-De={environment}]
+</code></pre>
+<p>Deploy (or validate depending on <code>sf_checkOnly</code> setting) metadata in the <code>force-app</code> / <code>src</code> directory with the <code>manifest/package.xml</code> / <code>src/package.xml</code> manifest against a target Salesforce org.</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified changes will be deployed to the default environment.</p>
+<p>This command will respect the <code>sf_checkOnly</code> property and run a validation or deployment accordingly - this property always defaults to false to protect against accidental deployments.</p>
+<p>The tooling will:</p>
+<ul>
+<li>Pack any static resources from the <code>resource-bundles</code> directory (MD / Hybrid modes)</li>
+<li>Modify metadata to ensure it can be deployed to Salesforce</li>
+<li>Run any pre-deploy Apex scripts (all scripts in <code>apex-scripts-pre</code> directory)</li>
+<li>Deploy (or validate) metadata in the <code>force-app</code> / <code>src</code> directory with <code>manifest/package.xml</code> / <code>src/package.xml</code></li>
+<li>Run any post-deploy Apex scripts (all scripts in <code>apex-scripts-post</code> directory - only on deploy)</li>
+<li>Deploy any configuration data as per <code>SoBeIt</code> configurations in <code>sobeit-config/import</code> (only on deploy)</li>
+</ul>
+<hr />
+<pre><code>    ant quickDeploy [-De={environment}]
+</code></pre>
+<p>Quick deploy the last successful validation. This command uses the <code>deploy.lastDeployId</code> property which is saved to <code>build-state.properties.local</code> following a successful deployment or validation (originating from <code>ant test</code> or <code>ant deploy</code>).</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified quick deploy will be initialised against the default environment.</p>
+<p>Notes:</p>
+<ul>
+<li>Quick deploy is not available if the validation didn't include a unit test run</li>
+<li>The <code>deploy.lastDeployId</code> property is updated after successful validation or deployment and is not saved per environment. Therefore if the following example sequence occurred: <code>ant test -De=env1</code> then <code>ant test -De=env2</code> then <code>ant quickDeploy -De=env1</code> - it would fail because the last deployment id would be from <code>env2</code> with a quick deploy target of <code>env1</code>.</li>
+</ul>
+<p>The tooling will:</p>
+<ul>
+<li>Quick deploy the last successful validation</li>
+<li>Run any post-deploy Apex scripts (all scripts in <code>apex-scripts-post</code> directory - only on deploy)</li>
+<li>Deploy any configuration data as per <code>SoBeIt</code> configurations in <code>sobeit-config/import</code> (only on deploy)</li>
+</ul>
+<h2 id="list">List</h2>
+<pre><code>    ant list -Dtype={metadata-type} [-Dfolder={folder}] [-De={environment}]
+</code></pre>
+<p>Get a list of metadata from a Salesforce environment for a specified metadata type (<code>-Dtype={metadata-type}</code>). Some metadata types require a folder (e.g. <code>Report</code>) to list metadata (see Salesforce documentation), this can be specified with <code>-Dfolder{folder}</code>.</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified changes will be listed for the default environment.</p>
+<p><strong>Example 1 - Retrieve a list of Apex Classes from the default environment:</strong></p>
+<pre><code>    ant list -Dtype=ApexClass
+</code></pre>
+<p><strong>Example 2 - Retrieve a list of Reports from a the <code>Sales_Reports</code> folder from the <code>dev</code> environment:</strong></p>
+<pre><code>    ant list -Dtype=Report -Dfolder=Sales_Reports -De=dev
+</code></pre>
+<h2 id="open">Open</h2>
+<pre><code>    ant open [-De={environment}]
+</code></pre>
+<p>Launch a web browser and open the target Salesforce environment.</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified the default environment will open.</p>
+<h2 id="reset">Reset</h2>
+<pre><code>    ant reset [-Df=true]
+</code></pre>
+<p>Reset all files back to the version held in source control and remove any untracked files (unknown to source control) from the source directories.</p>
+<p>This command is only applicable for Git repositories.</p>
+<p><strong>Warning</strong> - All changes to files in the directory will be permanently removed. This is generally safe as changes are developed/configured in Salesforce and retrieved to the working directory therefore can be retrieved again. However, that might not always be the case - especially if developing locally, working on scripts or working on build hooks.</p>
+<p>A confirmation prompt will check before resetting the directory, this can be suppressed with <code>-Df=true</code>.</p>
+<p>The tooling will:</p>
+<ul>
+<li>Run <code>git reset --hard</code></li>
+<li>Run <code>git clean -d -f force-app</code> or <code>git clean -d -f src</code></li>
+<li>Run <code>git clean -d -f resource-bundles</code></li>
+</ul>
+<h2 id="releasemanagement">Release Management</h2>
+<p>Release branches are named as follows:</p>
+<pre><code>    release/{major}.{minor}.{patch}
+</code></pre>
+<p>These commands are only applicable for Git repositories.</p>
+<hr />
+<pre><code>    ant createMajorRelease
+</code></pre>
+<p>Create and push a release branch with the next major version from the current checked-out branch. The current branch must be either develop or the highest release branch - this prevents creating a new release branch from old source.</p>
+<p>Major versions will start from <code>1.0.0</code>.</p>
+<hr />
+<pre><code>    ant createMinorRelease
+</code></pre>
+<p>Create and push a release branch with the next minor version from the current checked-out branch. The current branch must be either develop or the latest minor release branch of a given version for example, if creating a new minor version from <code>1.4.0</code> (which will be <code>1.5.0</code>) the current branch must be <code>release/1.4.x</code>. This prevents creating a new release branch from old source.</p>
+<hr />
+<pre><code>    ant createPatchRelease
+</code></pre>
+<p>Create and push a release branch with the next patch version from the current checked-out branch. The current branch must be either develop or the latest patch release branch of a given version for example, if creating a new patch version from <code>1.4.0</code> (which will be <code>1.4.1</code>) the current branch must be <code>release/1.4.0</code>. This prevents creating a new release branch from old source.</p>
+<hr />
+<pre><code>    ant fetchReleaseBranches
+</code></pre>
+<p>The tooling needs to know about all release branches to be able to figure out which version comes next. Most local Git repositories are full clones of the server and therefore will have all release branch references. However, most build servers shallow clone repositories for efficiency and therefore may not have release branch references. This command will fetch the release branch references required by the tooling - this may or may not be needed if creating releases from a build server.</p>
+<h2 id="boilerplate">Boilerplate</h2>
+<pre><code>    ant importModules
+</code></pre>
+<p>Import modules from the makepositive Boilerplate library into the <code>force-app</code> / <code>src</code> directory. Example modules include; unit test data factories, trigger handler framework, application properties, process deactivation and others.</p>
+<h2 id="scripts">Scripts</h2>
+<pre><code>    ant runApexScript -Dscript.file={script-file} [-De={environment}]
+</code></pre>
+<p>Run an anonymous Apex script in the target Salesforce environment.</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified the script will run against the default environment.</p>
+<p><strong>Example - run an Apex script to insert custom setting records to the <code>dev</code> environment:</strong></p>
+<pre><code>    ant runApexScript -Dscript.file=scripts/insert-custom-settings.apex -De=dev
+</code></pre>
+<hr />
+<pre><code>    ant runApexScriptsPre [-De={environment}]
+</code></pre>
+<p>Run all anonymous Apex scripts in the <code>apex-scripts-pre</code> directory - these scripts are run before validation or deployment.</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified the scripts will run against the default environment.</p>
+<p>Scripts will run in alphabetical order, the recommended naming convention is as follows:</p>
+<pre><code>    apex-scripts-pre/{Order-Number}-{Ticket-Id}-{Description}.apex
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code>    apex-scripts-pre/001-ABC-111-create-email-alert-user.apex
+</code></pre>
+<hr />
+<pre><code>    ant runApexScriptsPost [-De={environment}]
+</code></pre>
+<p>Run all anonymous Apex scripts in the <code>apex-scripts-post</code> directory - these scripts are run after a successful deployment.</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified the scripts will run against the default environment.</p>
+<p>Scripts will run in alphabetical order, the recommended naming convention is as follows:</p>
+<pre><code>    apex-scripts-post/{Order-Number}-{Ticket-Id}-{Description}.apex
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code>    apex-scripts-post/001-ABC-111-insert-order-custom-settings.apex
+    apex-scripts-post/002-ABC-222-schedule-batch-job.apex
+</code></pre>
+<p>See <code>Apex Scripting Framework</code> for more information on writing scripts.</p>
+<h2 id="data">Data</h2>
+<pre><code>    ant sobeit -Dconfig={sobeit-configuration-file-or-directory} [-De={environment}]
+</code></pre>
+<p>Run a sobeit config to import data to or export data from the Salesforce environment.</p>
+<p>Use <code>-De={environment-name}</code> to specify the source/target environment, if not specified the config will run against the default environment.</p>
+<p><strong>Example - run a sobeit config to export sales data from the <code>dev</code> environment:</strong></p>
+<pre><code>    ant sobeit -Dconfig=sobeit-config/export/001-sales.js -De=dev
+</code></pre>
+<p><strong>Example - run all sobeit configs in the <code>collection</code> folder against the default environment:</strong></p>
+<pre><code>    ant sobeit -Dconfig=sobeit-config/collection
+</code></pre>
+<hr />
+<pre><code>    ant dataExport [-De={environment}]
+</code></pre>
+<p>Run all sobeit export configs in the <code>sobeit-config/export</code> directory - these scripts are run after retrieve.</p>
+<p>Use <code>-De={environment-name}</code> to specify the source environment, if not specified the config will run against the default environment.</p>
+<p>Configs will run in alphabetical order, the recommended naming convention is as follows:</p>
+<pre><code>    sobeit-config/export/{order}-{config-name}.js
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code>    sobeit-config/export/001-sales.js
+    sobeit-config/export/002-doc-gen.js
+</code></pre>
+<pre><code>    ant dataImport [-De={environment}]
+</code></pre>
+<p>Run all sobeit import configs in the <code>sobeit-config/import</code> directory - these scripts are run after a successful deployment.</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified the config will run against the default environment.</p>
+<p>Configs will run in alphabetical order, the recommended naming convention is as follows:</p>
+<pre><code>    sobeit-config/import/{order}-{config-name}.js
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code>    sobeit-config/import/001-sales.js
+    sobeit-config/import/002-doc-gen.js
+</code></pre>
+<p>See <code>Data Export / Import</code> for more information.</p>
+<h2 id="plugins">Plugins</h2>
+<pre><code>    ant plugin -Dname={plugin-name} [-De={environment}]
+</code></pre>
+<p>Run a JavaScript plugin, optionally against the target Salesforce environment (plugins may not require a Salesforce connection).</p>
+<p>Use <code>-De={environment-name}</code> to specify the target environment, if not specified the plugin will run against the default environment (or no environment).</p>
+<p>Plugins are loaded from the <code>plugins</code> directory and <code>.js</code> will be added automatically when loading the file.</p>
+<p><strong>Example - run <code>metadata-changes</code> plugin (<code>plugins/metadata-changes.js</code>) with default environment / no environment:</strong></p>
+<pre><code>    ant plugin -Dname=metadata-changes
+</code></pre>
+<p><strong>Example - run <code>salesforce-changes</code> plugin (<code>plugins/salesforce-changes.js</code>) against the default environment:</strong></p>
+<pre><code>    ant plugin -Dname=salesforce-changes
+</code></pre>
+<p><strong>Example - run <code>salesforce-changes</code> plugin (<code>plugins/salesforce-changes.js</code>) against the <code>dev</code> environment:</strong></p>
+<pre><code>    ant plugin -Dname=salesforce-changes -De=dev
+</code></pre>
+<p>See <code>JavaScript Plugin Framework</code> for more information.</p>
+<h2 id="updatetemplatefiles">Update Template Files</h2>
+<pre><code>    ant updatePipelines
+</code></pre>
+<p>Overwrite the Bitbucket Pipelines configuration file with the tooling shipped template.</p>
+<hr />
+<pre><code>    ant updatePackage
+</code></pre>
+<p>Overwrite the <code>manifest/package.xml</code> / <code>src/package.xml</code> file with the tooling shipped template - as per the selected package defined during <code>ant init</code>. See the <code>tooling.package</code> property in <code>build.properties</code>.</p>
+<hr />
+<pre><code>    ant updateDestructivePre
+</code></pre>
+<p>Overwrite the <code>destructiveChanges/destructiveChangesPre.xml</code> / <code>src/destructiveChangesPre.xml</code> file with the tooling shipped empty template.</p>
+<hr />
+<pre><code>    ant updateDestructivePost
+</code></pre>
+<p>Overwrite the <code>destructiveChanges/destructiveChangesPost.xml</code> / <code>src/destructiveChangesPost.xml</code> file with the tooling shipped empty template.</p>
+<hr />
+<pre><code>    ant updateReadme
+</code></pre>
+<p>Overwrite the project <code>README.md</code> file with the tooling shipped template.</p>
+<h2 id="standaloneversion">Standalone Version</h2>
+<pre><code>    ant freeze [-Df=true]
+</code></pre>
+<p>Freeze the installed version of the tooling in the current state i.e. convert it to the standalone version. This disconnects updating and allows the tooling to be committed to source control therefore removing all dependencies on makepositive infrastructure. This allows clients to continue to use the tooling after engagements have ended.</p>
+<p>A confirmation prompt will check before resetting the directory, this can be suppressed with <code>-Df=true</code>.</p>
+<p>The tooling will:</p>
+<ul>
+<li>Remove the tooling cache from Bitbucket Pipelines configuration (if present) - the tooling will now form part of the repository therefore doesn't need to be cached</li>
+<li>Install third party ant libraries to the repository for check-in - these would usually be downloaded at build time but the connection to the infrastructure will no longer exist to support this</li>
+<li>Update Git configuration files to allow committing of the tooling</li>
+<li>Remove tooling features that don't make sense in the standalone version<ul>
+<li>Server properties - there is no server connection therefore no server properties</li>
+<li>Boilerplate modules - access to Boilerplate is only available to internal makepositive staff</li>
+<li>Initialisation - the tooling has already been initialised</li>
+<li>Metrics - telemetry is not supported in the standalone version</li>
+<li>Template updating - template files are not being delivered through new versions therefore nothing to update</li></ul></li>
+<li>Remove server connection properties from install.properties</li>
+<li>Remove the installer - this disconnects tooling installation/updating and replaces with the standalone build.xml</li>
+<li>Remove template files - templates have been installed and will no longer be updated, therefore can be removed</li>
+<li>Remove signing certificate - these are used during library installs therefore no longer required</li>
+<li>Remove last metrics callout response (if it exists)</li>
+<li>Update <code>build.properties</code> and <code>default.properties</code> to remove references to disabled features</li>
+<li>Rename <code>version.properties</code> to <code>last-version.properties</code> as a record of which version had been installed (handy if re-installing tooling later)</li>
+<li>Remove <code>server.properties</code> - there is no server connection therefore server properties are no longer needed</li>
+<li>Remove freeze functionality - the process is now complete and can't be frozen again </li>
+</ul>
+<h1 id="salesforcedeploymenttools">Salesforce Deployment Tools</h1>
+<p>The tooling supports two different Salesforce tools that facilitate retrieval and deployment of metadata:</p>
+<ul>
+<li>SFDX - Salesforce CLI</li>
+<li>Force.com Migration Tool - An Ant library</li>
+</ul>
+<p>Tooling features are the same regardless of the tool used behind the scenes. SFDX is the recommended tool as it is a newer technology, it is more secure and has more features that will be utilised in future tooling versions.</p>
+<p>Tooling support for SFDX is limited - scratch orgs and packaging are not yet supported.</p>
+<p>There is a prompt to decide which tool to use when running <code>ant init</code>.</p>
+<p>This can also be configured manually in <code>build.properties</code> by setting property <code>tooling.mode</code> to <code>sfdx</code> or <code>migration-tool</code>.</p>
+<p>Existing projects can be changed from <code>migration-tool</code> to <code>sfdx</code> by re-running <code>ant init</code> but keep in mind the authentication mechanisms will change affecting all users and CI servers.</p>
+<h2 id="sfdx">SFDX</h2>
+<ul>
+<li>The Salesforce CLI will be used for all interactions with Salesforce</li>
+<li>All tooling users and CI servers must have SFDX installed</li>
+<li>Uses OAuth for authentication therefore requires a connected app and certificates for CI connections</li>
+</ul>
+<h2 id="forcecommigrationtool">Force.com Migration Tool</h2>
+<ul>
+<li>The Salesforce Ant library will be used to connect for retrieving and deploying</li>
+<li>The ForceFlow Ant library will be used for automation not available in the SF Ant library e.g. Apex scripting</li>
+<li>Ant libraries are automatically downloaded at runtime</li>
+<li>Uses username, password and security token for authentication</li>
+</ul>
+<h1 id="metadata">Metadata</h1>
+<h2 id="formats">Formats</h2>
+<p>The tooling supports both the classic Metadata API and new SFDX source formats.</p>
+<p>There is a prompt to decide which format to use when running <code>ant init</code>.</p>
+<h3 id="sfdxrecommended">SFDX ** Recommended **</h3>
+<ul>
+<li>All metadata will be stored in the SFDX source format</li>
+<li>This will convert object metadata from Metadata API format into SFDX source format on retrieve (and back to MD on deploy)</li>
+<li>SFDX object source format splits objects into individual files for each field, record type, list view, etc</li>
+<li>Having separate, smaller metadata files makes committing metadata much easier, less error prone (due to malformed XML) and reduces merge issues</li>
+</ul>
+<h3 id="md">MD</h3>
+<ul>
+<li>All metadata will be stored in the Salesforce Metadata API format</li>
+<li>MD API format is tried and tested but not as easy to work with</li>
+</ul>
+<h3 id="hybridlegacyoption">Hybrid (legacy option)</h3>
+<ul>
+<li>Objects will be stored in SFDX source format, everything else will be in MD API format</li>
+<li>This option was used before the tooling fully supported the SFDX format - it should no longer be used for new projects</li>
+</ul>
+<p>Existing projects can switch formats but the change will need to be carefully planned - having a mix of branches in different formats will cause a number of merge issues.</p>
+<h2 id="compressions">Compressions</h2>
+<p>The tooling compresses XML tags into a single line; in some cases this will be to sections of a file and others the entire file.</p>
+<p>Compressing metadata files makes it easier to commit changes by:</p>
+<ul>
+<li>Improving readability of Git XML file diffs</li>
+<li>Reducing file sizes</li>
+</ul>
+<p>The compressed format reduces the chance of merge conflicts and when they do occur are much easier to resolve.</p>
+<h3 id="configuration">Configuration</h3>
+<p>Compression configuration is found in <code>compression.json</code> - this file is created by <code>ant init</code>. Template compressions can be removed and/or additional project specific entries added as required.</p>
+<h3 id="listofcompressions">List of Compressions</h3>
+<table class="table" >
+<thead>
+<tr>
+<th>Metadata</th>
+<th>Description</th>
+<th>Configuration - compression.json reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CustomApplication</td>
+<td>Partial compression of profile action overrides</td>
+<td><code>applications</code></td>
+</tr>
+<tr>
+<td>CustomObject</td>
+<td>Partial compression of pick list values (including assignments to record types)</td>
+<td><code>objects</code>, <code>fields</code>, <code>recordTypes</code> and <code>fieldSets</code></td>
+</tr>
+<tr>
+<td>GlobalValueSet</td>
+<td>Partial compression of global pick list values</td>
+<td><code>globalValueSets</code></td>
+</tr>
+<tr>
+<td>Layout</td>
+<td>Partial compression of layout items and action buttons</td>
+<td><code>layouts</code></td>
+</tr>
+<tr>
+<td>MutingPermissionSet</td>
+<td>Full compression of muting permission sets</td>
+<td><code>mutingpermissionsets</code></td>
+</tr>
+<tr>
+<td>PermissionSet</td>
+<td>Full compression of permission sets</td>
+<td><code>permissionsets</code></td>
+</tr>
+<tr>
+<td>Profile</td>
+<td>Full compression of profiles</td>
+<td><code>profiles</code></td>
+</tr>
+<tr>
+<td>QuickAction</td>
+<td>Partial compression of quick action layout items</td>
+<td><code>quickActions</code></td>
+</tr>
+<tr>
+<td>StandardValueSet</td>
+<td>Partial compression of standard pick list values</td>
+<td><code>standardValueSets</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="modifications">Modifications</h2>
+<p>There are various reasons to modify metadata after retrieval or before deployment, reasons include:</p>
+<ul>
+<li>The Salesforce Metadata API will occasionally return metadata on retrieve that cannot be deployed into a target environment</li>
+<li>There are cases where one metadata file will contain different metadata types - some of which may need to be tracked and others which may not</li>
+<li>Changes to make committing metadata easier and less time consuming</li>
+</ul>
+<h3 id="configuration-1">Configuration</h3>
+<p>Modification configuration is found in <code>modification.json</code> - this file is created by <code>ant init</code>. This file contains the list of modifications that are run on retrieve and deploy. This file can be updated to add or remove modifications. Some modifications have additional configuration that may be updated to fit the requirements of the project.</p>
+<p>A full list of available modifications and configuration options can be found by running: <code>ant listModificationDefinitions</code>.</p>
+<h3 id="listofmodifications">List of Modifications</h3>
+<h4 id="application">Application</h4>
+<h5 id="standardapplications">Standard Applications</h5>
+<h6 id="whatistheissue">What is the issue?</h6>
+<p>Some standard applications can’t be included in a deployment (Salesforce restriction). However, the Build Manager may choose to include standard applications so that their visibilities are retrieved in profiles or simply so that applications can use a wildcard.</p>
+<h6 id="whyisthisaproblem">Why is this a problem?</h6>
+<p>If standard applications are retrieved but can’t be deployed this will block deployments.</p>
+<h6 id="howdoesthetoolingaddresstheissue">How does the tooling address the issue?</h6>
+<p>Configured standard applications are deleted after retrieve - they only needed to be included so that profile settings would be retrieved, they serve no other purpose.</p>
+<hr />
+<h5 id="actionoverrides">Action Overrides</h5>
+<h6 id="whatistheissue-1">What is the issue?</h6>
+<p>Application metadata contains lists of <code>actionOverrides</code> and <code>profileActionOverrides</code>, these attributes relate to Lightning Page assignment to applications and profiles/applications. The order of these entries is not consistent between retrieves and there are often large lists of <code>profileActionOverrides</code>.</p>
+<h6 id="whyisthisaproblem-1">Why is this a problem?</h6>
+<p>This causes unnecessary noise when committing changes in source control, making it difficult to see exactly what has changed and can result in merge conflicts.</p>
+<h6 id="howdoesthetoolingaddresstheissue-1">How does the tooling address the issue?</h6>
+<p>This feature sorts the list of <code>actionOverrides</code> and <code>profileActionOverrides</code> after retrieve to ensure the order is always the same. There is also a related compression entry to make the <code>profileActionOverrides</code> easier to read.</p>
+<h6 id="configuration-2">Configuration</h6>
+<p>Standard application removal functionality is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    removeStandardApps
+</code></pre>
+<p>Standard application file names to be deleted after retrieve can be changed by updating the following setting in <code>modification.json</code>:</p>
+<pre><code>    removeStandardApps -&gt; config -&gt; regex
+</code></pre>
+<p>Action override sorting functionality is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    orderApplicationActions
+</code></pre>
+<p>The sort order for action overrides can be changed by updating the following setting in <code>modification.json</code>:</p>
+<pre><code>    orderApplicationActions -&gt; config -&gt; sortOrder
+</code></pre>
+<h5 id="metadata-1">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CustomApplication</code></td>
+<td><code>*.app</code> / <code>*.app-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="entitlementprocess">Entitlement Process</h4>
+<h5 id="whatistheissue-2">What is the issue?</h5>
+<p>Time triggered actions (<code>timeTriggers</code>) can change order in the metadata between retrieves (seeming randomly).</p>
+<h5 id="whyisthisaproblem-2">Why is this a problem?</h5>
+<p>This causes unnecessary noise when committing changes in source control, making it difficult to see exactly what has changed and can also result in merge conflicts.</p>
+<h5 id="howdoesthetoolingaddresstheissue-2">How does the tooling address the issue?</h5>
+<p>This feature sorts the list of time triggers after retrieve to ensure the order is always the same.</p>
+<h5 id="configuration-3">Configuration</h5>
+<p>This functionality is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    orderEntitlementTimeTriggers
+</code></pre>
+<h5 id="metadata-2">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EntitlementProcess</code></td>
+<td><code>*.entitlementProcess</code> / <code>*.entitlementProcess-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="layout">Layout</h4>
+<h5 id="whatistheissue-3">What is the issue?</h5>
+<p>Action buttons on layouts (<code>platformActionList</code>) can change order in the metadata between retrieves (seeming randomly). Also, adding or changing the order of a single button can change the sort order of every tag.</p>
+<h5 id="whyisthisaproblem-3">Why is this a problem?</h5>
+<p>This causes unnecessary noise when committing changes in source control, making it difficult to see exactly what has changed and can also result in merge conflicts.</p>
+<h5 id="howdoesthetoolingaddresstheissue-3">How does the tooling address the issue?</h5>
+<p>This feature sorts the list of actions and removes the <code>sortOrder</code> tag after retrieve and re-adds the tag before deploy</p>
+<h5 id="configuration-4">Configuration</h5>
+<p>This functionality is enabled by default but can be disabled by removing the following references from <code>modification.json</code>:</p>
+<pre><code>    removeLayoutSortOrder
+    addLayoutSortOrder
+</code></pre>
+<h5 id="metadata-3">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Layout</code></td>
+<td><code>*.layout</code> / <code>*.layout-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="leadconvertsettings">Lead Convert Settings</h4>
+<h5 id="whatistheissue-4">What is the issue?</h5>
+<p>Field mappings in lead convert settings can change order in the metadata between retrieves (seeming randomly).</p>
+<h5 id="whyisthisaproblem-4">Why is this a problem?</h5>
+<p>This causes unnecessary noise when committing changes in source control, making it difficult to see exactly what has changed and can also result in merge conflicts.</p>
+<h5 id="howdoesthetoolingaddresstheissue-4">How does the tooling address the issue?</h5>
+<p>This feature sorts the list of field mappings after retrieve to ensure the order is always the same.</p>
+<h5 id="configuration-5">Configuration</h5>
+<p>This functionality is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    orderLeadConvertSettings
+</code></pre>
+<h5 id="metadata-4">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LeadConvertSetting</code></td>
+<td><code>*.LeadConvertSetting</code> / <code>*.LeadConvertSetting-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="object">Object</h4>
+<h5 id="fieldhistorytrackingandfeedtracking">Field History Tracking and Feed Tracking</h5>
+<h6 id="whatistheissue-5">What is the issue?</h6>
+<p>Salesforce tracking limits are often not counted correctly when adding and removing tracking from fields in the same deployment. Some fields are not present in metadata therefore are not possible to deploy e.g. person account fields. There have been other intermittently reported issues with history tracking.</p>
+<h6 id="whyisthisaproblem-5">Why is this a problem?</h6>
+<p>Inconsistent behaviour when deploying history tracking therefore deployments are unreliable.</p>
+<h6 id="howdoesthetoolingaddresstheissue-5">How does the tooling address the issue?</h6>
+<p>Field history and feed history tracking is completely removed from object metadata files and therefore not deployed. Since these settings have no impact on any other functionality, can’t be customised and can’t be a dependency for other metadata it is recommended that changes to these settings are managed outside of the build process. These settings can be safely changed in Production at anytime. There is limited value to be gained by applying these settings to any sandbox before production.</p>
+<hr />
+<h5 id="listviews">List Views</h5>
+<h6 id="whatistheissue-6">What is the issue?</h6>
+<p>Deployment of list views for certain objects can result in duplication (even if the API name is the same). There may also be other cases where it is not desirable to track all changes to list views.</p>
+<h6 id="whyisthisaproblem-6">Why is this a problem?</h6>
+<p>Duplicate list views in environments can be confusing to users and is messy. Frequently changing list views that wouldn’t otherwise need to be tracked in source control can cause unnecessary deployment effort.</p>
+<h6 id="howdoesthetoolingaddresstheissue-6">How does the tooling address the issue?</h6>
+<p>This feature deletes a defined list of list views from object metadata after retrieve. The tooling can also be configured to delete or keep list views by pattern matching.</p>
+<p><strong>Note</strong> - This functionality only exists if SFDX source format is used for objects</p>
+<h5 id="configuration-6">Configuration</h5>
+<p>Removal of field/feed history tracking is enabled by default but can be disabled by removing the following references from <code>modification.json</code>:</p>
+<pre><code>    removeObjectLevelFieldHistoryTracking
+    removeObjectLevelFeedHistoryTracking
+    removeFieldLevelFieldHistoryTracking
+    removeFieldLevelFeedHistoryTracking
+</code></pre>
+<p>List of objects to remove field history tracking can be configured by updating the following setting in <code>modification.json</code>: (defaults to no restrictions i.e. apply to all objects)</p>
+<pre><code>    removeObjectLevelFieldHistoryTracking -&gt; config -&gt; objects
+    removeObjectLevelFeedHistoryTracking -&gt; config -&gt; objects
+    removeFieldLevelFieldHistoryTracking -&gt; config -&gt; objects
+    removeFieldLevelFeedHistoryTracking -&gt; config -&gt; objects
+</code></pre>
+<p>Removal of list views is enabled by default (assuming SFDX source format is enabled) but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    removeListViews
+</code></pre>
+<p>List views to be removed can be configured by updating the following setting in <code>modification.json</code>:</p>
+<pre><code>    removeListViews -&gt; config -&gt; all : [ "list", "of", "listViews", "to", "delete", "globally" ],
+                                 objects : { 
+                                     "ObjectName__c"  : [ "list", "of", "listViews", "to", "delete", "on", "ObjectName__c"  ],
+                                     "OtherObject__c" : [ "list", "of", "listViews", "to", "delete", "on", "OtherObject__c" ]
+                                 }
+</code></pre>
+<p>It's also possible to delete using regular expressions e.g. all list views globally that start <code>Test</code> and on the <code>Account</code> object <code>AllAccounts</code> and <code>MyAccounts</code>:</p>
+<pre><code>    removeListViews -&gt; config -&gt; all : [ "/^Test/" ]
+                                 objects : { 
+                                     "Account" : [ "/^(All|My)Accounts$/" ]
+                                 }
+</code></pre>
+<p>Another option is to keep using regular expressions i.e. delete everything that <em>doesn't</em> match e.g. all list views globally that do not start with <code>All</code> or <code>My</code>:</p>
+<pre><code>    removeListViews -&gt; config -&gt; all : [ "!/^(All|My)/" ]
+</code></pre>
+<p>Note - you can only have one keep entry at the all level / each object.</p>
+<h5 id="metadata-5">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CustomObject</code> / <code>CustomField</code> / <code>ListView</code></td>
+<td><code>*.object</code> / <code>*.object-meta.xml</code> / <code>*.field-meta.xml</code> / <code>*.listView-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="mutingpermissionsets">Muting Permission Sets</h4>
+<h5 id="whatistheissue-7">What is the issue?</h5>
+<p>Salesforce generates a <code>false</code> Field Level Security entry for every field in every Muting Permission Set.</p>
+<h5 id="whyisthisaproblem-7">Why is this a problem?</h5>
+<p>This causes unnecessary noise when committing changes in source control and makes it difficult to see exactly what access a muting permission set removes. Checking in false entries for every field for every permission set will result in a large overhead when checking in changes.</p>
+<h5 id="howdoesthetoolingaddresstheissue-7">How does the tooling address the issue?</h5>
+<p>This feature removes FLS entries after retrieve where both read and write access is <code>false</code> i.e. no access is removed.</p>
+<h5 id="configuration-7">Configuration</h5>
+<p>Removal of false entries is enabled by default but can be disabled by removing the following references from <code>modification.json</code>:</p>
+<pre><code>    removeFalseFieldPermissionsFromMutingPermissionSets
+</code></pre>
+<h5 id="metadata-6">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MutingPermissionSet</code></td>
+<td><code>*.mutingpermissionset</code> / <code>*.mutingpermissionset-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="permissionsets">Permission Sets</h4>
+<h5 id="removefieldlevelsecurityfalseentries">Remove Field Level Security false entries</h5>
+<h6 id="whatistheissue-8">What is the issue?</h6>
+<p>Salesforce generates a <code>false</code> Field Level Security entry for every field in every Permission Set.</p>
+<h6 id="whyisthisaproblem-8">Why is this a problem?</h6>
+<p>This causes unnecessary noise when committing changes in source control and makes it difficult to see exactly what access a permission set grants. Checking in false entries for every field for every permission set will result in a large overhead when checking in changes.</p>
+<h6 id="howdoesthetoolingaddresstheissue-8">How does the tooling address the issue?</h6>
+<p>This feature removes FLS entries after retrieve where both read and write access is <code>false</code> i.e. no access is granted.</p>
+<p>It is worth noting that false entries do serve a purpose - they remove access if it previously had access. If there is no false entry for a given field and the permission set in the target org has access to the field - access will not be removed on deploy.</p>
+<p>Removing field level access from a permission set is very rare but if there is a requirement to do this; a false entry can manually be added to the permission set and checked in.</p>
+<hr />
+<h5 id="removenondeployableuserpermissions">Remove non-deployable user permissions</h5>
+<h6 id="whatistheissue-9">What is the issue?</h6>
+<p>Some User Permissions that are granted to Permission Sets (or Profiles) can be retrieved but will fail deployment to another environment.</p>
+<h6 id="whyisthisaproblem-9">Why is this a problem?</h6>
+<p>This causes build failures blocking deployment to some orgs.</p>
+<h6 id="howdoesthetoolingaddresstheissue-9">How does the tooling address the issue?</h6>
+<p>This feature removes a pre-defined list of user permissions from permission sets after retrieve.</p>
+<h5 id="configuration-8">Configuration</h5>
+<p>Removal of false entries is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    removeFalseFieldPermissions
+</code></pre>
+<p>Removal of User Permissions is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    removePermissionSetUserPermissions
+</code></pre>
+<p>The list of User Permissions to be removed can be overwritten by updating the following setting in <code>modification.json</code>:</p>
+<pre><code>    removePermissionSetUserPermissions -&gt; config -&gt; userPermissions
+</code></pre>
+<h5 id="metadata-7">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PermissionSet</code></td>
+<td><code>*.permissionset</code> / <code>*.permissionset-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="profiles">Profiles</h4>
+<h5 id="removelayoutassignmententries">Remove layout assignment entries</h5>
+<h6 id="whatistheissue-10">What is the issue?</h6>
+<p>There is at least one known layout assignment that can be retrieved but not deployed - <code>SocialPost-Social Post Layout</code> (there could potentially be others).</p>
+<h6 id="whyisthisaproblem-10">Why is this a problem?</h6>
+<p>This will fail builds blocking deployments of any profiles that reference the layout assignment. This will be an issue if layouts use a wildcard in <code>package.xml</code> as the layout and assignment will be retrieved but the assignment will not be deployable.</p>
+<h6 id="howdoesthetoolingaddresstheissue-10">How does the tooling address the issue?</h6>
+<p>This feature removes the layout assignment from all profiles.</p>
+<hr />
+<h5 id="removeloginiprangeentries">Remove login IP range entries</h5>
+<h6 id="whatistheissue-11">What is the issue?</h6>
+<p>Login IP ranges can change frequently and often need to be made at a moments notice.</p>
+<h6 id="whyisthisaproblem-11">Why is this a problem?</h6>
+<p>Pushing each and every Login IP range change through a full CI process could be time consuming. These changes are often time sensitive therefore making changes manually in Production and excluding from metadata tracking may be desirable.</p>
+<h6 id="howdoesthetoolingaddresstheissue-11">How does the tooling address the issue?</h6>
+<p>This feature removes all login IP range entries from all profiles - this will leave any existing login IP range configuration untouched in the target org.</p>
+<p><strong>Note</strong> - if any one IP range is included in the deployment, it will overwrite all IP ranges against the profile in the target org.</p>
+<hr />
+<h5 id="removenondeployableuserpermissions-1">Remove non-deployable user permissions</h5>
+<h6 id="whatistheissue-12">What is the issue?</h6>
+<p>Some User Permissions that are granted to Profiles (or Permission Sets) can be retrieved but will fail deployment to another environment.</p>
+<h6 id="whyisthisaproblem-12">Why is this a problem?</h6>
+<p>This causes build failures blocking deployment to some orgs.</p>
+<h6 id="howdoesthetoolingaddresstheissue-12">How does the tooling address the issue?</h6>
+<p>This feature removes a pre-defined list of user permissions from profiles after retrieve.</p>
+<h5 id="configuration-9">Configuration</h5>
+<p>Removal of configured layout assignments is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    removeLayoutAssignments
+</code></pre>
+<p>List of layout assignments to be removed can be changed by updating the following setting in <code>modification.json</code>:</p>
+<pre><code>    removeLayoutAssignments -&gt; config -&gt; layouts
+</code></pre>
+<p>Removal of IP ranges from profiles is disabled by default but can be enabled by adding the following reference to <code>modification.json</code>:</p>
+<pre><code>    removeLoginIPRanges
+</code></pre>
+<p>Removal of User Permissions is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    removeProfileUserPermissions
+</code></pre>
+<p>The list of User Permissions to be removed can be changed by updating the following setting in <code>modification.json</code>:</p>
+<pre><code>    removeProfileUserPermissions -&gt; config -&gt; userPermissions
+</code></pre>
+<h5 id="metadata-8">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Profile</code></td>
+<td><code>*.profile</code> / <code>*.profile-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="workflow">Workflow</h4>
+<h5 id="whatistheissue-13">What is the issue?</h5>
+<p>Entry formulas for Workflow rules can have line breaks when configured in the Salesforce UI - this is useful for formatting complex entry criteria. However, on deployment these line breaks are removed.</p>
+<h5 id="whyisthisaproblem-13">Why is this a problem?</h5>
+<p>On retrieving from production following a deployment, there is unnecessary noise as all line breaks are removed. It's difficult to see if there have been any other changes in the production environment.</p>
+<h5 id="howdoesthetoolingaddresstheissue-13">How does the tooling address the issue?</h5>
+<p>Unfortunately, it is not possible to fix the line break issue in Salesforce - this would have to be fixed on the Salesforce platform. However, the tooling can remove line breaks on retrieve to reduce noise on production retrieve - the line breaks can't be deployed so they may as well be removed as early in the process as possible.</p>
+<h5 id="configuration-10">Configuration</h5>
+<p>This functionality is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    removeWorkflowLineBreaks
+</code></pre>
+<h5 id="metadata-9">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Type</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Workflow</code></td>
+<td><code>*.workflow</code> / <code>*.workflow-meta.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="packagexml">Package.xml</h4>
+<h5 id="whatistheissue-14">What is the issue?</h5>
+<p>There may occasionally be members that need to be included in package.xml for retrieving but should not be deployed.</p>
+<h5 id="whyisthisaproblem-14">Why is this a problem?</h5>
+<p>If a member exists in package.xml but no metadata is being deployed for that member the deployment will fail - deployment will be blocked.</p>
+<h5 id="howdoesthetoolingaddresstheissue-14">How does the tooling address the issue?</h5>
+<p>This feature removes entries from package.xml at deploy time based on a regular expression match.</p>
+<h5 id="configuration-11">Configuration</h5>
+<p>Removal of members is not currently enabled but can be by adding the following reference to <code>modification.json</code>:</p>
+<pre><code>    removePackageMembers
+</code></pre>
+<p>The pattern of members to be removed can be changed by updating the following setting in <code>modification.json</code>:</p>
+<pre><code>    removePackageMembers -&gt; config -&gt; regex
+</code></pre>
+<h5 id="metadata-10">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>package.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="lineendingnormalisation">Line Ending Normalisation</h4>
+<h5 id="whatistheissue-15">What is the issue?</h5>
+<p>Line endings can be saved differently depending on the operating system (Windows/Mac/Linux) of a user. Different metadata files may have different line endings or sections of files may have different line endings.</p>
+<h5 id="whyisthisaproblem-15">Why is this a problem?</h5>
+<p>This can cause noise on retrieve and problems with diff tools.</p>
+<h5 id="howdoesthetoolingaddresstheissue-15">How does the tooling address the issue?</h5>
+<p>Source code repositories are typically configured to store line endings as LF (Linux/Mac) but files retrieved from Salesforce may have either LF, CR LF (Windows) or a mix of both. The tooling converts all line endings (of configured file extensions) to LF for consistency.</p>
+<h5 id="configuration-12">Configuration</h5>
+<p>This functionality is enabled by default but can be disabled by removing the following reference from <code>modification.json</code>:</p>
+<pre><code>    normaliseLineEndings
+</code></pre>
+<p>The files to be normalised can be changed by updating the following setting in <code>modification.json</code>:</p>
+<pre><code>    normaliseLineEndings -&gt; patterns
+</code></pre>
+<h5 id="metadata-11">Metadata</h5>
+<table class="table" >
+<thead>
+<tr>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*.cls</code></td>
+</tr>
+<tr>
+<td><code>*.css</code></td>
+</tr>
+<tr>
+<td><code>*.js</code></td>
+</tr>
+<tr>
+<td><code>*.xml</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="staticresourcepackingandunpacking">Static Resource Packing and Unpacking</h2>
+<p>Salesforce implementations, particularly Visualforce customisations, often store CSS and JS in Static Resources as ZIP files. ZIP files are a binary format and therefore not well suited to being stored in a source control system. A file diff will only tell the user that the file has changed not what has changed within the file (well, not in a readable or useful format) - this makes it difficult to see what has changed overtime. Keeping the static resource in a compressed binary format also makes it impossible to search for text within files.</p>
+<p>This feature unpacks any static resources of type ZIP into the resource bundles folder after a retrieve and re-packs them before deployment.</p>
+<p><em>Note</em> - This feature is standard as part of the SFDX source format. The following configuration is only relevant to older MD and Hybrid source modes.</p>
+<h3 id="configuration-13">Configuration</h3>
+<p>This functionality is enabled by default but can be disabled by the following setting:</p>
+<pre><code>    resources.enableResourceBundles
+</code></pre>
+<p>By default, the static resource zip file is deleted after it has been unpacked - this file will be repacked from source at time of deployment. If for some reason the file is still required, deletion can be turned off by the following setting:</p>
+<pre><code>    resources.unpack.removeStaticResource
+</code></pre>
+<p>By default, the resource bundles directory (output directory for unpacked static resources) will be deleted before resources are unpacked as part of a retrieve. If for some reason the reset needs to be disabled (unable to think of an example), this can be turned off by the following setting:</p>
+<pre><code>    resources.unpack.resetResourceBundlesDirectory
+</code></pre>
+<h1 id="properties">Properties</h1>
+<p>At a high level the goal of the tooling is to ensure that all build tasks always follow the same steps regardless of whether they are running locally or on a server and have a target of production or a sandbox.</p>
+<p>Parameters can be passed to the tooling to vary behaviour for different projects and also to provide connection strings for Salesforce orgs. These parameters are called 'properties' and are loaded from a number of different sources to provide maximum flexibility when using the tool locally or as part of a CI setup.</p>
+<p>Properties can be passed by; command line, configuration files or environment variables. Most properties have default values but some must be configured e.g. Salesforce connection details.</p>
+<h2 id="propertytypes">Property Types</h2>
+<h3 id="orderofprecedence">Order of Precedence</h3>
+<ol>
+<li>Command line arguments</li>
+<li>Property files<ol>
+<li><code>build.properties.local</code></li>
+<li><code>build.properties</code></li></ol></li>
+<li>Environment variables</li>
+<li>Prefixed environment variables (<code>ENV__*</code>)</li>
+<li>Prefixed properties in property files (<code>env.*</code>)<ol>
+<li><code>build.properties.local</code></li>
+<li><code>build.properties</code></li></ol></li>
+<li>Hardcoded defaults</li>
+</ol>
+<h3 id="commandline">Command Line</h3>
+<p>Properties can be passed via the command line as follows:</p>
+<pre><code>    -D{property}={value}
+</code></pre>
+<p>This is useful for passing a frequently changing property e.g. if you are working with multiple Salesforce environments you may want to retrieve from <code>config</code> one minute and <code>dev</code> the next.</p>
+<p><strong>Example - pass the <code>e</code> (environment) property to retrieve changes from the <code>dev</code> environment:</strong></p>
+<pre><code>    ant retrieve -De=dev
+</code></pre>
+<p>It is also useful for automation e.g. with build systems where you need to pass parameters to the build.</p>
+<p><strong>Example - pass connection properties to test changes against a sandbox:</strong></p>
+<pre><code>    ant test -Dsf_username={username} -Dsf_password={password}
+</code></pre>
+<p>Note - it is easier to use environment variables instead of specifying a list of parameters in a build script.</p>
+<p><strong>Remember - never store sensitive properties in source control</strong></p>
+<h3 id="propertyfiles">Property Files</h3>
+<p>Properties can be stored in ant property files as follows:</p>
+<pre><code>    {property}={value}
+</code></pre>
+<p><strong>Example - ignore any warnings that occur on deployment:</strong></p>
+<pre><code>    deploy.mainIgnoreWarnings=true
+</code></pre>
+<p>There are two build property files:</p>
+<table class="table" >
+<thead>
+<tr>
+<th>File</th>
+<th>Level</th>
+<th style="text-align:center;">Commit?</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>build.properties</code></td>
+<td>Project</td>
+<td style="text-align:center;">Yes (i)</td>
+<td>Applies to everyone on the project - project settings e.g. <code>deploy.mainIgnoreWarnings</code> and common non-sensitive Salesforce environment settings e.g. <code>prod.sf_serverUrl=https://login.salesforce.com</code></td>
+</tr>
+<tr>
+<td><code>build.properties.local</code></td>
+<td>User</td>
+<td style="text-align:center;">No (ii)</td>
+<td>Applies to a specific user - Salesforce connection settings e.g. <code>config.sf_username=john.smith@makepositive.com.config</code></td>
+</tr>
+</tbody>
+</table>
+<p>(i) Never include sensitive values in files that are checked into source control, even if they are common across all users on the project (use system environment variables instead).</p>
+<p>(ii) This file contains properties specific to a user, some sensitive, therefore can't be checked into source control (also everyone's local files would conflict).</p>
+<h3 id="environmentvariables">Environment Variables</h3>
+<p>Properties can be stored in environment variables (operating system feature) as follows:</p>
+<pre><code>    {PROPERTY}={value}
+</code></pre>
+<p>Note - environment variables are case sensitive and typically stored in all caps (by naming convention). However, the tooling treats environment variables as case insensitive so either is fine.</p>
+<p>The most common place for using environment variables is a build system. Most (probably all) build systems will provide a store for variables and these will be injected into the build as environment variables at build time.</p>
+<p>Use environment variables for properties that can't be checked into source control i.e. the same set of properties stored in <code>build.properties.local</code> when running the tooling locally.</p>
+<p>Remember that <code>build.properties</code> will be checked into source control and so will be present at build time therefore don't need to be duplicated in environment variables.</p>
+<p><strong>Example - set username of Salesforce connection:</strong></p>
+<pre><code>    SF_USERNAME=deployment.user@makepositive.com.ci
+</code></pre>
+<h2 id="prefixedproperties">Prefixed Properties</h2>
+<p>The tooling is designed to work with multiple Salesforce environments without the need to constantly change configuration files, environment variables or command line arguments. This is achieved by prefixing properties with an environment name to form a set of environment properties (not to be confused with environment variables - sorry there isn't really anything else to call them).</p>
+<p>Properties can be prefixed in property files with:</p>
+<pre><code>    {environment}.
+</code></pre>
+<p><strong>Example - <code>build.properties.local</code> file with two environment configurations (<code>config</code> and <code>dev</code>):</strong></p>
+<pre><code>    config.sf_username=john.smith@makepositive.com.config
+    config.sf_password=MySuperSecurePasswordForConfig
+    config.sf_token=sdfkjnsdkjfnk22332kj
+
+    dev.sf_username=john.smith@makepositive.com.dev
+    dev.sf_password=MySuperSecurePasswordForDev
+    dev.sf_token=4kj3njkn43jkn34jn4jk
+</code></pre>
+<p>Properties can be prefixed in environment variables with:</p>
+<pre><code>    {ENVIRONMENT}__
+</code></pre>
+<p><strong>Example: environment variables with two environment configurations (<code>config</code> and <code>dev</code>):</strong></p>
+<pre><code>    CONFIG__SF_USERNAME=john.smith@makepositive.com.config
+    CONFIG__SF_PASSWORD=MySuperSecurePasswordForConfig
+    CONFIG__SF_TOKEN=sdfkjnsdkjfnk22332kj
+
+    DEV__SF_USERNAME=john.smith@makepositive.com.dev
+    DEV__SF_PASSWORD=MySuperSecurePasswordForDev
+    DEV__SF_TOKEN=4kj3njkn43jkn34jn4jk
+</code></pre>
+<h3 id="whythetwodifferentnamingconventionsisntthatconfusing">Why the two different naming conventions? Isn't that confusing?</h3>
+<ol>
+<li>Ant properties and system environment variables have different conventions - UPPER case with underscore separators for environment variables, lower case with dot separators for ant properties</li>
+<li>Environment variables don't have dots - the tooling could have used double underscore instead of dots but support for property files came before environment variables (so it just wasn't considered at the time)</li>
+</ol>
+<p>Yes - it could be confusing, sorry.</p>
+<h3 id="iftherearemultipleenvironmentconfigurationshowdoesantknowwhichonetouse">If there are multiple environment configurations how does ant know which one to use?</h3>
+<p>You can pass the environment name via the command line:</p>
+<pre><code>    -De={environment-name}
+</code></pre>
+<p><strong>Example:</strong></p>
+<p>Retrieve from config</p>
+<pre><code>    ant retrieve -De=config
+</code></pre>
+<p>Test against ci</p>
+<pre><code>    ant test -De=ci
+</code></pre>
+<p>The <code>e</code> property is just like any other, therefore can be set in <code>build.properties.local</code> to set a default environment - this is useful if you typically work with one environment but occasionally want to run commands against other environments.</p>
+<h3 id="multiplepropertysourcesforasingleenvironment">Multiple property sources for a single environment</h3>
+<p>Properties are always loaded from all sources as per the order of precedence above therefore environment properties from <code>build.properties</code>, environment variables and the command line can (and should) be used together.</p>
+<p><strong>Example 1:</strong></p>
+<p><code>build.properties</code> file with environment properties:</p>
+<pre><code>    ci.checkBranch=true
+    ci.allowedBranch=feature/(.*)
+</code></pre>
+<p>environment variables:</p>
+<pre><code>    CI__SF_USERNAME=deployment.user@company.com.ci
+    CI__SF_PASSWORD=MySuperSecurePasswordForCI
+    CI__SF_TOKEN=24i5mmdj3n3noaeo3njs
+</code></pre>
+<p>All of these properties belong to the <code>ci</code> environment therefore running <code>ant test -De=ci</code> will run a validation deployment with user deployment.user@company.com.ci and check the branch is a feature branch.</p>
+<p><strong>Example 2:</strong></p>
+<p><code>build.properties</code> file with environment properties:</p>
+<pre><code>    prod.sf_serverUrl=https://login.salesforce.com
+    prod.checkBranch=true
+    prod.allowedBranch=master
+</code></pre>
+<p>environment variables:</p>
+<pre><code>    SF_USERNAME=deployment.user@company.com.prod
+    SF_PASSWORD=MySuperSecurePasswordForProd
+    SF_TOKEN=2jnfksltinsnfsllrwnm
+    SF_CHECKONLY=false
+    SF_ENVNAME=prod
+</code></pre>
+<p>Setting <code>SF_ENVNAME</code> tells the tooling that the non-prefixed variables link to the <code>prod</code> environment therefore the the rest will be loaded from <code>build.properties</code> (this is the same as setting <code>e</code> but is a little more descriptive for use an environment property).</p>
+<p>Properties that are not sensitive and define the environment should always be configured in <code>build.properties</code> - this ensures the same settings apply for a Salesforce environment regardless of the Build environment i.e. whether it's running on a local machine or on a CI build server.</p>
+<p>The example above highlights this well; all production deployments will have a Server URL of https://login.salesforce.com and should only ever deploy from the <code>master</code> branch regardless of who is deploying or from where they are deploying (CI or local). However, the connection details will not be stored in source control and will be different depending on the user therefore are well suited to environment variables. The check only property could go in either <code>build.properties</code> or an environment variable since it is not sensitive but an environment variable is preferred as you don't want users accidentally deploying production.</p>
+<h2 id="propertydetails">Property Details</h2>
+<p>Configurable properties and their defaults can be found in: <a href="default.properties">default.properties</a>.</p>
+<p>Environment properties that can be set by CLI, property file or environment variable can be found below:</p>
+<table class="table" >
+<thead>
+<tr>
+<th>Variable (i)</th>
+<th style="text-align:center;">CLI</th>
+<th style="text-align:center;">BP</th>
+<th style="text-align:center;">BPL</th>
+<th style="text-align:center;">ENV</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sf_envName</code> / <code>e</code> (ii)</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>Name of Salesforce environment e.g. <code>config</code>, <code>ci</code>, <code>qa</code>, <code>uat</code>, <code>staging</code>, <code>prod</code> - this should match environment names in <code>build.properties</code></td>
+<td><code>config</code></td>
+</tr>
+<tr>
+<td><code>sf_username</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>Salesforce username - be sure to use a service account</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sf_password</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>Salesforce password - always use a long random string</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sf_token</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>Salesforce security token - may or may not be required depending on security settings/ip ranges</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sf_alias</code></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;">N</td>
+<td>SFDX - alias used for web authentication - only set where <code>sf_authMode</code> is <code>web</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>sf_authMode</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>SFDX - authentication mode - <code>web</code> or <code>jwt</code> - end users should use <code>web</code> automation i.e. build servers should use <code>jwt</code></td>
+<td><code>web</code></td>
+</tr>
+<tr>
+<td><code>sf_clientId</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>SFDX - client id of Connected App used for <code>jwt</code> authentication</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sf_keyFile</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>SFDX - path to encrypted private key file for <code>jwt</code> authentication</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sf_decryptKey</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>SFDX - key used with initialisation vector to decrypt private key</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sf_decryptIV</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>SFDX - initialisation vector used with key to decrypt private key</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sf_serverUrl</code></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td>Salesforce server login url - only set if different from default and use <code>build.properties</code> instead of environment variables (iii)</td>
+<td>https://test.salesforce.com</td>
+</tr>
+<tr>
+<td><code>sf_checkOnly</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td>Check only specifies whether to run a validation or deployment - applies to ant deploy commands (ant test is always check only) (iv)</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>sf_testLevel</code></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td>Defines whether to run unit tests on deploy and if so which ones (v)</td>
+<td><code>RunLocalTests</code></td>
+</tr>
+<tr>
+<td><code>sf_testClasses</code></td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">Y</td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td>Defines which tests to run (used with a <code>TestLevel</code> of <code>RunSpecifiedTests</code>) (vi)</td>
+<td></td>
+</tr>
+<tr>
+<td><code>checkBranch</code></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td>Check the current branch against the allowed branch before deploying? This protects against accidental deployments of the wrong branch to the wrong environment</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>allowedBranch</code></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td>Regular expression used when checking branch before deployment</td>
+<td><code>feature/(.*)</code></td>
+</tr>
+<tr>
+<td><code>orgEmail</code></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;"><strong>R</strong></td>
+<td style="text-align:center;">N</td>
+<td style="text-align:center;">N</td>
+<td>Shared email address for the environment - used by the CI user</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<table class="table" >
+<thead>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLI</td>
+<td>Pass by command line</td>
+</tr>
+<tr>
+<td>BP</td>
+<td>Save to <code>build.properties</code> (and commit)</td>
+</tr>
+<tr>
+<td>BPL</td>
+<td>Save to <code>build.properties.local</code> (don't commit)</td>
+</tr>
+<tr>
+<td>ENV</td>
+<td>Store as environment variable</td>
+</tr>
+<tr>
+<td>R</td>
+<td>Recommended option</td>
+</tr>
+<tr>
+<td>Y</td>
+<td>Yes, you can but not the recommended option</td>
+</tr>
+<tr>
+<td>N</td>
+<td>No, you can but not advised</td>
+</tr>
+</tbody>
+</table>
+<p>(i) These are the core property names - adjust depending on usage e.g. <code>sf_username</code> would be <code>SF_USERNAME</code> as an environment variable, <code>ENV__SF_USERNAME</code> as an environment prefixed environment variable or <code>env.sf_username</code> as an environment prefixed property. See sections above for explanation.</p>
+<p>(ii) <code>e</code> is an alias of <code>sf_envName</code> - e is useful where it's used frequently on a command line (-De={environment-name}) whereas <code>sf_envName</code> is useful in an environment variable where it's set once but handy to be descriptive.</p>
+<p>(iii) The default configuration in <code>build.properties</code> will cover most cases i.e. <code>prod</code> has a server url of https://login.salesforce.com, everything else can use the default https://test.salesforce.com. This is a connection property therefore it's understandable to think it would go with other connection properties like <code>sf_username</code> however it shouldn't, it doesn't change depending on the user who is connecting to the environment and it's not sensitive therefore it belongs in <code>build.properties</code>.</p>
+<p>(iv) Check-only is technically not required as it has a default value (false) but this will need to be set to true to run a full deployment (not just a validation). Most of the time this will need to be set to true - the default is only false to protect against accidental deployments before everything is fully configured and tested. </p>
+<p>(v) Strongly recommend leaving as default - <code>RunLocalTests</code> (if you are not running unit tests on every build how do you know you've not broken anything?).</p>
+<p>(vi) <code>RunSpecifiedTests</code> with a list of test classes is not supported in <code>migration-tool</code> mode.</p>
+<h3 id="authmodes">Auth Modes</h3>
+<p>Different properties are required depending on the tooling and auth mode.</p>
+<p>The Force.com Migration Tool uses username and password based authentication whereas SFDX uses OAuth flows. Two OAuth flows are supported by the tooling <code>web</code> and <code>jwt</code>; the <code>web</code> flow directs the user to a Salesforce login page in a browser and <code>jwt</code> uses certificate authentication with a connected app. Users of the tooling should use <code>web</code> and build servers should use <code>jwt</code>. Certificates can be generated with encrypted keys using the tooling, see <code>ant createCertificate</code>.</p>
+<p>Properties for different modes are as follows:</p>
+<table class="table" >
+<thead>
+<tr>
+<th>Variable (i)</th>
+<th style="text-align:center;">Migration</th>
+<th style="text-align:center;">SFDX - Web</th>
+<th style="text-align:center;">SFDX - JWT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sf_envName</code> / <code>e</code></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>sf_username</code></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>sf_password</code></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"></td>
+</tr>
+<tr>
+<td><code>sf_token</code></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"></td>
+</tr>
+<tr>
+<td><code>sf_alias</code></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+<td style="text-align:center;"></td>
+</tr>
+<tr>
+<td><code>sf_authMode</code></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"><strong>Yes</strong> (i)</td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>sf_clientId</code></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>sf_keyFile</code></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>sf_decryptKey</code></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>sf_decryptIV</code></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"></td>
+<td style="text-align:center;"><strong>Yes</strong></td>
+</tr>
+</tbody>
+</table>
+<p>(i) sf_authMode is applicable to SFDX mode web auth but defaults to 'web' so doesn't need to be set</p>
+<h2 id="wheretolookinthecode">Where to look in the code</h2>
+<p><a href="scripts/ant/setupEnvironmentProperties.js">See setupEnvironmentProperties.js script</a></p>
+<h2 id="howtoaddcustomenvironmentproperties">How to add custom environment properties</h2>
+<p>When customising the tooling it may be necessary to have additional project specific environment properties that can be passed by command line, build properties or environment variables. These may be useful in build hooks or apex scripts - particularly for passing sensitive data into a build from environment variables.</p>
+<p>A simple property can be configured in build.properties as follows:</p>
+<pre><code>## Input - project_exampleSimple=var
+## Output - environment.project.exampleSimple=var
+
+environment.project.exampleSimple=default-simple-value
+</code></pre>
+<p>In this example, <code>project_exampleSimple</code> is the environment property (like <code>sf_username</code>, <code>sf_password</code>, etc), it has a default value of <code>default-simple-value</code> and can be referenced in build hooks or scripts as <code>${environment.project.exampleSimple}</code>. Like other environment properties, the naming convention should be adjusted depending on use i.e. <code>PROJECT_EXAMPLESIMPLE=abc</code> as an environment variable. Also like other environment properties, it can be prefixed e.g. <code>QA__PROJECT_EXAMPLESIMPLE=abc</code> or <code>qa.project_exampleSimple=abc</code>.</p>
+<p>A complex property can be configured in build.properties as follows:</p>
+<pre><code>## Input - project_exampleComplex=var
+## Output - environment.project.exampleComplex=var, exampleProjectComplexAlias=var
+environment.project.exampleComplex.required=false
+environment.project.exampleComplex.type=string|boolean|integer|float
+environment.project.exampleComplex.default=default-complex-value
+environment.project.exampleComplex.alias=exampleProjectComplexAlias
+environment.project.exampleComplex.nodeArg=mpdx.plugin.exampleComplex
+</code></pre>
+<p>This example demonstrates how an environment property can be marked as <code>required</code>, have a specific data <code>type</code>, have a <code>default</code> value, have an <code>alias</code> and be mapped as a Node argument. These options are all optional; by default <code>required</code> is <code>false</code>, <code>type</code> is <code>string</code>, there is no <code>default</code> value and no <code>alias</code>.</p>
+<h2 id="nodearguments">Node Arguments</h2>
+<p>Ant Properties can be passed into Node, MPDX, SOBEIT and Plugin calls as command line arguments.</p>
+<p>These are configured as below.</p>
+<p>Note - if the same property is present at a higher (<code>arg.node.propertyName</code>) and lower (<code>arg.node.mpdx.plugin.myPlugin.propertyName</code>) level, the lowest level will be used.</p>
+<h3 id="nodelevelproperty">Node Level Property</h3>
+<p><strong>Example:</strong></p>
+<pre><code>    arg.node.propertyA=node-level
+</code></pre>
+<p>Is passed to all node calls (including MPDX, Plugins and SOBEIT) as <code>--propertyA node-level</code>.</p>
+<h2 id="mpdxlevelproperty">MPDX Level Property</h2>
+<p><strong>Example:</strong></p>
+<pre><code>    arg.node.mpdx.propertyB=mpdx-level
+</code></pre>
+<p>Is passed to all MPDX calls (including Plugins and SOBEIT) as <code>--propertyB mpdx-level</code>.</p>
+<h2 id="sobeitlevelproperty">SOBEIT Level Property</h2>
+<p><strong>Example:</strong></p>
+<pre><code>    arg.node.mpdx.sobeit.propertyC=sobeit-level
+</code></pre>
+<p>Is passed to all SOBEIT calls as <code>--arg-propertyC sobeit-level</code> and therefore available in all SOBEIT configs as <code>runtimeConfig.propertyC</code>.</p>
+<h2 id="pluginlevelproperty">Plugin Level Property</h2>
+<p><strong>Example:</strong></p>
+<pre><code>    arg.node.mpdx.plugin.propertyD=plugin-level
+</code></pre>
+<p>Is passed to all plugin calls as <code>--arg-propertyD plugin-level</code> and therefore available in all plugins as <code>context.arguments.propertyD</code>.</p>
+<h2 id="specifiedpluginlevelproperty">Specified Plugin Level Property</h2>
+<p><strong>Example:</strong></p>
+<pre><code>    arg.node.mpdx.plugin.specified.propertyE=specified-plugin-level
+</code></pre>
+<p>Is passed to the plugin named <code>specified</code> call as <code>--arg-propertyE specified-plugin-level</code> and therefore available in the <code>specified</code> plugin as <code>context.arguments.propertyE</code>.</p>
+<h2 id="modificationsengineproperty">Modifications Engine Property</h2>
+<p><strong>Example:</strong></p>
+<pre><code>    arg.node.mpdx.script.applyModifications.propertyF=my-apply-modifications-arg
+</code></pre>
+<p>Is passed to the modifications engine into modify and delete operations as <code>runtimeConfig.propertyF = my-modifications-arg</code>.</p>
+<h1 id="sourcetreeforkuiintegration">Sourcetree / Fork UI Integration</h1>
+<p>Want to use the tooling but not keen on using a command line? If so, Sourcetree custom actions or Fork custom commands are just the thing for you! Using custom actions/commands allows you to run a defined set of commands from a menu within your source control UI without needing to open a terminal.</p>
+<p>The tooling contains a set of bash scripts (<a href="scripts/custom-actions">see scripts/custom-actions</a>) that can be configured as custom actions in Sourcetree or custom commands in Fork. These scripts only need to be added once and can be used by any project/repository that is using the tooling. Custom action scripts are executed in the root of the open repository therefore as long as the tooling is always installed to tooling/ the scripts will always be available in <code>tooling/scripts/custom-actions/*</code>.</p>
+<h2 id="supportedactions">Supported actions</h2>
+<h3 id="setupconnectiontosalesforceconfigure">Setup connection to Salesforce (configure)</h3>
+<p>Run <code>ant configure</code> - connect the tooling to a Salesforce sandbox and set your default Salesforce environment (for the open repository).</p>
+<p><strong>Note - This will only work for SFDX mode</strong></p>
+<h3 id="opensalesforce">Open Salesforce</h3>
+<p>Run <code>ant open</code> - launch a web browser and log into the default Salesforce environment (for the open repository).</p>
+<h3 id="retrieve-1">Retrieve</h3>
+<p>Run <code>ant retrieve</code> - retrieve metadata from your default Salesforce environment (for the open repository).</p>
+<h3 id="postretrieve">Post Retrieve</h3>
+<p>Run <code>ant postRetrieve</code> - run post retrieve metadata modifications and compressions (for the open repository) - this is useful if metadata has been retrieved using another tool e.g. VSCode.</p>
+<h3 id="exportconfigurationdata">Export Configuration Data</h3>
+<p>Run <code>ant dataExport</code> - export configuration data from your default Salesforce environment (for the open repository) - this is part of ant retrieve but can be run standalone if only wishing to retrieve configuration data.</p>
+<h3 id="resetcleanworkingdirectory">Reset &amp; Clean Working Directory</h3>
+<p>Run <code>ant reset</code> - reset all files and remove all untracked files i.e. reset your working copy back to the metadata of the checked out branch.</p>
+<p><strong>WARNING - If you’ve made any changes locally this command will destroy those changes!</strong></p>
+<h2 id="howtoaddacustomactioninsourcetree">How to add a Custom Action in Sourcetree</h2>
+<p>Open Sourcetree and goto <code>Actions -&gt; Custom Actions -&gt; Edit...</code></p>
+<h2 id="howtoaddacustomcommandinfork">How to add a Custom Command in Fork</h2>
+<p>Open Fork and goto <code>Fork -&gt; Preferences... -&gt; Custom Commands -&gt; + -&gt; Add Repository Custom Command</code></p>
+<h2 id="recommendedsettings">Recommended Settings</h2>
+<table class="table" >
+<thead>
+<tr>
+<th>Menu / Title</th>
+<th>Script</th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Setup connection to Salesforce</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/configure.sh -d</code></td>
+</tr>
+<tr>
+<td>Open Salesforce</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/open.sh</code></td>
+</tr>
+<tr>
+<td>Retrieve</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/retrieve.sh</code></td>
+</tr>
+<tr>
+<td>Post Retrieve</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/postRetrieve.sh</code></td>
+</tr>
+<tr>
+<td>Export Configuration Data</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/dataExport.sh</code></td>
+</tr>
+<tr>
+<td>Reset &amp; Clean Working Directory</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/resetAndCleanWorkingDirectory.sh</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="configuringadditionalenvironments">Configuring additional environments</h2>
+<p>Additional configure commands can be added for other environments by specifying <code>-e {environment-name}</code> as an additional parameter.</p>
+<p><strong>Example:</strong></p>
+<table class="table" >
+<thead>
+<tr>
+<th>Menu / Title</th>
+<th>Script</th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Setup connection to Salesforce - Dev</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/configure.sh -d -e dev</code></td>
+</tr>
+<tr>
+<td>Setup connection to Salesforce - Integration</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/configure.sh -e integration</code></td>
+</tr>
+</tbody>
+</table>
+<p>In this example Dev is the default environment (defined by <code>-d</code>).</p>
+<p>Server URL defaults to https://test.salesforce.com for sandboxes but can be changed by specifying <code>-s {server-url}</code> as an additional parameter.</p>
+<p><strong>Example:</strong></p>
+<table class="table" >
+<thead>
+<tr>
+<th>Menu / Title</th>
+<th>Script</th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Setup connection to Salesforce - Production</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/configure.sh -e prod -s https://login.salesforce.com</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="openingsalesforceforotherenvironments">Opening Salesforce for other environments</h2>
+<p>Additional open commands can be added for other environments by specifying <code>-e {environment-name}</code> as an additional parameter.</p>
+<p><strong>Example:</strong></p>
+<table class="table" >
+<thead>
+<tr>
+<th>Menu / Title</th>
+<th>Script</th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Open Salesforce - Dev</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/open.sh -e dev</code></td>
+</tr>
+<tr>
+<td>Open Salesforce - Integration</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/open.sh -e integration</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="retrievingfromotherenvironments">Retrieving from other environments</h2>
+<p>Additional retrieve commands can be added for other environments by specifying <code>-e {environment-name}</code> as an additional parameter.</p>
+<p><strong>Example:</strong></p>
+<table class="table" >
+<thead>
+<tr>
+<th>Menu / Title</th>
+<th>Script</th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retrieve - Dev</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/retrieve.sh -e dev</code></td>
+</tr>
+<tr>
+<td>Retrieve - Integration</td>
+<td><code>/bin/bash</code></td>
+<td><code>-l ./tooling/scripts/custom-actions/retrieve.sh -e integration</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="distributingcustomcommandsconfigurationbyrepositoryfork">Distributing Custom Commands configuration by repository (Fork)</h2>
+<p>Custom Commands in Fork can be configured globally or by repository. Repository configured commands can be local or shared - if shared they are read from a file in the repository. This feature is useful for distributing tooling custom commands, making it even easier for users to get started.</p>
+<p>The tooling automatically installs a sample configuration file with the recommended custom command settings on <code>ant init</code>, this can be found in <code>.fork/custom-commands.json</code>.</p>
+<h2 id="issuetrackingconfigurationfork">Issue Tracking configuration (Fork)</h2>
+<p>Fork can be configured to find ticket ids (by regex) within commit messages and link to an issue tracking system.</p>
+<p>The tooling automatically installs a sample issue tracking configuration file matching Jira tickets and linking to the makepositive Jira instance. This is installed by <code>ant init</code> and can be found in <code>.issuetracker</code>.</p>
+<h1 id="gitfeatures">Git Features</h1>
+<h2 id="configuration-14">Configuration</h2>
+<p>The tooling automatically installs and updates <code>.gitignore</code> and <code>.gitattributes</code> files. These files tell source control which files to exclude from source control and how to handle line endings.</p>
+<p>These configuration files are automatically updated every time an ant command runs - any manual changes to these files will be overwritten. If project specific entries are required in either file they can be added to <code>.toolingignore</code> / <code>.toolingattributes</code>, the next time an ant command runs they will be merged to <code>.gitignore</code> and <code>.gitattributes</code>.</p>
+<p>Note - this feature is not present in the standalone (frozen) version of the tooling.</p>
+<h2 id="hooks">Hooks</h2>
+<p>The following Git hooks are installed by default with the tooling (if in a Git repository). Any change to the configuration will automatically update hooks the next time an ant command is run.</p>
+<h3 id="commitmessage">Commit Message</h3>
+<p>There are two git hooks that are useful for checking commit messages link to tickets; at the time of creating a commit (client side - <code>commit-msg</code> hook) and before the commit is pushed to the origin (server side - <code>pre-receive</code> hook).</p>
+<p>The tooling provides a local <code>commit-msg</code> hook to check for the presence of a ticket based on a regular expression - by default this is the format of a Jira ticket but could be anything (configurable). The hook does not validate tickets against an API, it is designed to prevent accidentally committing without a ticket reference. A user can easily skip the hook or disable it completely. The key benefit of using a local hook is that the mistake is caught before the commit, a server side <code>pre-receive</code> hook will only catch the mistake on push by which time the commit has already been made (not difficult to fix but an inconvenience that can easily be prevented wit this hook).</p>
+<p>This hook is not a substitute for a server side hook, this hook prevents accidents, the server hook can enforce compliance and check against the ticket system. There is no harm in having both.</p>
+<p>The hook can be configured by setting these properties in <code>build.properties</code> (only change the ones you need to):</p>
+<pre><code>    git.hooks.commitMsg.enable={true or false}
+    git.hooks.commitMsg.ticketRegex={Regular expression to match tickets (by default in Jira format)}
+    git.hooks.commitMsg.projectKey={Jira project key that is inserted into the regular expression above - this allows customising to a specific Jira project without overriding the whole regex}
+    git.hooks.commitMsg.error={Message to display when ticket is missing}
+</code></pre>
+<h3 id="prepush">Pre Push</h3>
+<p>A <code>pre-push</code> hook is installed to check the branch name conforms to a pattern - this prevents accidental creation of branches with names that don't follow conventions. Like the commit message hook this can be skipped / disabled - it is not a substitute for a server side hook to enforce a naming policy but it helps to prevent silly mistakes and keeps repositories tidy.</p>
+<p>By default, the hook is configured to check the branch follows Gitflow (plus <code>deploy/*</code> and <code>environment/*</code>). It is possible to customise this further e.g. to check for the presence of a ticket reference in a feature branch or that release branches follow semantic versioning. </p>
+<p>The hook can be configured by setting these properties in <code>build.properties</code> (only change the ones you need to):</p>
+<pre><code>    git.hooks.prePush.enable={true or false}
+    git.hooks.prePush.branchRegex={Regular expression to check branch name}
+    git.hooks.prePush.error={Message to display when branch doesn't match pattern}
+</code></pre>
+<h1 id="bitbucketpipelines">Bitbucket Pipelines</h1>
+<p>The tooling can be initialised with a Bitbucket Pipelines build configuration file. This configuration file is a template to get started with Pipelines - it will need adjusting to individual project requirements.</p>
+<p><strong>Note</strong> - Bitbucket Pipelines is the makepositive default choice for CI however, the tooling can be used with any build server that supports Ant.</p>
+<p>There are the following build definition templates:</p>
+<ul>
+<li><code>validate</code> - Run a validation against the environment as defined in environment variables (with no prefix <code>SF_USERNAME</code>, etc)</li>
+<li><code>ci-validate</code> - Run a validation against an environment named 'CI' (environment variables should be configured with <code>CI__</code> prefix)</li>
+<li><code>staging-validate</code> - Run a validation against an environment named 'STAGING' (environment variables should be configured with <code>CI__</code> prefix)</li>
+<li><code>prod-validate</code> - Run a validation against an environment named 'PROD' (environment variables should be configured with <code>CI__</code> prefix)</li>
+<li><code>deploy</code> - Run a deployment against the environment as defined in environment variables (with no prefix <code>SF_USERNAME</code>, etc)</li>
+<li><code>quick-deploy</code> - Run a quick deployment of the last validation against the environment as defined in environment variables (with no prefix <code>SF_USERNAME</code>, etc)</li>
+<li><code>create-major-release</code> - Run <code>ant fetchReleaseBranches</code> to <code>git fetch</code> the release branches followed by <code>ant createMajorRelease</code> to create a new major release branch</li>
+<li><code>create-minor-release</code> - Run <code>ant fetchReleaseBranches</code> to <code>git fetch</code> the release branches followed by <code>ant createMinorRelease</code> to create a new minor release branch</li>
+<li><code>create-patch-release</code> - Run <code>ant fetchReleaseBranches</code> to <code>git fetch</code> the release branches followed by <code>ant createPatchRelease</code> to create a new patch release branch</li>
+</ul>
+<p>The following artifacts are retained (these are available to following build steps):</p>
+<ul>
+<li><code>logs/*</code> - log files generated during build (may not be any)</li>
+<li><code>build-state.properties.local</code> - holds the last deployment id (this is used to link a validation with quick deploy)</li>
+</ul>
+<p>These build definitions are referenced in <code>branch</code> and <code>pull-request</code> builds as follows:</p>
+<ul>
+<li><code>branch</code><ul>
+<li><code>develop</code> - auto runs <code>deploy</code>  to <code>QA</code> environment</li>
+<li><code>deploy/UAT</code> - auto runs <code>deploy</code> to <code>UAT</code> environment</li>
+<li><code>deploy/STAGING</code> - auto runs <code>staging-validate</code> then <code>quick-deploy</code> to <code>STAGING</code> environment (should be configured the same as production to test steps but doesn't necessarily need to be manually triggered)</li>
+<li><code>master</code><ul>
+<li>Auto runs empty step to prevent accidental deployment</li>
+<li>Manual second step to run <code>prod-validate</code> against <code>PRODUCTION</code> environment</li>
+<li>Manual third step to run <code>quick-deploy</code> to <code>PRODUCTION</code> environment (to quick deploy the recent validation and then run and post deployment steps)</li>
+<li>Manual fourth step to run <code>deploy</code> to <code>CI</code> environment (to realign CI environment with production following the release)</li></ul></li></ul></li>
+<li><code>pull-request</code><ul>
+<li><code>**</code> (all) - auto runs <code>ci-validation</code> on creation and update of all pull requests to confirm validity of <code>feature</code> branches</li></ul></li>
+</ul>
+<p>Release management commands can be triggered manually as custom builds:</p>
+<ul>
+<li><code>create-major-release</code> uses definition <code>create-major-release</code></li>
+<li><code>create-minor-release</code> uses definition <code>create-minor-release</code></li>
+<li><code>create-patch-release</code> uses definition <code>create-patch-release</code></li>
+</ul>
+<p>These custom builds can be triggered against <code>develop</code> or a <code>release</code> branch.</p>
+<p>Adhoc validations and deployments can be triggered manually as custom builds:</p>
+<ul>
+<li><code>validate</code> uses definition <code>validate</code> - useful for triggering a validation against any environment</li>
+<li><code>deploy</code> uses definition <code>deploy</code> - useful for deploying to development sandboxes - DO NOT USE FOR ENVIRONMENTS IN PIPELINE (use branch builds with deployment tags so that tickets are properly updated). This configuration is commented out by default to prevent any mishaps - make sure users know not to use this pipeline without approval from the Build Manager.</li>
+</ul>
+<p>The following folders can (and should) be cached for optimum build performance:</p>
+<ul>
+<li><code>~/.mp-dev-ops</code> - directory containing third party build dependencies</li>
+<li><code>tooling</code> - tooling installation directory</li>
+</ul>
+<p><strong>Note</strong> - There is no need to cache these directories if running in standalone mode (the tooling and libraries will be checked into source control)</p>
+<h1 id="apexscripting">Apex Scripting</h1>
+<p>Everyone knows the key to reliable and repeatable builds is being able to automate as many deployment steps as possible. What if you need to schedule an Apex job? or insert a custom setting? or initialise a batch job? That’s where Apex scripting comes in.</p>
+<p>The tooling comes with a framework for Apex scripts that can be run on-demand and/or automatically as part of a deployment.</p>
+<h2 id="deploymentscripts">Deployment Scripts</h2>
+<p>Apex scripts can be run pre or post deployment i.e. before or after the main metadata deployment. Pre-scripts are useful when the deployment depends on a task being completed e.g. a test user needs to be created to receive email alerts created by the main deployment. Post-scripts are useful when a task depends on a deployment being completed e.g. scheduling an Apex job after the corresponding class has been deployed or insertion of a custom setting to configure the system.</p>
+<p>Scripts to be run pre deployment should be saved to:</p>
+<pre><code>    apex-scripts-pre
+</code></pre>
+<p>Scripts to be run post deployment should be saved to:</p>
+<pre><code>    apex-scripts-post
+</code></pre>
+<p>Since one script may depend on another having been run first, ordering can be important. Scripts will be run in alphabetical order.</p>
+<p>Tip - define a naming convention for scripts and ensure it is followed in all pull requests.</p>
+<p>The suggested naming convention is as follows:</p>
+<pre><code>    {Order-Number}-{Ticket-Id}-{Description}.apex
+</code></pre>
+<p>e.g.</p>
+<pre><code>    001-ABC-111-Insert-Process-Deactivation-Setting.apex
+    002-ABC-222-Schedule-Maintenance-Batch-Job.apex
+</code></pre>
+<p>Remember scripts will be run on all deployments, ensure they can be run multiple times against the same environment without producing an error.</p>
+<h3 id="debug">Debug</h3>
+<p>Any output from system.debug will be passed to stdout and therefore will appear in command line output - this can be useful for returning status information from apex scripts.</p>
+<h3 id="antpropertiesandenvironmentawareness">Ant Properties and Environment Awareness</h3>
+<p>All ant properties are substituted into scripts before running, for example:</p>
+<h4 id="property">Property:</h4>
+<pre><code>project.name=Demo Project
+</code></pre>
+<h4 id="script">Script:</h4>
+<pre><code>system.debug('Project: ${project.name}');
+</code></pre>
+<h4 id="output">Output:</h4>
+<pre><code>Project: Demo Project
+</code></pre>
+<p>There may be cases where a script needs to be aware of the environment in which it is running, this is possible using <code>${sf_envName}</code>, for example:</p>
+<pre><code class="java language-java">    String environment = ('${sf_envName}').toLowerCase();
+
+    List&lt;Demo__c&gt; demoSettings = [SELECT Id FROM Demo__c];
+    if (demoSettings.size() == 0) {
+
+        String colour = 'red';
+        if (environment == 'config') {
+            colour = 'Green';
+        } else if (environment == 'qa') {
+            colour = 'Gold';
+        } else if (environment == 'uat') {
+            colour = 'DarkOrange';
+        } else if (environment == 'staging') {
+            colour = 'Brown';
+        } else if (environment == 'prod') {
+            colour = 'Red';
+        }
+
+        insert new Demo__c(
+            Environment__c = environment,
+            Colour__c = colour
+        );
+        system.debug('Demo custom setting successfully inserted!');
+    } else {
+        system.debug('Skipping... demo custom setting has already been inserted.');
+    }
+</code></pre>
+<p>Remember, property substitution is a tooling feature (not Apex) - properties are not apex variables so consider usage carefully.</p>
+<h4 id="antproperty">Ant Property:</h4>
+<pre><code>    my.ant.property=Hello
+</code></pre>
+<hr />
+<h4 id="rawscript">Raw Script:</h4>
+<pre><code>    String myVariable = ${my.ant.property};
+</code></pre>
+<h4 id="preparedscript">Prepared Script:</h4>
+<pre><code>    String myVariable = Hello;
+</code></pre>
+<h4 id="result">Result:</h4>
+<pre><code>    Variable does not exist: Hello
+</code></pre>
+<hr />
+<h4 id="rawscript-1">Raw Script:</h4>
+<pre><code>    String myVariable = '${my.ant.property}';
+</code></pre>
+<h4 id="preparedscript-1">Prepared Script:</h4>
+<pre><code>    String myVariable = 'Hello';
+</code></pre>
+<h4 id="result-1">Result:</h4>
+<pre><code>    Success (myVariable = Hello)
+</code></pre>
+<h3 id="configuration-15">Configuration</h3>
+<p>Pre and Post scripts are enabled by default, though this will only apply if there are scripts to run. Automated script running can be disabled with the following settings:</p>
+<pre><code>    deploy.enableApexScriptsPre
+    deploy.enableApexScriptsPost
+</code></pre>
+<p>There shouldn’t be a need to change the pre/post script directories but they can be modified if necessary with the following settings:</p>
+<pre><code>    dir.apexScriptsPre
+    dir.apexScriptsPost
+</code></pre>
+<h1 id="dataexportimport">Data Export / Import</h1>
+<p>There are some types of configuration within Salesforce that are not exposed as metadata, these are instead stored as sobject records. Examples of this include CPQ, FSL and managed package configurations. This configuration data is often just as important as metadata and therefore should be treated as such i.e. retrieved, source controlled and included as part of automated deployments. This is where SoBeIt comes in. SoBeIt is a makepositive developed javascript tool for exporting data from and importing config data to Salesforce.</p>
+<p>The tooling installs SoBeIt and provides a framework for configs that can be run on-demand and/or automatically as part of retrieval and deployment.</p>
+<h2 id="retrievalanddeploymentconfigs">Retrieval and Deployment Configs</h2>
+<p>SoBeIt configs can be run to export data following a retrieval and import data following a deployment.</p>
+<p>Export configs to be run post retrieval should be saved to:</p>
+<pre><code>    sobeit-config/export
+</code></pre>
+<p>Import configs to be run post deployment should be saved to:</p>
+<pre><code>    sobeit-config/import
+</code></pre>
+<p>Since one config may depend on another having been run first, ordering can be important. Configs will be run in alphabetical order.</p>
+<p>Tip - define a naming convention for configs and ensure it is followed in all pull requests.</p>
+<p>The suggested naming convention is as follows:</p>
+<pre><code>    {Order-Number}-{Config-Name}.js
+</code></pre>
+<p>e.g.</p>
+<pre><code>    001-fsl.js
+    002-doc-gen.js
+    003-content-documents.js
+    004-cpq-products-and-pricing.js
+</code></pre>
+<h3 id="configuration-16">Configuration</h3>
+<p>Export and import configs are enabled by default, though this will only apply if there are configs to run. Automated import and export can be disabled with the following settings:</p>
+<pre><code>    retrieve.enableDataExport
+    deploy.enableDataImport
+</code></pre>
+<p>There shouldn’t be a need to change the import/export directories but they can be modified if necessary with the following settings:</p>
+<pre><code>    dir.sobeitConfig
+    dir.sobeitConfigExport
+    dir.sobeitConfigImport
+</code></pre>
+<p>Data is stored in <code>sobeit-data</code>, this can be modified with the following setting:</p>
+<pre><code>    dir.sobeitData
+</code></pre>
+<h3 id="sobeitauthenticationruntimeconfiguration">SoBeIt Authentication / Runtime Configuration</h3>
+<p>The tooling passes the following runtime configuration to SoBeIt:</p>
+<ul>
+<li><code>environment</code> - All lowercase name of environment as known to Ant (mapped from <code>${sf_envName_lower}</code>)</li>
+<li><code>instanceUrl</code> - Salesforce Instance URL to be used with Session Id for authentication</li>
+<li><code>sessionId</code> - Salesforce Session Id to be used with Instance URL for authentication</li>
+<li><code>dataDirectory</code> - Directory where data is stored (mapped from <code>${dir.sobeitData}</code>)</li>
+</ul>
+<p><strong>Example Export Config:</strong></p>
+<pre><code class="javascript language-javascript">    exports.build = (library, runtimeConfig) =&gt; {
+        return {
+            source: {
+                connectionType     : "SalesforceSessionConnection",
+                instanceUrl        : runtimeConfig.instanceUrl,
+                sessionId          : runtimeConfig.sessionId,
+                useBulkApi         : true,
+            },
+
+            target: {
+                connectionType     : 'JsonFileConnection',
+                targetDirectory    : runtimeConfig.dataDirectory + '/example',
+            },
+
+            move: [
+
+                {
+                    objectName     : 'Account',
+                    includeFields  : ['Name', 'BillingStreet', 'BillingCountry'],
+                }
+            ]
+        }
+    };
+</code></pre>
+<h3 id="callingsobeitfromatoolinghook">Calling SoBeIt from a Tooling Hook</h3>
+<p>If extending the tooling using a hook, it is possible to run a SoBeIt configuration file as follows:</p>
+<pre><code class="xml language-xml">    &lt;sobeit config="[path-to-config-file]" /&gt;
+</code></pre>
+<p>Additional arguments can be passed to SoBeIt as follows:</p>
+<pre><code class="xml language-xml">    &lt;sobeit config="[path-to-config-file]"&gt;
+        &lt;sobeitArgs&gt;
+            &lt;arg line="--arg-[arg-name] &amp;quot;[arg value]&amp;quot;" /&gt;
+            &lt;arg line="--arg-[arg-flag]" /&gt;
+        &lt;/sobeitArgs&gt;
+    &lt;/sobeit&gt;
+</code></pre>
+<p>Arguments can also be passed using build properties (see Properties -&gt; Node Arguments section):</p>
+<pre><code>    arg.node.mpdx.sobeit.cheese=cheddar
+</code></pre>
+<p>Is passed to all SOBEIT calls as <code>--arg-cheese cheddar</code> and therefore available in all SOBEIT configs as <code>runtimeConfig.cheese=cheddar</code>.</p>
+<h1 id="javascriptpluginframework">JavaScript Plugin Framework</h1>
+<p>There may be occasions where customisation of the tooling is required. Previously, the only option was to write using Ant build files, now there is also an option to write JavaScript plugins that will run using NodeJS. JavaScript is vastly more powerful and is a modern language therefore customisations are future-proof.</p>
+<p>Plugins have access to a number of common Node modules for connecting to Salesforce APIs, working with files and parsing/building XML. Session information and configuration is passed between Ant and plugins to provide a seamless integration.</p>
+<h2 id="pluginfiles">Plugin Files</h2>
+<p>Plugin files must be saved to:</p>
+<pre><code>    plugins
+</code></pre>
+<p>All plugins must have a file extension of <code>.js</code>.</p>
+<p>Plugins are invoked by <code>ant plugin -Dname={plugin-name}</code> (see usage above) or can be incorporated into build hooks <code>&lt;plugin name="[plugin-name]" /&gt;</code> (see below).</p>
+<p>Tip - define a naming convention for plugins and ensure it is followed in all pull requests.</p>
+<h3 id="configuration-17">Configuration</h3>
+<p>There shouldn’t be a need to change the plugin directory but it can be modified if necessary with the following setting:</p>
+<pre><code>    dir.plugins
+</code></pre>
+<h3 id="writingaplugin">Writing a Plugin</h3>
+<h4 id="interface">Interface</h4>
+<p>Plugins should export a function with a single <code>context</code> parameter (explained in next section) and optionally return <code>any</code> or a <code>promise</code>:</p>
+<pre><code class="javascript language-javascript">    module.exports = context =&gt; {
+        return [[optional return any]]
+    }
+</code></pre>
+<h4 id="context">Context</h4>
+<p>A <code>context</code> object with three keys; <code>arguments</code>, <code>modules</code> and <code>session</code>, will be passed into the plugin.</p>
+<h5 id="arguments">Arguments</h5>
+<p>Arguments is an object that provides runtime parameters to the plugin (from <code>--arg-{arg-name}</code> command line arguments).</p>
+<p>The tooling passes the following command line arguments to plugins:</p>
+<ul>
+<li><code>arg-sourceDir</code> -&gt; <code>context.arguments.sourceDir</code> - Directory where metadata is stored (mapped from <code>${dir.sourceDir}</code>)</li>
+<li><code>arg-deployDir</code> -&gt; <code>context.arguments.deployDir</code> - Directory where metadata is stored temporarily in MD format before deployment (mapped from <code>${dir.tempDeployMain}</code>)</li>
+<li><code>arg-retrieveDir</code> -&gt; <code>context.arguments.retrieveDir</code> - Directory where metadata is stored temporarily in MD format after retrieve (mapped from <code>${dir.tempRetrieveMain}</code>)</li>
+</ul>
+<h5 id="modules">Modules</h5>
+<p>Modules is an object of the following common useful Node modules:</p>
+<table class="table" >
+<thead>
+<tr>
+<th>Object Key</th>
+<th>Module</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>axios</code></td>
+<td><code>axios</code></td>
+<td>NPM module for HTTP requests</td>
+</tr>
+<tr>
+<td><code>del</code></td>
+<td><code>del</code></td>
+<td>NPM module for deletion of files and directories</td>
+</tr>
+<tr>
+<td><code>jsforce</code></td>
+<td><code>jsforce</code></td>
+<td>NPM module for interaction with Salesforce APIs</td>
+</tr>
+<tr>
+<td><code>minimatch</code></td>
+<td><code>minimatch</code></td>
+<td>NPM module for glob matching</td>
+</tr>
+<tr>
+<td><code>mkdirp</code></td>
+<td><code>mkdirp</code></td>
+<td>NPM module for creating directories</td>
+</tr>
+<tr>
+<td><code>mpdx</code></td>
+<td><code>../../core</code></td>
+<td>MPDX core modules</td>
+</tr>
+<tr>
+<td><code>open</code></td>
+<td><code>open</code></td>
+<td>NPM module for opening URLs in a browser</td>
+</tr>
+<tr>
+<td><code>recursiveReadDir</code></td>
+<td><code>recursive-readdir</code></td>
+<td>NPM module for recursively reading directories</td>
+</tr>
+<tr>
+<td><code>sfCompress</code></td>
+<td><code>sf-compress</code></td>
+<td>NPM module for compressing SF Metadata</td>
+</tr>
+<tr>
+<td><code>sfMetadata</code></td>
+<td><code>sf-metadata</code></td>
+<td>NPM module for reading and writing SF Metadata</td>
+</tr>
+<tr>
+<td><code>sobeit</code></td>
+<td><code>sobeit</code></td>
+<td>Internal makepositive module for SoBeIt</td>
+</tr>
+<tr>
+<td><code>xml2js</code></td>
+<td><code>xml2js-fork-stringify</code></td>
+<td>NPM module for XML parsing and building</td>
+</tr>
+</tbody>
+</table>
+<h5 id="session">Session</h5>
+<p>Session is an object that provides the following Salesforce connection parameters:</p>
+<table class="table" >
+<thead>
+<tr>
+<th>Object Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apiVersion</code></td>
+<td>Salesforce API Version</td>
+</tr>
+<tr>
+<td><code>environment</code></td>
+<td>Name of Salesforce environment</td>
+</tr>
+<tr>
+<td><code>instanceUrl</code></td>
+<td>Salesforce Instance URL</td>
+</tr>
+<tr>
+<td><code>sessionId</code></td>
+<td>Salesforce Session Id</td>
+</tr>
+</tbody>
+</table>
+<p>The tooling passes the following command line arguments to plugins:</p>
+<ul>
+<li><code>apiVersion</code> -&gt; <code>context.session.apiVersion</code> - Salesforce API version that the tooling uses for interactions with Salesforce (mapped from <code>${sf.version}</code>)</li>
+<li><code>environment</code> -&gt; <code>context.session.environment</code> - All lowercase name of environment as known to Ant (mapped from <code>${sf_envName_lower}</code>)</li>
+<li><code>instanceUrl</code> -&gt; <code>context.session.instanceUrl</code> - Salesforce Instance URL to be used with Session Id for authentication</li>
+<li><code>sessionId</code> -&gt; <code>context.session.sessionId</code> - Salesforce Session Id to be used with Instance URL for authentication</li>
+</ul>
+<h4 id="example">Example</h4>
+<p>The following command:</p>
+<pre><code>     ant plugin -Dname=example
+</code></pre>
+<p>Will run the following plugin file:</p>
+<pre><code>    plugins/example.js
+</code></pre>
+<p>With file contents:</p>
+<pre><code class="javascript language-javascript">    module.exports = async ({ arguments, modules, session }) =&gt; {
+
+        const fs          = require('fs');
+        const { jsforce } = modules;
+
+        console.log('-----------------------------------------------------------------------');
+        console.log('Hello, I am an example JavaScript plugin being run through NodeJS.\n');
+
+        console.log('These are the modules available to me:');
+        console.log(Object.keys(modules));
+
+        console.log();
+
+        console.log('This is the configuration I have been given:\n');
+
+        console.log('Arguments:');
+        console.log(arguments);
+
+        console.log();
+
+        console.log('Session:');
+        console.log(Object.keys(session));
+
+        console.log();
+
+        console.log('Here is a source directory listing based on the configuration provided:');
+        console.log(fs.readdirSync(arguments.sourceDir));
+
+        console.log();
+
+        console.log('Here is some information from Salesforce:');
+
+        const connection = new jsforce.Connection({
+            serverUrl : session.instanceUrl,
+            sessionId : session.sessionId,
+            version   : session.apiVersion
+        });
+
+        const identity = await connection.identity();
+
+        console.log('User ID         :', identity.user_id        );
+        console.log('Organization ID :', identity.organization_id);
+        console.log('Username        :', identity.username       );
+        console.log('Display Name    :', identity.display_name   );
+        console.log('-----------------------------------------------------------------------');
+    }
+</code></pre>
+<p>Will have <code>context</code>:</p>
+<pre><code class="javascript language-javascript">    {
+        arguments: {
+            sourceDir  : '[sourceDir from ${dir.sourceDir}',
+        },
+        modules: {
+            axios            : require('axios'),
+            del              : require('del'),
+            jsforce          : require('jsforce'),
+            minimatch        : require('minimatch'),
+            mkdirp           : require('mkdirp'),
+            mpdx             : require('../../core'),
+            open             : require('open'),
+            recursiveReadDir : require('recursive-readdir'),
+            sfCompress       : require('sf-compress'),
+            sfMetadata       : require('sf-metadata'),
+            sobeit           : require('sobeit'),
+            xml2js           : require('xml2js-fork-stringify')
+        },
+        session: {
+            apiVersion       : '[Salesforce API version from ${sf.version}',
+            environment      : '[environment from ${sf_envName_lower}',
+            instanceUrl      : '[instanceUrl from ${sf_instanceUrl}',
+            sessionId        : '[sessionId from ${sf_sessionId}'
+        }
+    }
+</code></pre>
+<p>Will output:</p>
+<pre><code>     [echo] =========================================
+     [echo] Running plugin example...
+     [echo] =========================================
+     [exec] Running plugin:  ./plugins/example.js
+     [exec] --------------------------------------------------------------------
+     [exec] Hello, I'm an example JavaScript plugin being run through NodeJS.
+     [exec] 
+     [exec] These are the modules available to me:
+     [exec] 
+     [exec] [ 'axios', 'del', 'jsforce', 'minimatch', 'mkdirp', 'mpdx', 'open', 'recursiveReadDir', 'sfCompress', 'sfMetadata', 'sobeit', 'xml2js' ]
+     [exec] 
+     [exec] This is the configuration I've been given:
+     [exec] 
+     [exec] Arguments:
+     [exec] { deployDir: './temp/deployMain', retrieveDir: './temp/retrieveMain', sourceDir: './src' }
+     [exec] 
+     [exec] Session:
+     [exec] [ 'apiVersion', 'environment', 'instanceUrl', 'sessionId' ]
+     [exec] 
+     [exec] Here is a directory listing based on the configuration provided:
+     [exec] [
+     [exec]   'destructiveChangesPost.xml',
+     [exec]   'destructiveChangesPre.xml',
+     [exec]   'package.xml'
+     [exec] ]
+     [exec] 
+     [exec] Here is some information from Salesforce:
+     [exec] User ID         : 0053xxxxxxxxxxxxxx
+     [exec] Organization ID : 00D3xxxxxxxxxxxxxx
+     [exec] Username        : [Username]
+     [exec] Display Name    : [Name]
+     [exec] --------------------------------------------------------------------
+     [exec] Plugin complete
+</code></pre>
+<h3 id="callingapluginfromatoolinghook">Calling a Plugin from a Tooling Hook</h3>
+<p>If the objective is to run a plugin as part of an existing tooling command i.e. it should be 'hooked in', this can be achieved by configuration or code. Configuration should be the first choice. </p>
+<h4 id="configuration-18">Configuration</h4>
+<p>Add the following to build.properties:</p>
+<pre><code>    hook.{hook-name}.{order}.plugin={plugin-name}
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>{hook-name}</code> is the hook point where the plugin should be triggered (see Tooling Hooks section)</li>
+<li><code>{order}</code> is an integer that indicates the order different plugins will execute at the hook point - must always be set, even if there is only one plugin</li>
+<li><code>{plugin-name}</code> is the name of the plugin that will execute (filename without the <code>.js</code> extension)</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code>    hook.hook-pre-deploy-steps-pre.0.plugin=myPreDeployPlugin
+</code></pre>
+<p>The <code>myPreDeployPlugin</code> plugin will run first at the <code>hook-pre-deploy-steps-pre</code> hook point.</p>
+<h5 id="advancedconfiguration">Advanced Configuration</h5>
+<p>Additional configuration can be added to control whether or not the plugin is given a Salesforce Session Id and/or arguments:</p>
+<pre><code>    hook.{hook-name}.{order}.plugin={plugin-name}
+    hook.{hook-name}.{order}.includeSession={true|false Default:true}
+    hook.{hook-name}.{order}.enabledProperty={property-name If not set defaults to enabled}
+    hook.{hook-name}.{order}.args.{arg-name-1}={arg-value-1}
+    hook.{hook-name}.{order}.args.{arg-name-2}={arg-value-2}
+    hook.{hook-name}.{order}.args.{arg-name-n}={arg-value-n}
+</code></pre>
+<p><strong>Important</strong> - If <code>enabledProperty</code> is not set the plugin will run. If <code>enabledProperty</code> is set the property must exist and evaluate to true when the hook runs else the plugin will not run.</p>
+<p><strong>Example:</strong></p>
+<pre><code>    hook.hook-pre-deploy-steps-pre.0.plugin=myPreDeployPlugin
+    hook.hook-pre-deploy-steps-pre.1.plugin=myGeneralPlugin
+    hook.hook-pre-deploy-steps-pre.1.includeSession=false
+    hook.hook-pre-deploy-steps-pre.1.enabledProperty=environment.project.myGeneralPluginEnabled
+    hook.hook-pre-deploy-steps-pre.1.args.type=deploy
+    hook.hook-pre-deploy-steps-pre.1.args.favouriteTeletubby=Tinky Winky
+</code></pre>
+<p>The <code>myPreDeployPlugin</code> and <code>myGeneralPlugin</code> will run at the <code>hook-pre-deploy-steps-pre</code> hook point.</p>
+<ul>
+<li><code>myPreDeployPlugin</code> will run first with a Session Id and no arguments</li>
+<li><code>myGeneralPlugin</code> will run second without a Session Id and two arguments <strong>Only if the environment.project.myGeneralPluginEnabled evaluates to true</strong>:<ul>
+<li>Argument <code>type</code> with value <code>deploy</code></li>
+<li>Argument <code>favouriteTeletubby</code> with value <code>Tinky Winky</code></li></ul></li>
+</ul>
+<p><strong>Important</strong> - These arguments should only be used where values are static/constant i.e. the plugin requires an argument and at hook point <code>a</code> it should equal <code>z</code> v.s. point <code>b</code> it should equal <code>y</code>.</p>
+<p>See the Properties -&gt; Node Arguments section for arguments that differ based on environment, user input, etc.</p>
+<h4 id="code">Code</h4>
+<p>If extending the tooling using an XML code hook, it is possible to run a plugin as follows:</p>
+<pre><code class="xml language-xml">    &lt;plugin name="[plugin-name]" includeSession="[true|false Default:true]" /&gt;
+</code></pre>
+<p>Additional arguments can be passed to plugins as follows:</p>
+<pre><code class="xml language-xml">    &lt;plugin plugin="[plugin-name]" includeSession="[true|false Default:true]"&gt;
+        &lt;pluginArgs&gt;
+            &lt;arg line="--arg-[arg-name] &amp;quot;[arg value]&amp;quot;" /&gt;
+            &lt;arg line="--arg-[arg-flag]" /&gt;
+        &lt;/pluginArgs&gt;
+    &lt;/plugin&gt;
+</code></pre>
+<p>Arguments can also be passed using build properties (see Properties -&gt; Node Arguments section):</p>
+<pre><code>    arg.node.mpdx.plugin.cheese=cheddar
+</code></pre>
+<p>Is passed to all Plugin calls as <code>--arg-cheese cheddar</code> and therefore available in all Plugins as <code>context.arguments.cheese=cheddar</code>.</p>
+<h3 id="runningapluginwithoutasalesforcesessionid">Running a Plugin without a Salesforce Session Id</h3>
+<p>If the plugin doesn't require a Salesforce Session Id, execution can be sped up by setting <code>-Dnosession=true</code>.</p>
+<p><strong>Example:</strong></p>
+<pre><code>    ant plugin -Dname=example -Dnosession=true
+</code></pre>
+<h3 id="runningxmltoolinghookcodeandconfiguredplugins">Running XML Tooling Hook code and configured Plugins</h3>
+<p>XML Tooling Hook code and Plugins can be tested together by running:</p>
+<pre><code>    ant hook -Dname={hook-point}
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code>    ant hook -Dname=hook-pre-deploy-steps-pre
+</code></pre>
+<p><strong>Note</strong> - Where an XML Tooling Hook and Plugins run at the same hook point - the XML hook will always run first.</p>
+<h3 id="debuggingaplugin">Debugging a Plugin</h3>
+<p>Stacktraces on error can be enabled in the plugin framework by setting the following property in <code>build.properties.local</code>:</p>
+<pre><code>    arg.node.mpdx.debug=true
+</code></pre>
+<h1 id="toolinghooks">Tooling Hooks</h1>
+<p>The tooling is intended to provide a standardised set of tools and configurations for retrieving and deploying Salesforce metadata. There may be a need to customise the tooling to the needs of an individual project e.g. some extra metadata modifications, other commands or tools that should be integrated into retrieve/deploy. The tooling has a framework to allow for extensions, these are referred to as <code>hooks</code>. The idea is that project customisations can be implemented whilst still being able to receive updates.</p>
+<p>It is important to note that there are no guarantees that an update will not break project customisations but the risk is low.</p>
+<p>So, how does it work? At key points in any ant execution the tooling checks for any customisations that need to run.</p>
+<p>For example, the following checks for a hook called <code>hook-retrieve-post</code> after a retrieve and if found will execute:</p>
+<pre><code class="xml language-xml">    &lt;hook target="hook-retrieve-post" /&gt;
+</code></pre>
+<p>An example implementation of this hook is as follows:</p>
+<pre><code class="xml language-xml">    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+    &lt;project name="ant-sf-build-hooks-retrieve"&gt;
+
+        &lt;target name="hook-retrieve-post"&gt;
+            &lt;echo&gt;Example post retrieve hook&lt;/echo&gt;
+        &lt;/target&gt;
+
+    &lt;/project&gt;
+</code></pre>
+<p>This file should be saved to:</p>
+<pre><code>    build-hooks/{file}.xml
+</code></pre>
+<p>The file can be named anything but for consistency it is recommended to call it the same as the file where the hook is triggered. In the above example, <code>hook-retrieve-post</code> is in the <code>retrieve.xml</code> file therefore the path should be <code>build-hooks/retrieve.xml</code> - this helps to keep hooks organised. Similarly, the project name should be <code>ant-sf-build-hooks-{file}</code>.</p>
+<p>Hooks can be called on their own like any other ant target:</p>
+<pre><code>    ant hook-retrieve-post
+</code></pre>
+<p>It is also possible to create standalone targets, just be sure to give them a name that doesn't conflict with existing targets or likely names of new targets (hard to predict but easy to avoid with a simple prefix e.g. project).</p>
+<p>Example:</p>
+<pre><code class="xml language-xml">    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+    &lt;project name="ant-sf-build-hooks-project"&gt;
+
+        &lt;target name="projectTarget"&gt;
+            &lt;echo&gt;Example project target&lt;/echo&gt;
+        &lt;/target&gt;
+
+    &lt;/project&gt;
+</code></pre>
+<pre><code>    ant projectTarget
+</code></pre>
+<p>Hook locations can be found by reading through the ant configuration files in the <code>ant</code> directory and figuring out where to inject logic.</p>
+<p>It is also possible to search for all hooks using something like this:</p>
+<pre><code>    &lt;hook\s+target="([A-Za-z0-9@${}-]+)"\s?/&gt;
+</code></pre>
+<p>When developing hooks remember that ant properties are global and immutable. In order to avoid conflicts use a naming convention and prefix all properties with <code>hooks.</code>. Even if a property doesn't exist now, it may in the future. The tooling will never create properties that are prefixed with <code>hooks.</code> therefore are safe from potential conflicts. The tooling generally uses <code>{file}.{property}</code> as convention, the recommendation for hooks is: <code>hooks.{file}.{property}</code>.</p>
+<h1 id="3rdpartylibrariesandtools">3rd Party Libraries and Tools</h1>
+<p>The tooling uses the following 3rd party Ant libraries and tools:</p>
+<ul>
+<li>Force.com Migration Tool (<code>migration-tool</code> mode only)</li>
+<li>ForceFlow (<code>migration-tool</code> mode only)</li>
+<li>Ant Contrib</li>
+<li>NodeJS</li>
+<li>MPDX</li>
+</ul>
+<p>These libraries and tools are automatically downloaded and installed as required.</p>
+<p>They are stored in <code>~/.mp-dev-ops</code>.</p>
+<h2 id="antcontrib">Ant Contrib</h2>
+<p>Ant-Contrib is a useful collection of common Ant tasks, the tooling uses it for for loops.</p>
+<p><a href="http://ant-contrib.sourceforge.net">AntContrib Docs</a></p>
+<h2 id="forcecommigrationtool-1">Force.com Migration Tool</h2>
+<p>Force.com Migration Tool is a library Ant tasks for interacting with the Salesforce Metadata API for retrieving and deploying metadata.</p>
+<p><a href="https://developer.salesforce.com/docs/atlas.en-us.daas.meta/daas/meta_development.htm">Force.com Migration Tool Docs</a></p>
+<h2 id="forceflow">ForceFlow</h2>
+<p>ForceFlow is a library of Ant tasks for interacting with Salesforce APIs that is used in conjunction with the Force.com Migration Tool. The tooling uses a customised version of ForceFlow.</p>
+<p>The original version of ForceFlow can be found here:</p>
+<p><a href="https://github.com/eroispaziali/ForceFlow">ForceFlow Repository</a></p>
+<h2 id="nodejs">NodeJS</h2>
+<p>NodeJS is a JavaScript runtime. The tooling uses JavaScript for as a scripting language and to make use of third party tools.</p>
+<p><a href="https://nodejs.org/">NodeJS</a></p>
+<h2 id="mpdx">MPDX</h2>
+<p>MPDX is a command line Node package developed by makepositive that is used to provide additional tooling features and integrate external packages such as SoBeIt.</p>
+<p><a href="https://bitbucket.org/makepositive/mpdx/">MPDX</a></p>
+<h1 id="miscellaneous">Miscellaneous</h1>
+<h2 id="warningnashornengineisplannedtoberemovedfromafuturejdkrelease">Warning: Nashorn engine is planned to be removed from a future JDK release</h2>
+<p>You may see the following warning message when using the tooling: </p>
+<pre><code>    Warning: Nashorn engine is planned to be removed from a future JDK release
+</code></pre>
+<h3 id="whatdoesthewarningmean">What does the warning mean?</h3>
+<p>This is a Java warning indicating that at some point in a future release of the Java Development Kit the Nashorn engine will be removed and no longer supported by Oracle. Nashorn is a Javascript engine, Ant uses it to support script and scriptDef tasks, the tooling uses scriptDef tasks for some of the more complicated parts of tooling that wouldn’t otherwise be possible (or would be horrendously complicated) with standard xml based Ant tasks.</p>
+<h3 id="canthewarningbehidden">Can the warning be hidden?</h3>
+<p>Yes. You can set an environment variable <code>ANT_OPTS</code> with a value of <code>-Dnashorn.args="--no-deprecation-warning"</code> and this will hide the deprecation notice.</p>
+<p>Note - this doesn’t fix the underlying issue, at some point Oracle will stop supporting Nashorn engine and our tooling will no longer work with newer versions of Java.</p>
+<h1 id="licensedata">License &amp; Data</h1>
+<h2 id="license">License</h2>
+<p><a href="LICENSE.md">See License</a></p>
+<h2 id="telemetry">Telemetry</h2>
+<p>Build metrics may be collected to measure performance of the tool. This is only enabled by default for internal makepositive tooling accounts and does not contain any metadata or Salesforce connection parameters. Metrics are not collected for the standalone (frozen) version. </p>
+<p>You can see an example of this data by running:</p>
+<pre><code>    ant printMetricsData
+</code></pre>
+<p>The last set of data returned can be found here: <code>{tooling-install-dir}/metrics.json</code> (if the file doesn't exist no data has been sent)</p>
+<p>Metrics can be disabled at a machine level by setting an environment variable <code>MP_TOOLING_DISABLE_METRICS</code> to <code>true</code>. It is best to consult the DevOps team before overriding this setting.</p></body>

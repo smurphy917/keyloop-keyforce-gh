@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Required_Approvals__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF( OR(Count_Of_Aftersales_Approval_Lines__c &gt; 0, AftersalesApprovalRequired__c, OpportunityType__c = &quot;New Business&quot;, OpportunityType__c = &quot;Migration&quot;), &quot;Aftersales&quot; &amp; BR(), &quot;&quot;) &amp;
+IF ( LegalApprovalRequired__c, &quot;Legal&quot; &amp; BR(), &quot;&quot;) &amp;
+IF( OR(Count_Of_RD_Approval_Lines__c &gt; 0, RDApprovalRequired__c), &quot;R&amp;D&quot; &amp; BR(),&quot;&quot;) &amp;
+CASE(Highest_Approval_Tier__c,
+  1,&quot;Discount Tier 1&quot;,
+  2,&quot;Discount Tier 2&quot;,
+  3,&quot;Discount Tier 3&quot;,
+  &quot;&quot;
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Approvals that will be required once the quote has been submitted for approval.</inlineHelpText>
+    <label>Required Approvals</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

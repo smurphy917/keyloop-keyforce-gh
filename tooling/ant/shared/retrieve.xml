@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-retrieve" xmlns:if="ant:if">
+
+	<target name="retrieve">
+		<echo>=========================================</echo>
+		<echo>Retrieving...</echo>
+		<echo>=========================================</echo>
+
+		<validateEnvironmentProperties />
+		<retrieveEnvironmentInfo />
+
+		<metricTimestamp name="retrieve-start" />
+
+		<setupBranchProperties />
+
+		<hook target="hook-retrieve-pre" />
+
+		<retrieveMain          if:true="${retrieve.enableMain}"          />
+		<retrieveDataExport    if:true="${retrieve.enableDataExport}"    />
+
+		<hook target="hook-retrieve-post" />
+
+		<setupFileStatsProperties />
+
+		<echo 
+			file    = ".git/mp-last-retrieve" 
+			message = "${metrics.timestamps.retrieve-start}" 
+			if:true = "${git.isGitRepo}"  />
+
+		<metricTimestamp name="retrieve-stop" />
+	</target>
+
+	<target name="retrieveMain">
+		<echo>=========================================</echo>
+		<echo>Retrieving...</echo>
+		<echo>=========================================</echo>
+
+		<retrieveEnvironmentInfo />
+		<retrieveMain />
+	</target>
+
+	<target name="postRetrieve">
+		<echo>=========================================</echo>
+		<echo>Applying post retrieve changes...</echo>
+		<echo>=========================================</echo>
+
+		<retrieveModifications />
+		<retrieveCompressions  />
+	</target>
+
+	<macrodef name="retrieveMain">
+		<sequential>
+			<metricTimestamp name="retrieve-main-start" />
+
+			<retrieve
+				type        = "Main"
+				hookName    = "main"
+				src         = "${dir.tempRetrieveMain}"
+				package     = "${file.mainPackage}"
+				/>
+
+			<retrieveMainConversion />
+			<retrieveModifications />
+			<retrieveCompressions  />
+
+			<metricTimestamp name="retrieve-main-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="retrieveMainConversion">
+		<sequential>
+			<metricTimestamp name="retrieve-main-conversion-start" />
+
+			<hook target="hook-retrieve-main-pre-conversion" />
+
+			<checkAndConvertMdToToolingSource sourceDir="${dir.tempRetrieveMain}" targetDir="${dir.sourceDir}" />
+
+			<hook target="hook-retrieve-main-post-conversion" />
+
+			<metricTimestamp name="retrieve-main-conversion-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="retrieveModifications">
+		<sequential>
+			<metricTimestamp name="retrieve-main-modifications-start" />
+
+			<hook target="hook-retrieve-main-pre-modifications" />
+
+			<applyRetrieveModifications if:true="${retrieve.enableMetadataModifications}" />
+
+			<hook target="hook-retrieve-main-post-modifications" />
+
+			<metricTimestamp name="retrieve-main-modifications-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="retrieveCompressions">
+		<sequential>
+			<metricTimestamp name="retrieve-main-compressions-start" />
+
+			<hook target="hook-retrieve-main-pre-compressions" />
+
+			<applyCompressions if:true="${retrieve.enableMetadataCompressions}" />
+
+			<hook target="hook-retrieve-main-post-compressions" />
+
+			<metricTimestamp name="retrieve-main-compressions-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="retrieveDataExport">
+		<sequential>
+			<metricTimestamp name="retrieve-data-export-start" />
+
+			<hook target="hook-retrieve-data-export-pre" />
+
+			<sobeitExport />
+
+			<hook target="hook-retrieve-data-export-post" />
+
+			<metricTimestamp name="retrieve-data-export-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="retrieve">
+		<attribute name="type" />
+		<attribute name="hookName" />
+		<attribute name="src" />
+		<attribute name="package" />
+
+		<sequential>
+			<metricTimestamp name="retrieve-@{hookName}-sf-start" />
+
+			<hook target="hook-retrieve-@{hookName}-pre" />
+
+			<resetSrcDir dir="@{src}" />
+
+			<echo>Retrieving @{type} Package...</echo>
+			<retrieveCommand 
+				src     = "@{src}" 
+				package = "@{package}" />
+
+			<hook target="hook-retrieve-@{hookName}-post" />
+
+			<metricTimestamp name="retrieve-@{hookName}-sf-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="retrieveEnvironmentInfo">
+		<sequential>
+			<validateEnvironmentProperties />
+
+			<echo>Environment: ${sf_envName}</echo>
+			<echo>User:        ${sf_username}</echo>
+			<echo>Server:      ${sf_serverUrl}</echo>
+		</sequential>
+	</macrodef>
+
+</project>

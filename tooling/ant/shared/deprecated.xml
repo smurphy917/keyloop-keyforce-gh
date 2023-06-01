@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-deprecated" xmlns:if="ant:if" xmlns:unless="ant:unless">
+	
+	<!-- DEPRECATED: use importSalesforceLibrary / importForceFlowLibrary / importAntContribLibrary
+		 to import specific libraries instead
+		 Note - this is referenced in the boilerplate repo-->
+	<target name="installLibraries">
+		<importSalesforceLibrary />
+		<importForceFlowLibrary />
+		<importAntContribLibrary />
+	</target>
+
+	<target name="setupReleaseProperties">
+		<echo>You should remove call to setupReleaseProperties - this target is deprecated</echo>
+		<setupBranchAndVersionProperties />
+	</target>
+
+	<target name="setupBranchProperties">
+		<echo>You should remove call to setupBranchProperties - this target is deprecated</echo>
+		<setupBranchProperties />
+	</target>
+
+	<target name="setupFileStatsProperties">
+		<echo>You should remove call to setupFileStatsProperties - this target is deprecated</echo>
+		<setupFileStatsProperties />
+	</target>
+	
+	<target name="setupEnvironmentProperties">
+		<echo>You should remove call to setupEnvironmentProperties - this target is deprecated</echo>
+		<validateEnvironmentProperties />
+	</target>
+
+	<target name="removeFalseEntriesFromPermissionSets">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="removeLoginIPRangesFromProfiles">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="removeFieldHistoryTracking">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="removeListViews">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="removeUserPermissions">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="removeLayoutAssignments">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="removeStandardApps">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="removePackageMembers">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="decompressPageLayouts">
+		<echoRemovedModificationFunctionalityMessage />
+	</target>
+
+	<target name="compressProfiles">
+		<echoRemovedCompressionFunctionalityMessage />
+	</target>
+
+	<target name="compressPageLayouts">
+		<echoRemovedCompressionFunctionalityMessage />
+	</target>
+
+	<target name="compressGlobalValueSets">
+		<echoRemovedCompressionFunctionalityMessage />
+	</target>
+
+	<target name="compressStandardValueSets">
+		<echoRemovedCompressionFunctionalityMessage />
+	</target>
+
+	<target name="compressObjectPicklists">
+		<echoRemovedCompressionFunctionalityMessage />
+	</target>
+
+	<target name="compressQuickActions">
+		<echoRemovedCompressionFunctionalityMessage />
+	</target>
+
+	<target name="compressCustomMetaData">
+		<echoRemovedCompressionFunctionalityMessage />
+	</target>
+
+	<target name="compressQueues">
+		<echoRemovedCompressionFunctionalityMessage />
+	</target>
+
+	<macrodef name="echoRemovedCompressionFunctionalityMessage">
+		<sequential>
+			<echo>This functionality has been removed and replaced by `ant applyCompressions`</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="echoRemovedModificationFunctionalityMessage">
+		<sequential>
+			<echo>This functionality has been removed and replaced by `ant applyRetrieveModifications` / `ant applyDeployModifications`</echo>
+		</sequential>
+	</macrodef>
+
+	<!-- DEPRECATED: these macrodefs are no longer supported and will be removed in a future release - use javascript plugins instead -->
+
+	<macrodef name="compressXmlNode">
+		<attribute name="directory" />
+		<attribute name="extension" />
+		<attribute name="node" />
+		<attribute name="indentation" />
+
+		<sequential>
+			<echo>WARNING: compressXmlNode is deprecated and will be removed from a future release</echo>
+			<apply executable="${file.exec.perl}"> 
+				<arg value="${dir.perlScripts}/compressXmlNode.pl" />
+				<srcfile />
+				<fileset dir="${dir.sourceDir}/@{directory}/" includes="**/*.@{extension}" erroronmissingdir="false" />
+				<arg value="@{node}" />
+				<arg value="@{indentation}" />
+			</apply>
+			<deleteBakFiles directory="${dir.sourceDir}/@{directory}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="removeXmlTag">
+		<attribute name="tag" />
+		<attribute name="files" />
+
+		<sequential>
+			<echo>WARNING: removeXmlTag is deprecated and will be removed from a future release</echo>
+			<echo>Remove @{tag} from @{files}...</echo>
+			<replaceregexp 
+				match   = "([ \t])*&lt;@{tag}&gt;(true|false)&lt;/@{tag}&gt;[\n\r]" 
+				replace = "" 
+				flags   = "gim" 
+				byline  = "false">
+
+				<fileset 
+					dir         = "${dir.sourceDir}" 
+					includes    = "@{files}" />
+			</replaceregexp>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="removeUserPermission">
+		<attribute name="name" />
+		<attribute name="files" />
+
+		<sequential>
+			<echo>WARNING: removeUserPermission is deprecated and will be removed from a future release</echo>
+			<echo>Remove @{name} user permission from @{files}...</echo>
+			<replaceregexp 
+				match   = "([ \t])*&lt;userPermissions&gt;&lt;enabled&gt;(true|false)&lt;/enabled&gt;&lt;name&gt;@{name}&lt;/name&gt;&lt;/userPermissions&gt;[\n\r]" 
+				replace = "" 
+				flags   = "gim" 
+				byline  = "false">
+
+				<fileset 
+					dir         = "${dir.sourceDir}" 
+					includes    = "@{files}" />
+			</replaceregexp>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="removeLayoutAssignment">
+		<attribute name="name" />
+		<attribute name="files" />
+
+		<sequential>
+			<echo>WARNING: removeLayoutAssignment is deprecated and will be removed from a future release</echo>
+			<echo>Remove @{name} layout assignment from @{files}...</echo>
+			<replaceregexp 
+				match   = "([ \t])*&lt;layoutAssignments&gt;&lt;layout&gt;@{name}&lt;/layout&gt;&lt;/layoutAssignments&gt;[\n\r]" 
+				replace = "" 
+				flags   = "gim" 
+				byline  = "false">
+
+				<fileset 
+					dir         = "${dir.sourceDir}" 
+					includes    = "@{files}" />
+			</replaceregexp>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="deleteListViewFile">
+		<attribute name="file" />
+		<sequential>
+			<echo>WARNING: deleteListViewFile is deprecated and will be removed from a future release</echo>
+			<delete file="${dir.sourceDir}/objects/@{file}.listView-meta.xml"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="removeFieldHistoryTrackingFromObject">
+		<attribute name="object" />
+		<sequential>
+			<echo>WARNING: removeFieldHistoryTrackingFromObject is deprecated and will be removed from a future release</echo>
+			<removeXmlTag files="objects/@{object}.object" tag="enableFeeds" />
+			<removeXmlTag files="objects/@{object}.object" tag="enableHistory" />
+			<removeXmlTag files="objects/@{object}.object" tag="trackFeedHistory" />
+			<removeXmlTag files="objects/@{object}.object" tag="trackHistory" />
+			<removeXmlTag files="objects/@{object}.object" tag="recordTypeTrackFeedHistory" />
+			<removeXmlTag files="objects/@{object}.object" tag="recordTypeTrackHistory" />
+		</sequential>
+	</macrodef>
+
+</project>

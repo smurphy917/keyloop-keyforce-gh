@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-usage">
+
+	<target name="usage">
+		<echo>=========================================</echo>
+		<echo>Usage</echo>
+		<echo>=========================================</echo>
+
+		<hook target="hook-usage-pre" />
+
+		<echo>
+Targets:
+
+	Documentaton
+		- ant help
+
+	Environment Management:
+		- ant retrieve [-De={environment}]
+		- ant test [-De={environment}]
+		- ant deploy [-De={environment}]
+		- ant quickDeploy [-De={environment}]
+		- ant list -Dtype={metadata-type} [-Dfolder={metadata-folder}] [-De={environment}]
+		- ant open [-De={environment}]
+
+	Metadata Manipulation:
+		- ant applyRetrieveModifications
+		- ant applyDeployModifications
+		- ant applyModifications -Dgroup={modification-group}
+		- ant listModificationDefinitions
+		- ant applyCompressions
+
+	Apex Execution:
+		- ant runApexScript -Dscript.file={script-file} [-De={environment}]
+		- ant runApexScriptsPre [-De={environment}]
+		- ant runApexScriptsPost [-De={environment}]
+
+	Data Management:
+		- ant sobeit -Dconfig={sobeit-configuration-file-or-directory} [-De={environment}]
+		- ant dataExport [-De={environment}]
+		- ant dataImport [-De={environment}]
+
+	Plugins
+		- ant plugin -Dname={plugin-name} [-Dnosession=true]
+
+	Tooling Management:
+		- ant init
+		- ant setup
+		- ant configure
+		- ant configureCI [-De={environment}]
+		- ant createCertificate [-Dssl.name={certificate-name}]
+		- ant updatePipelines
+		- ant updatePackage
+		- ant updateDestructivePre
+		- ant updateDestructivePost
+		- ant updateReadme
+		- ant freeze [-Df=true]
+
+	Version Control Management:
+		- ant reset [-Df=true]
+		- ant createMajorRelease
+		- ant createMinorRelease
+		- ant createPatchRelease
+		- ant fetchReleaseBranches
+
+	Project Seeding
+		- ant importModules
+
+	Debug Deploy:
+		- ant preDeploySteps [-De={environment}]
+		- ant postDeploySteps [-De={environment}]
+
+	Debug Retrieve:
+		- ant postRetrieve [-De={environment}]
+
+	Debug Hooks:
+		- ant hook -Dname={hook-point}
+
+	Debug Metrics:
+		- ant printMetricsData
+		
+	Debug Properties:
+		- ant printProperties
+		- ant printEnvProperties [-De={environment}]]
+
+	Debug Session:
+		- ant session [-De={environment}]
+		</echo>
+
+		<hook target="hook-usage-post" />
+	</target>
+
+</project>

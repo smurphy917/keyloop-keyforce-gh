@@ -1,0 +1,13 @@
+name: QA Deployment
+
+on:
+  push:
+    branches: [ "deploy/QA" ]
+
+jobs:
+
+  QA:
+    uses: ./.github/workflows/template-deployment.yml
+    with:
+      environment: QA
+    secrets: inherit

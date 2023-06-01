@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue><fullName>Voice</fullName><default>false</default><label>Voice</label></customValue>
+    <customValue><fullName>Network</fullName><default>false</default><label>Network</label></customValue>
+    <customValue><fullName>Other</fullName><default>false</default><label>Other</label></customValue>
+    <customValue><fullName>3rd Parties</fullName><default>false</default><label>3rd Parties</label></customValue>
+    <customValue><fullName>Analytics</fullName><default>false</default><label>Analytics</label></customValue>
+    <customValue><fullName>Message</fullName><default>false</default><label>Message</label></customValue>
+    <customValue><fullName>Autoline DMS</fullName><default>false</default><label>Autoline DMS</label></customValue>
+    <customValue><fullName>Drive DMS</fullName><default>false</default><label>Drive DMS</label></customValue>
+    <customValue><fullName>Windrakkar DMS</fullName><default>false</default><label>Windrakkar DMS</label></customValue>
+    <customValue><fullName>Aswin DMS</fullName><default>false</default><label>Aswin DMS</label></customValue>
+    <customValue><fullName>Dracar+ DMS</fullName><default>false</default><label>Dracar+ DMS</label></customValue>
+    <customValue><fullName>Talisman DMS</fullName><default>false</default><label>Talisman DMS</label></customValue>
+    <customValue><fullName>Automaster DMS</fullName><default>false</default><label>Automaster DMS</label></customValue>
+    <customValue><fullName>Dealer Bridge</fullName><default>false</default><label>Dealer Bridge</label></customValue>
+    <customValue><fullName>Print Manager</fullName><default>false</default><label>Print Manager</label></customValue>
+    <customValue><fullName>Service Hub</fullName><default>false</default><label>Service Hub</label></customValue>
+    <customValue><fullName>Parts Hub</fullName><default>false</default><label>Parts Hub</label></customValue>
+    <customValue><fullName>IMS</fullName><default>false</default><label>IMS</label></customValue>
+    <customValue><fullName>Service Booking</fullName><default>false</default><label>Service Booking</label></customValue>
+    <customValue><fullName>Contact</fullName><default>false</default><label>Contact</label></customValue>
+    <customValue><fullName>Fleet</fullName><default>false</default><label>Fleet</label></customValue>
+    <customValue><fullName>Tigre DMS</fullName><default>false</default><label>Tigre DMS</label></customValue>
+    <customValue><fullName>AutoData</fullName><default>false</default><label>AutoData</label></customValue>
+    <customValue><fullName>AutoSys DMS</fullName><default>false</default><label>AutoSys DMS</label></customValue>
+    <customValue><fullName>Documents</fullName><default>false</default><label>Documents</label></customValue>
+    <customValue><fullName>EVA DMS</fullName><default>false</default><label>EVA DMS</label></customValue>
+    <customValue><fullName>PC</fullName><default>false</default><label>PC</label></customValue>
+    <customValue><fullName>Peripherals</fullName><default>false</default><label>Peripherals</label></customValue>
+    <customValue><fullName>Servers &amp; Storage</fullName><default>false</default><label>Servers &amp; Storage</label></customValue>
+    <customValue><fullName>e-Invoicing</fullName><default>false</default><label>e-Invoicing</label></customValue>
+    <customValue><fullName>Video</fullName><default>false</default><label>Video</label></customValue>
+    <customValue><fullName>PAR SHOWROOM</fullName><default>false</default><label>PAR SHOWROOM</label></customValue>
+    <customValue><fullName>API</fullName><default>false</default><label>API</label></customValue>
+    <customValue><fullName>Service Experience</fullName><default>false</default><label>Service Experience</label></customValue>
+    <customValue><fullName>PAR OTHER</fullName><default>false</default><label>PAR OTHER</label></customValue>
+    <customValue><fullName>Commerce</fullName><default>false</default><label>Commerce</label></customValue>
+    <customValue><fullName>Connected Invoicing</fullName><default>false</default><label>Connected Invoicing</label></customValue>
+    <customValue><fullName>Leads</fullName><default>false</default><label>Leads</label></customValue>
+    <customValue><fullName>Digital Communications</fullName><default>false</default><label>Digital Communications</label></customValue>
+    <customValue><fullName>0</fullName><default>false</default><label>0</label></customValue>
+    <customValue><fullName>Showroom</fullName><default>false</default><label>Showroom</label></customValue>
+    <customValue><fullName>-</fullName><default>false</default><label>-</label></customValue>
+    <masterLabel>Product</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

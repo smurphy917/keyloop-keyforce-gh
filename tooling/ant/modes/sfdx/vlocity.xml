@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-vlocity" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<!-- Do not use directly - use vlocity macrodef in shared/vlocity.xml -->
+	<macrodef name="vlocityCommand">
+		<attribute name="command"                      />
+		<attribute name="job"          default=""      />
+		<attribute name="includeAlias" default="true"  />
+		<attribute name="failOnError"  default="true"  />
+		<element   name="vlocityArgs"  optional="true" />
+		<sequential>
+			<local name="propertyFileExists" />
+			<local name="jobSet" />
+
+			<condition property="propertyFileExists" value="true" else="false">
+				<available file="${file.vlocityProperties}" />
+			</condition>
+
+			<condition property="jobSet" value="true" else="false">
+				<not>
+					<or>
+						<equals   arg1="@{job}"   arg2=""        />
+						<contains string="@{job}" substring="${" />
+					</or>
+				</not>
+			</condition>
+
+			<login if:true="@{includeAlias}" />
+
+			<vlocityCheck unless:true="${execCheck.vlocity.disabled}" />
+
+			<exec 
+				executable  = "${file.exec.vlocity}" 
+				failonerror = "@{failOnError}">
+				<arg line="-sfdx.username ${sf_alias}"              if:true="@{includeAlias}"       />
+				<arg line="-propertyfile ${file.vlocityProperties}" if:true="${propertyFileExists}" />
+				<arg line="-job @{job}"                             if:true="${jobSet}"             />
+				<arg line="@{command}" />
+				<vlocityArgs />
+			</exec>
+		</sequential>
+	</macrodef>
+
+</project>

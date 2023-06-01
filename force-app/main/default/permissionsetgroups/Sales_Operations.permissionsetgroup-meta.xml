@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Sales Operations</label>
+    <permissionSets>Competitor_Products_Read_Create_Edit_Delete</permissionSets>
+    <permissionSets>Make_Management_Write_Access</permissionSets>
+    <permissionSets>Manual_Renewal</permissionSets>
+    <permissionSets>Quote_Management_Delete_Access</permissionSets>
+    <permissionSets>Quote_Management_Write_Access</permissionSets>
+    <permissionSets>Risk_Management_Write_Access</permissionSets>
+    <permissionSets>View_Setup_Transfer_Records</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

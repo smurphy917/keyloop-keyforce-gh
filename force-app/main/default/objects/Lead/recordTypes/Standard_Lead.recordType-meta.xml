@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Standard_Lead</fullName>
+    <active>true</active>
+    <businessProcess>Standard Lead Process</businessProcess>
+    <label>Standard Lead</label>
+    <picklistValues>
+        <picklist>Country__c</picklist>
+        <values><fullName>Albania</fullName><default>false</default></values>
+        <values><fullName>Algeria</fullName><default>false</default></values>
+        <values><fullName>Andorra</fullName><default>false</default></values>
+        <values><fullName>Angola</fullName><default>false</default></values>
+        <values><fullName>Argentina</fullName><default>false</default></values>
+        <values><fullName>Australia</fullName><default>false</default></values>
+        <values><fullName>Austria</fullName><default>false</default></values>
+        <values><fullName>Bahrain</fullName><default>false</default></values>
+        <values><fullName>Bangladesh</fullName><default>false</default></values>
+        <values><fullName>Belgium</fullName><default>false</default></values>
+        <values><fullName>Benin</fullName><default>false</default></values>
+        <values><fullName>Bolivia%2C Plurinational State of</fullName><default>false</default></values>
+        <values><fullName>Botswana</fullName><default>false</default></values>
+        <values><fullName>Brazil</fullName><default>false</default></values>
+        <values><fullName>Brunei Darussalam</fullName><default>false</default></values>
+        <values><fullName>Bulgaria</fullName><default>false</default></values>
+        <values><fullName>Burkina Faso</fullName><default>false</default></values>
+        <values><fullName>Cambodia</fullName><default>false</default></values>
+        <values><fullName>Canada</fullName><default>false</default></values>
+        <values><fullName>Chile</fullName><default>false</default></values>
+        <values><fullName>China</fullName><default>false</default></values>
+        <values><fullName>Chinese Taipei</fullName><default>false</default></values>
+        <values><fullName>Colombia</fullName><default>false</default></values>
+        <values><fullName>Costa Rica</fullName><default>false</default></values>
+        <values><fullName>Cote d%27Ivoire</fullName><default>false</default></values>
+        <values><fullName>Czech Republic</fullName><default>false</default></values>
+        <values><fullName>Denmark</fullName><default>false</default></values>
+        <values><fullName>Djibouti</fullName><default>false</default></values>
+        <values><fullName>Ecuador</fullName><default>false</default></values>
+        <values><fullName>Egypt</fullName><default>false</default></values>
+        <values><fullName>Estonia</fullName><default>false</default></values>
+        <values><fullName>Ethiopia</fullName><default>false</default></values>
+        <values><fullName>Finland</fullName><default>false</default></values>
+        <values><fullName>France</fullName><default>false</default></values>
+        <values><fullName>Germany</fullName><default>false</default></values>
+        <values><fullName>Ghana</fullName><default>false</default></values>
+        <values><fullName>Gibraltar</fullName><default>false</default></values>
+        <values><fullName>HONG KONG</fullName><default>false</default></values>
+        <values><fullName>Hungary</fullName><default>false</default></values>
+        <values><fullName>India</fullName><default>false</default></values>
+        <values><fullName>Indonesia</fullName><default>false</default></values>
+        <values><fullName>Ireland</fullName><default>false</default></values>
+        <values><fullName>Italy</fullName><default>false</default></values>
+        <values><fullName>Japan</fullName><default>false</default></values>
+        <values><fullName>Jordan</fullName><default>false</default></values>
+        <values><fullName>Kenya</fullName><default>false</default></values>
+        <values><fullName>Korea</fullName><default>false</default></values>
+        <values><fullName>Kuwait</fullName><default>false</default></values>
+        <values><fullName>Lao People%27s Democratic Republic</fullName><default>false</default></values>
+        <values><fullName>Latvia</fullName><default>false</default></values>
+        <values><fullName>Lebanon</fullName><default>false</default></values>
+        <values><fullName>Lithuania</fullName><default>false</default></values>
+        <values><fullName>Luxembourg</fullName><default>false</default></values>
+        <values><fullName>Malawi</fullName><default>false</default></values>
+        <values><fullName>Malaysia</fullName><default>false</default></values>
+        <values><fullName>Mali</fullName><default>false</default></values>
+        <values><fullName>Mauritania</fullName><default>false</default></values>
+        <values><fullName>Mauritius</fullName><default>false</default></values>
+        <values><fullName>Mexico</fullName><default>false</default></values>
+        <values><fullName>Mongolia</fullName><default>false</default></values>
+        <values><fullName>Morocco</fullName><default>false</default></values>
+        <values><fullName>Mozambique</fullName><default>false</default></values>
+        <values><fullName>Myanmar</fullName><default>false</default></values>
+        <values><fullName>Namibia</fullName><default>false</default></values>
+        <values><fullName>Nepal</fullName><default>false</default></values>
+        <values><fullName>Netherlands</fullName><default>false</default></values>
+        <values><fullName>New Zealand</fullName><default>false</default></values>
+        <values><fullName>Nicaragua</fullName><default>false</default></values>
+        <values><fullName>Nigeria</fullName><default>false</default></values>
+        <values><fullName>Norway</fullName><default>false</default></values>
+        <values><fullName>Oman</fullName><default>false</default></values>
+        <values><fullName>Pakistan</fullName><default>false</default></values>
+        <values><fullName>Palestinian Territory%2C Occupied</fullName><default>false</default></values>
+        <values><fullName>Panama</fullName><default>false</default></values>
+        <values><fullName>Paraguay</fullName><default>false</default></values>
+        <values><fullName>Peru</fullName><default>false</default></values>
+        <values><fullName>Philippines</fullName><default>false</default></values>
+        <values><fullName>Poland</fullName><default>false</default></values>
+        <values><fullName>Portugal</fullName><default>false</default></values>
+        <values><fullName>Qatar</fullName><default>false</default></values>
+        <values><fullName>Romania</fullName><default>false</default></values>
+        <values><fullName>Russian Federation</fullName><default>false</default></values>
+        <values><fullName>Rwanda</fullName><default>false</default></values>
+        <values><fullName>Saudi Arabia</fullName><default>false</default></values>
+        <values><fullName>Senegal</fullName><default>false</default></values>
+        <values><fullName>Serbia</fullName><default>false</default></values>
+        <values><fullName>Seychelles</fullName><default>false</default></values>
+        <values><fullName>Singapore</fullName><default>false</default></values>
+        <values><fullName>Slovenia</fullName><default>false</default></values>
+        <values><fullName>South Africa</fullName><default>false</default></values>
+        <values><fullName>Spain</fullName><default>false</default></values>
+        <values><fullName>Sri Lanka</fullName><default>false</default></values>
+        <values><fullName>Sweden</fullName><default>false</default></values>
+        <values><fullName>Switzerland</fullName><default>false</default></values>
+        <values><fullName>Taiwan</fullName><default>false</default></values>
+        <values><fullName>Tanzania</fullName><default>false</default></values>
+        <values><fullName>Tanzania%2C United Republic of</fullName><default>false</default></values>
+        <values><fullName>Thailand</fullName><default>false</default></values>
+        <values><fullName>Timor-Leste</fullName><default>false</default></values>
+        <values><fullName>Togo</fullName><default>false</default></values>
+        <values><fullName>Tunisia</fullName><default>false</default></values>
+        <values><fullName>Turkey</fullName><default>false</default></values>
+        <values><fullName>Uganda</fullName><default>false</default></values>
+        <values><fullName>Ukraine</fullName><default>false</default></values>
+        <values><fullName>United Arab Emirates</fullName><default>false</default></values>
+        <values><fullName>United Kingdom</fullName><default>false</default></values>
+        <values><fullName>United States</fullName><default>false</default></values>
+        <values><fullName>Uruguay</fullName><default>false</default></values>
+        <values><fullName>Viet Nam</fullName><default>false</default></values>
+        <values><fullName>Zambia</fullName><default>false</default></values>
+        <values><fullName>Zimbabwe</fullName><default>false</default></values>
+        <values><fullName>eSwatini</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>DACH_Email_Opt_In__c</picklist>
+        <values><fullName>Vorhanden</fullName><default>false</default></values>
+        <values><fullName>Widerrufen %2F nicht gegeben</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>DACH_Fax_Opt_In__c</picklist>
+        <values><fullName>Vorhanden</fullName><default>false</default></values>
+        <values><fullName>Widerrufen %2F nicht gegeben</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>DACH_Mail_Opt_In__c</picklist>
+        <values><fullName>Vorhanden</fullName><default>false</default></values>
+        <values><fullName>Widerrufen %2F nicht gegeben</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>DACH_Phone_Opt_In__c</picklist>
+        <values><fullName>Vorhanden</fullName><default>false</default></values>
+        <values><fullName>Widerrufen %2F nicht gegeben</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>DACH_SMS_Opt_In__c</picklist>
+        <values><fullName>Vorhanden</fullName><default>false</default></values>
+        <values><fullName>Widerrufen %2F nicht gegeben</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Decision_Timeframe__c</picklist>
+        <values><fullName>1-3 Months</fullName><default>false</default></values>
+        <values><fullName>3-6 Months</fullName><default>false</default></values>
+        <values><fullName>6-12 Months</fullName><default>false</default></values>
+        <values><fullName>Immediately</fullName><default>false</default></values>
+        <values><fullName>Next Year</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Disqualified_Reason__c</picklist>
+        <values><fullName>Not Our Target Market</fullName><default>false</default></values>
+        <values><fullName>Poor Data Quality</fullName><default>false</default></values>
+        <values><fullName>Product Does Not Match Needs</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Industry</picklist>
+        <values><fullName>Agriculture</fullName><default>false</default></values>
+        <values><fullName>Apparel</fullName><default>false</default></values>
+        <values><fullName>Banking</fullName><default>false</default></values>
+        <values><fullName>Biotechnology</fullName><default>false</default></values>
+        <values><fullName>Chemicals</fullName><default>false</default></values>
+        <values><fullName>Communications</fullName><default>false</default></values>
+        <values><fullName>Construction</fullName><default>false</default></values>
+        <values><fullName>Consulting</fullName><default>false</default></values>
+        <values><fullName>Education</fullName><default>false</default></values>
+        <values><fullName>Electronics</fullName><default>false</default></values>
+        <values><fullName>Energy</fullName><default>false</default></values>
+        <values><fullName>Engineering</fullName><default>false</default></values>
+        <values><fullName>Entertainment</fullName><default>false</default></values>
+        <values><fullName>Environmental</fullName><default>false</default></values>
+        <values><fullName>Finance</fullName><default>false</default></values>
+        <values><fullName>Food %26 Beverage</fullName><default>false</default></values>
+        <values><fullName>Government</fullName><default>false</default></values>
+        <values><fullName>Healthcare</fullName><default>false</default></values>
+        <values><fullName>Hospitality</fullName><default>false</default></values>
+        <values><fullName>Insurance</fullName><default>false</default></values>
+        <values><fullName>Machinery</fullName><default>false</default></values>
+        <values><fullName>Manufacturing</fullName><default>false</default></values>
+        <values><fullName>Media</fullName><default>false</default></values>
+        <values><fullName>Not For Profit</fullName><default>false</default></values>
+        <values><fullName>Other</fullName><default>false</default></values>
+        <values><fullName>Recreation</fullName><default>false</default></values>
+        <values><fullName>Retail</fullName><default>false</default></values>
+        <values><fullName>Shipping</fullName><default>false</default></values>
+        <values><fullName>Technology</fullName><default>false</default></values>
+        <values><fullName>Telecommunications</fullName><default>false</default></values>
+        <values><fullName>Transportation</fullName><default>false</default></values>
+        <values><fullName>Utilities</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>LeadSource</picklist>
+        <values><fullName>Account Based Marketing</fullName><default>false</default></values>
+        <values><fullName>Blog%3B Customer Referral</fullName><default>false</default></values>
+        <values><fullName>Direct Mail</fullName><default>false</default></values>
+        <values><fullName>Event %E2%80%93 External</fullName><default>false</default></values>
+        <values><fullName>Event %E2%80%93 Keyloop</fullName><default>false</default></values>
+        <values><fullName>Google Natural Search</fullName><default>false</default></values>
+        <values><fullName>Marketing Email</fullName><default>false</default></values>
+        <values><fullName>Mobile %E2%80%93 SMS%2C WhatsApp</fullName><default>false</default></values>
+        <values><fullName>Online Display Advertising</fullName><default>false</default></values>
+        <values><fullName>PPC</fullName><default>false</default></values>
+        <values><fullName>Paid Advertorial %28Awareness%29</fullName><default>false</default></values>
+        <values><fullName>Paid Print Advertising %28Awareness%29</fullName><default>false</default></values>
+        <values><fullName>Partner Referral</fullName><default>false</default></values>
+        <values><fullName>Social Advertising</fullName><default>false</default></values>
+        <values><fullName>Social Media %E2%80%93 LinkedIn</fullName><default>false</default></values>
+        <values><fullName>Social Media %E2%80%93 Twitter</fullName><default>false</default></values>
+        <values><fullName>Social Media %E2%80%93 YouTube</fullName><default>false</default></values>
+        <values><fullName>Telemarketing %E2%80%93 External</fullName><default>false</default></values>
+        <values><fullName>Telemarketing %E2%80%93 Internal</fullName><default>false</default></values>
+        <values><fullName>Webinar %E2%80%93 Internal</fullName><default>false</default></values>
+        <values><fullName>Webinar - External</fullName><default>false</default></values>
+        <values><fullName>Websites</fullName><default>false</default></values>
+        <values><fullName>Whitepaper</fullName><default>false</default></values>
+        <values><fullName>eBook</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Lead_Source_Team__c</picklist>
+        <values><fullName>BDR Team</fullName><default>false</default></values>
+        <values><fullName>Marketing</fullName><default>false</default></values>
+        <values><fullName>Sales</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Marketing_Persona__c</picklist>
+        <values><fullName>Aftersales Associate</fullName><default>false</default></values>
+        <values><fullName>Aftersales Manager</fullName><default>false</default></values>
+        <values><fullName>Finance Associate</fullName><default>false</default></values>
+        <values><fullName>Finance Manager</fullName><default>false</default></values>
+        <values><fullName>GM%2FDealer Principal</fullName><default>false</default></values>
+        <values><fullName>IT Associate</fullName><default>false</default></values>
+        <values><fullName>IT Manager</fullName><default>false</default></values>
+        <values><fullName>Marketing Associate</fullName><default>false</default></values>
+        <values><fullName>Marketing Manager</fullName><default>false</default></values>
+        <values><fullName>Member Dealer%2FProf%2E Assoc%2E</fullName><default>false</default></values>
+        <values><fullName>OEM IT</fullName><default>false</default></values>
+        <values><fullName>OEM MGMT</fullName><default>false</default></values>
+        <values><fullName>OEM Zone Manager</fullName><default>false</default></values>
+        <values><fullName>Parts Associate</fullName><default>false</default></values>
+        <values><fullName>Parts Manager</fullName><default>false</default></values>
+        <values><fullName>Sales Associate</fullName><default>false</default></values>
+        <values><fullName>Sales Manager</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Name</picklist>
+        <values><fullName>Dr%2E</fullName><default>false</default></values>
+        <values><fullName>Mr%2E</fullName><default>false</default></values>
+        <values><fullName>Mrs%2E</fullName><default>false</default></values>
+        <values><fullName>Ms%2E</fullName><default>false</default></values>
+        <values><fullName>Prof%2E</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Nurture_Reason__c</picklist>
+        <values><fullName>Budget not available</fullName><default>false</default></values>
+        <values><fullName>Locked in Contract</fullName><default>false</default></values>
+        <values><fullName>Not a Decision Maker</fullName><default>false</default></values>
+        <values><fullName>Product missing feature</fullName><default>false</default></values>
+        <values><fullName>Prospect is re-evaluating</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Rating</picklist>
+        <values><fullName>Cold</fullName><default>false</default></values>
+        <values><fullName>Hot</fullName><default>false</default></values>
+        <values><fullName>Warm</fullName><default>false</default></values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Region__c</picklist>
+        <values><fullName>APAC</fullName><default>false</default></values>
+        <values><fullName>Canada</fullName><default>false</default></values>
+        <values><fullName>Europe</fullName><default>false</default></values>
+        <values><fullName>UKI %26 MEA</fullName><default>false</default></values>
+    </picklistValues>
+</RecordType>

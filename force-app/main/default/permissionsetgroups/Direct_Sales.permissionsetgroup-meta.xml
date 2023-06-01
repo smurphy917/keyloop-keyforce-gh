@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Direct Sales</label>
+    <permissionSets>Account_Contact_Management_Write_Access</permissionSets>
+    <permissionSets>Activity_Management_Write_Access</permissionSets>
+    <permissionSets>Approval_Management_Read_Access</permissionSets>
+    <permissionSets>Asset_Management_Read_Access</permissionSets>
+    <permissionSets>CPQ_Config_Management_Read_Access</permissionSets>
+    <permissionSets>CPQ_Config_Product_Option_Write_Access</permissionSets>
+    <permissionSets>Campaign_Management_Read_Access</permissionSets>
+    <permissionSets>Contract_Document_Component_Write_Access</permissionSets>
+    <permissionSets>Create_List_Views</permissionSets>
+    <permissionSets>Klue_Access</permissionSets>
+    <permissionSets>Lead_Management_Convert_Lead</permissionSets>
+    <permissionSets>Lead_Management_Write_Access</permissionSets>
+    <permissionSets>Make_Management_Read_Access</permissionSets>
+    <permissionSets>Opportunity_Management_Write_Access</permissionSets>
+    <permissionSets>Order_Management_ReadCreate_Access</permissionSets>
+    <permissionSets>Order_Management_Read_Access</permissionSets>
+    <permissionSets>Product_Management_Read_Access</permissionSets>
+    <permissionSets>Quote_Management_Read_Access</permissionSets>
+    <permissionSets>Quote_Management_Write_Access</permissionSets>
+    <permissionSets>Run_Flows</permissionSets>
+    <permissionSets>SBQQ__SteelBrickCPQUser</permissionSets>
+    <permissionSets>force__SalesCloudEinsteinIncluded</permissionSets>
+    <permissionSets>sbaa__AdvancedApprovalsUser</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

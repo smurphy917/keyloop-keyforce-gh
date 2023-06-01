@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Current_Provider__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>LTC-2: Captures who is currently providing services for this Lead.</description>
+    <externalId>false</externalId>
+    <label>Current Provider</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Leads</relationshipLabel>
+    <relationshipName>Leads</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

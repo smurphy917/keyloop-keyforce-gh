@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build" default="usage" xmlns:if="ant:if">
+
+	<property file="install.properties" />
+
+	<property name="dir.toolingBase" value="." />
+	<property name="dir.ant" value="${dir.toolingBase}/ant" />
+	<property name="dir.ant.load" value="${dir.ant}/load" />
+	<property name="dir.ant.properties" value="${dir.ant}/properties" />
+	<property name="dir.ant.buildListeners" value="${dir.ant}/build-listeners" />
+	<property name="dir.ant.shared" value="${dir.ant}/shared" />
+	<property name="dir.ant.libraries" value="${dir.ant}/libraries" />
+	<property name="dir.ant.modes" value="${dir.ant}/modes" />
+
+	<property file="${dir.toolingBase}/version.properties" prefix="running" />
+
+	<import>
+		<fileset dir="${dir.ant.load}" casesensitive="yes">
+			<include name="**/*.xml" />
+		</fileset>
+	</import>
+
+	<metricTimestamp name="load-start" />
+
+	<import>
+		<fileset dir="${dir.ant.properties}" casesensitive="yes">
+			<include name="**/*.xml" />
+		</fileset>
+	</import>
+
+	<import>
+		<fileset dir="${dir.ant.buildListeners}" casesensitive="yes">
+			<include name="**/*.xml" />
+		</fileset>
+	</import>
+
+	<import>
+		<fileset dir="${dir.ant.modes}" casesensitive="yes">
+			<include name="${tooling.mode.folder}/*.xml" />
+		</fileset>
+	</import>
+
+	<import>
+		<fileset dir="${dir.ant.shared}" casesensitive="yes">
+			<include name="**/*.xml" />
+		</fileset>
+	</import>
+
+	<import>
+		<fileset dir="${dir.ant.libraries}" casesensitive="yes">
+			<include name="common.xml" />
+			<include name="${tooling.librariesMode}.xml" />
+		</fileset>
+	</import>
+
+	<import if:set="fileset.buildHooks.hasFiles">
+		<fileset refid="fileset.buildHooks" />
+	</import>
+
+	<metricTimestamp name="load-stop" />
+
+</project>

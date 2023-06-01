@@ -1,0 +1,2 @@
+Id,OrderId,Product2Id,PricebookEntryId,SBQQ__ChargeType__c,UnitPrice,Quantity,SBQQ__RequiredBy__c,SBQQ__BundleRoot__c,SBQQ__BillingType__c,SBQQ__BillingFrequency__c,SBQQ__ShippingAccount__c,ServiceDate,EndDate,Asset__c,SBQQ__QuoteLine__c
+OI1,O1,B1,PBE1,One-Time,800,1,,,,,A2,2024-01-01,2024-12-31,,

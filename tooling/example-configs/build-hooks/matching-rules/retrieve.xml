@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-hooks-retrieve" xmlns:if="ant:if">
+
+	<!-- Hook into the retrieve process 'pre' i.e. after the Salesforce retrieve -->
+	<target name="hook-retrieve-pre">
+		<retrieveMatchingRules if:true="${retrieve.enableMatchingRules}" />
+	</target>
+
+	<!-- 
+		Expose the function on as a standalone ant target that can be run independently of ant retrieve:
+		ant retrieveMatchingRules
+	-->
+	<target name="retrieveMatchingRules">
+		<echo>=========================================</echo>
+		<echo>Retrieving Matching Rules...</echo>
+		<echo>=========================================</echo>
+
+		<retrieveEnvironmentInfo />
+		<retrieveMatchingRules />
+	</target>
+
+	<!-- Re-use retrieve macrodef provided by the tooling - this will take care of calling SFDX/Force.com Migration Tool -->
+	<macrodef name="retrieveMatchingRules">
+		<sequential>
+			<retrieve
+				type        = "Matching Rules"
+				hookName    = "matching-rules"
+				src         = "${dir.matchingRules}"
+				package     = "${file.matchingRulesPackage}"
+				/>
+		</sequential>
+	</macrodef>
+
+</project>

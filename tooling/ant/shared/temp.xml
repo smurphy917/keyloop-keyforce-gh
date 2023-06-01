@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-temp" xmlns:if="ant:if">
+
+	<macrodef name="cleanupTempDir">
+		<sequential>
+			<setLogLevel level="1" />
+
+			<delete dir="${dir.temp}" if:true="${temp.autoClean.enabled}" />
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+</project>

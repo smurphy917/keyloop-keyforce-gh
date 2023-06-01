@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-vlocity" xmlns:unless="ant:unless">
+
+	<!--
+		!!! WARNING - this functionality may be removed or changed without usual deprecation/major version changes !!!
+
+		# New undocumented beta feature for integration of vlocity build tool
+
+		Usage:
+			ant vlocity -De={tooling environment} -Dcommand={vlocity command} -Djob={vlocity job file} -DincludeAlias={true|false Default:true}
+
+			e.g. ant vlocity -Dcommand=help
+
+		Authentication to environment is done by the tooling and passed to vlocity via sfdx.username parameter.
+
+		Therefore, ant vlocity can be used with environment switch like other commands.
+
+			e.g. ant vlocity -De=uat -Dcommand=packDeploy -Djob=jobs/example.yaml
+
+		Hooks can be used to link vlocity into ant retrieve/test/deploy. Use vlocity macrodef defined below.
+	-->
+
+	<target name="vlocity">
+		<echo>============================================</echo>
+		<echo>vlocity</echo>
+		<echo>============================================</echo>
+
+		<fail unless:set="command">Must specify command (-Dcommand={command})</fail>
+
+		<property name="job"          value="" />
+		<property name="includeAlias" value="true" />
+
+		<vlocity
+			command      = "${command}"
+			job          = "${job}"
+			includeAlias = "${includeAlias}" />
+	</target>
+
+	<macrodef name="vlocity">
+		<attribute name="command"                      />
+		<attribute name="job"          default=""      />
+		<attribute name="includeAlias" default="true"  />
+		<attribute name="failOnError"  default="true"  />
+		<element   name="args"         optional="true" />
+		<sequential>
+			<vlocityCommand
+				command      = "@{command}"
+				job          = "@{job}"
+				includeAlias = "@{includeAlias}"
+				failOnError  = "@{failOnError}">
+				<vlocityArgs>
+					<args />
+				</vlocityArgs>
+			</vlocityCommand>
+		</sequential>
+	</macrodef>
+
+</project>

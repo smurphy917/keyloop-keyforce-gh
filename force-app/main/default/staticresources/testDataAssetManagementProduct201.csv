@@ -1,0 +1,2 @@
+Id,ExternalId__c,Name,AssetConversion__c,SBQQ__SubscriptionTerm__c,SBQQ__ConfigurationType__c,SBQQ__ConfigurationEvent__c,SBQQ__ChargeType__c
+B1,B1,APEX TEST - Bundle Item,Consolidated by product,12,Required,Always,

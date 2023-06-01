@@ -1,0 +1,15 @@
+name: CI Validation
+
+on: [ pull_request ]
+
+jobs:
+
+  CI:
+    uses: ./.github/workflows/template-validation.yml
+    with:
+      environment: CI
+    secrets:
+        #MP_TOOLING_USERNAME: ${{ secrets.MP_TOOLING_USERNAME }}
+        #MP_TOOLING_PASSWORD: ${{ secrets.MP_TOOLING_PASSWORD }}
+        SF_DECRYPTKEY: ${{ secrets.CI__SF_DECRYPTKEY }}
+        SF_DECRYPTIV: ${{ secrets.CI__SF_DECRYPTIV }}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ContactDetailsPresent</fullName>
+    <active>true</active>
+    <description>validation that either the phone number or email address is present to save the lead</description>
+    <errorConditionFormula>AND(NOT($Setup.Process_Deactivation__c.Disable_All_Validation_Rules__c),
+ISBLANK(Phone), ISBLANK(Email)
+)</errorConditionFormula>
+    <errorMessage>Please ensure that you capture either a phone number or email address for this Lead</errorMessage>
+</ValidationRule>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-setup" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<macrodef name="createBuildPropertiesLocal">
+		<sequential>
+			<copyNoOverride 
+				file         = "${dir.setupFiles}/build-properties/migration-local" 
+				toFile       = "build.properties.local" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="environmentCredentialPrompt">
+		<sequential>
+			<echo>-----------------------------------------</echo>
+			<echo />
+
+			<input 
+				message      = "Salesforce Username:" 
+				addproperty  = "setup.username"
+				unless:set   = "setup.username" />
+
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Salesforce Password</echo>
+			<echo />
+			<echo>Password input is hidden, take care when entering or pasting.</echo>
+			<echo />
+
+			<input 
+				message      = "Salesforce Password:" 
+				addproperty  = "setup.password"
+				unless:set   = "setup.password">
+				
+				<handler 
+					type     = "secure" />
+			</input>
+
+			<echo>-----------------------------------------</echo>
+			<echo />
+			<echo>Salesforce Token</echo>
+			<echo />
+			<echo>This can be left empty if a token is not required e.g. accessing Salesforce from a trusted IP.</echo>
+			<echo>Token input is hidden, take care when entering or pasting.</echo>
+			<echo />
+
+			<input 
+				message      = "Salesforce Token:" 
+				addproperty  = "setup.token"
+				unless:set   = "setup.token">
+
+				<handler 
+					type     = "secure" />
+			</input>
+
+			<serverUrlPrompt />
+
+			<defaultEnvironmentPrompt />
+
+			<setLogLevel level="1" />
+
+			<propertyfile file="build.properties.local">
+				<entry key="e"                             value="${setup.envName}"   if:true="${setup.setDefault}" />
+				<entry key="${setup.envName}.sf_username"  value="${setup.username}"  if:set="setup.username"       />
+				<entry key="${setup.envName}.sf_password"  value="${setup.password}"  if:set="setup.password"       />
+				<entry key="${setup.envName}.sf_token"     value="${setup.token}"     if:set="setup.token"          />
+				<entry key="${setup.envName}.sf_serverUrl" value="${setup.serverUrl}" if:set="setup.serverUrl"      />
+			</propertyfile>
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+</project>

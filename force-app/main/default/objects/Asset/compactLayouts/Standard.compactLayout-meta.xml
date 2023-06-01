@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Standard</fullName>
+    <fields>Product2Id</fields>
+    <fields>AccountId</fields>
+    <fields>CurrentQuantity</fields>
+    <fields>Status</fields>
+    <fields>LifecycleStartDate</fields>
+    <fields>LifecycleEndDate</fields>
+    <fields>TotalLifecycleAmount</fields>
+    <fields>CurrentMrr</fields>
+    <label>Standard</label>
+</CompactLayout>

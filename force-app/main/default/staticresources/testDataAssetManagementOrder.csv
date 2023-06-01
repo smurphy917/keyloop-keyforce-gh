@@ -1,0 +1,3 @@
+Id,AccountId,Pricebook2Id,Status,EffectiveDate,SBQQ__Quote__c
+O1,A1,PB1,Draft,2024-01-01,Q01
+O2,A1,PB1,Draft,2024-01-01,Q02

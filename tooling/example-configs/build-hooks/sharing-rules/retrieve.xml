@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-hooks-retrieve" xmlns:if="ant:if">
+
+	<!-- Hook into the retrieve process 'pre' i.e. before the Salesforce retrieve -->
+	<target name="hook-retrieve-pre">
+		<retrieveSharingRules if:true="${retrieve.enableSharingRules}"  />
+	</target>
+
+	<!-- 
+		Expose the function on as a standalone ant target that can be run independently of ant retrieve:
+		ant retrieveSharingRules
+	-->
+	<target name="retrieveSharingRules">
+		<echo>=========================================</echo>
+		<echo>Retrieving Sharing Rules...</echo>
+		<echo>=========================================</echo>
+
+		<retrieveEnvironmentInfo />
+		<retrieveSharingRules />
+	</target>
+
+	<!-- Re-use retrieve macrodef provided by the tooling - this will take care of calling SFDX/Force.com Migration Tool -->
+	<macrodef name="retrieveSharingRules">
+		<sequential>
+			<retrieve
+				type        = "Sharing Rules"
+				hookName    = "sharing-rules"
+				src         = "${dir.sharingRules}"
+				package     = "${file.sharingRulesPackage}"
+				/>
+		</sequential>
+	</macrodef>
+
+</project>

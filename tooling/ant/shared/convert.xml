@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-convert" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<macrodef name="checkAndConvertMdToToolingSource">
+		<attribute name="sourceDir"        default="${dir.sourceDir}" />
+		<attribute name="targetDir"        default="${dir.sourceDir}" />
+		<attribute name="resetTarget"      default="true" />
+		<attribute name="packageXmlAction" default="replace" /><!-- none/replace/merge - TODO: implement merge in future -->
+		<sequential>
+			<convertFromMd             sourceDir="@{sourceDir}" targetDir="@{targetDir}" resetTarget="@{resetTarget}" packageXmlAction="@{packageXmlAction}" if:true="${tooling.source.isMd}" />
+			<checkAndConvertMdToHybrid sourceDir="@{sourceDir}" targetDir="@{targetDir}" resetTarget="@{resetTarget}" packageXmlAction="@{packageXmlAction}" if:true="${tooling.source.isHybrid}" />
+			<convertMdToSfdx           sourceDir="@{sourceDir}" targetDir="@{targetDir}" resetTarget="@{resetTarget}" packageXmlAction="@{packageXmlAction}" if:true="${tooling.source.isSfdx}" />
+
+			<checkAndUnpackResources sourceDir="@{targetDir}" resetDir="@{resetTarget}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="checkAndConvertToolingSourceToMd">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<attribute name="targetDir" default="${dir.sourceDir}" />
+		<sequential>
+			<convertToMd               sourceDir="@{sourceDir}" targetDir="@{targetDir}" if:true="${tooling.source.isMd}" />
+			<checkAndConvertHybridToMd sourceDir="@{sourceDir}" targetDir="@{targetDir}" if:true="${tooling.source.isHybrid}" />
+			<convertSfdxToMd           sourceDir="@{sourceDir}" targetDir="@{targetDir}" if:true="${tooling.source.isSfdx}" />
+
+			<checkAndPackResources sourceDir="@{targetDir}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="checkAndConvertMdToHybrid">
+		<attribute name="sourceDir"        default="${dir.sourceDir}" />
+		<attribute name="targetDir"        default="${dir.sourceDir}" />
+		<attribute name="resetTarget"      default="true" />
+		<attribute name="packageXmlAction" default="replace" />
+		<sequential>
+			<fileset 
+				dir               = "@{sourceDir}/objects" 
+				id                = "convert.mdToSfdx.fileset"
+				erroronmissingdir = "false">
+
+				<include name     = "*.object"/>
+			</fileset>
+
+			<pathconvert 
+				refid             = "convert.mdToSfdx.fileset"
+				property          = "convert.mdToSfdx.contents"
+				setonempty        = "false" />
+
+			<condition property="convert.mdToSfdx.convertRequired">
+				<isset property="convert.mdToSfdx.contents" />
+			</condition>
+
+			<convertMdToHybrid sourceDir="@{sourceDir}" targetDir="@{targetDir}" resetTarget="@{resetTarget}" packageXmlAction="@{packageXmlAction}"     if:set="convert.mdToSfdx.convertRequired" />
+			<convertFromMd     sourceDir="@{sourceDir}" targetDir="@{targetDir}" resetTarget="@{resetTarget}" packageXmlAction="@{packageXmlAction}" unless:set="convert.mdToSfdx.convertRequired" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="checkAndConvertHybridToMd">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<attribute name="targetDir" default="${dir.sourceDir}" />
+		<sequential>
+			<fileset 
+				dir               = "@{sourceDir}/objects" 
+				id                = "convert.sfdxToMd.fileset"
+				erroronmissingdir = "false">
+
+				<include name     = "**/*.xml"/>
+			</fileset>
+
+			<pathconvert 
+				refid             = "convert.sfdxToMd.fileset"
+				property          = "convert.sfdxToMd.contents"
+				setonempty        = "false" />
+
+			<condition property="convert.sfdxToMd.convertRequired">
+				<isset property="convert.sfdxToMd.contents" />
+			</condition>
+
+			<convertHybridToMd sourceDir="@{sourceDir}" targetDir="@{targetDir}"     if:set="convert.sfdxToMd.convertRequired" />
+			<convertToMd       sourceDir="@{sourceDir}" targetDir="@{targetDir}" unless:set="convert.sfdxToMd.convertRequired" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="convertFromMd">
+		<attribute name="sourceDir"        default="${dir.sourceDir}" />
+		<attribute name="targetDir"        default="${dir.sourceDir}" />
+		<attribute name="resetTarget"      default="true" />
+		<attribute name="packageXmlAction" default="replace" />
+		<sequential>
+			<setLogLevel level="1" />
+
+			<delete includeemptydirs="true" if:true="@{resetTarget}">
+				<fileset dir="@{targetDir}">
+					<include name="**/*" />
+					<exclude name="package.xml" />
+					<exclude name="destructiveChanges.xml" />
+					<exclude name="destructiveChangesPre.xml" />
+					<exclude name="destructiveChangesPost.xml" />
+				</fileset>
+			</delete>
+
+			<local name="convert.replacePackageXml" />
+			<condition property="convert.replacePackageXml" value="true" else="false">
+				<equals arg1="@{packageXmlAction}" arg2="replace" />
+			</condition>
+
+			<move todir="@{targetDir}">
+				<fileset dir="@{sourceDir}">
+					<exclude name="package.xml" unless:true="${convert.replacePackageXml}" />
+				</fileset>
+			</move>
+
+			<cleanupTempDir />
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="convertToMd">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<attribute name="targetDir" default="${dir.sourceDir}" />
+		<sequential>
+			<setLogLevel level="1" />
+
+			<delete dir="@{targetDir}" />
+
+			<copy todir="@{targetDir}">
+				<fileset dir="@{sourceDir}" />
+			</copy>
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="convertMdToHybrid">
+		<attribute name="sourceDir"        default="${dir.sourceDir}" />
+		<attribute name="targetDir"        default="${dir.sourceDir}" />
+		<attribute name="resetTarget"      default="true" />
+		<attribute name="packageXmlAction" default="replace" />
+		<sequential>
+			<echo>============================================</echo>
+			<echo>Convert Objects from Metadata to SFDX...</echo>
+			<echo>============================================</echo>
+
+			<setLogLevel level="1" />
+
+			<delete includeemptydirs="true" if:true="@{resetTarget}">
+				<fileset dir="@{targetDir}">
+					<include name="**/*" />
+					<exclude name="package.xml" />
+					<exclude name="destructiveChanges.xml" />
+					<exclude name="destructiveChangesPre.xml" />
+					<exclude name="destructiveChangesPost.xml" />
+				</fileset>
+			</delete>
+
+			<move todir="@{targetDir}">
+				<fileset dir="@{sourceDir}">
+					<exclude name="objects/**/*" />
+					<exclude name="package.xml" />
+				</fileset>
+			</move>
+
+			<backupAndCreateTempSfdxProjectConfig
+				packageDir="${dir.temp}/sfdxObjects" />
+
+			<delete dir="${dir.temp}/sfdxObjects" />
+
+			<setConvertCommand />
+
+			<setLogLevel level="2" />
+
+			<sfdx 
+				command="${convert.command}">
+				<args>
+					<arg line="--rootdir=@{sourceDir}" />
+					<arg line="--outputdir=${dir.temp}/sfdxObjects" />
+				</args>
+			</sfdx>
+
+			<setLogLevel level="1" />
+
+			<move todir="@{targetDir}/objects">
+				<fileset 
+					dir = "${dir.temp}/sfdxObjects/main/default/objects" />
+			</move>
+
+			<local name="convert.replacePackageXml" />
+			<condition property="convert.replacePackageXml" value="true" else="false">
+				<equals arg1="@{packageXmlAction}" arg2="replace" />
+			</condition>
+
+			<move file="@{sourceDir}/package.xml" tofile="@{targetDir}/package.xml" if:true="@{convert.replacePackageXml}" />
+
+			<deleteTempAndRestoreSfdxProjectConfig />
+
+			<cleanupTempDir />
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="convertHybridToMd">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<attribute name="targetDir" default="${dir.sourceDir}" />
+		<sequential>
+			<echo>============================================</echo>
+			<echo>Convert Objects from SFDX to Metadata...</echo>
+			<echo>============================================</echo>
+
+			<setLogLevel level="1" />
+
+			<delete dir="@{targetDir}" />
+
+			<backupAndCreateTempSfdxProjectConfig
+				packageDir="${dir.temp}/sfdxObjects" />
+
+			<copy todir="@{targetDir}">
+				<fileset dir="@{sourceDir}">
+					<exclude name="objects/**/*" />
+				</fileset>
+			</copy>
+
+			<delete dir="${dir.temp}/sfdxObjects" />
+			<delete dir="${dir.temp}/mdObjects" />
+
+			<mkdir dir="${dir.temp}/sfdxObjects" />
+			<mkdir dir="${dir.temp}/mdObjects" />
+
+			<copy todir="${dir.temp}/sfdxObjects/objects">
+				<fileset 
+					dir      = "@{sourceDir}/objects" 
+					includes = "**/*-meta.xml" />
+			</copy>
+
+			<setLogLevel level="2" />
+
+			<sfdx 
+				command="force:source:convert">
+				<args>
+					<arg line="--rootdir=${dir.temp}/sfdxObjects" />
+					<arg line="--outputdir=${dir.temp}/mdObjects" />
+				</args>
+			</sfdx>
+
+			<setLogLevel level="1" />
+
+			<move todir="@{targetDir}/objects">
+				<fileset 
+					dir = "${dir.temp}/mdObjects/objects" />
+			</move>
+
+			<deleteTempAndRestoreSfdxProjectConfig />
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="convertMdToSfdx">
+		<attribute name="sourceDir"        default="${dir.sourceDir}" />
+		<attribute name="targetDir"        default="${dir.sourceDir}" />
+		<attribute name="resetTarget"      default="true" />
+		<attribute name="packageXmlAction" default="replace" />
+		<sequential>
+			<echo>============================================</echo>
+			<echo>Convert from Metadata to SFDX...</echo>
+			<echo>============================================</echo>
+
+			<setLogLevel level="1" />
+
+			<delete dir="@{targetDir}" if:true="@{resetTarget}" />
+
+			<backupAndCreateTempSfdxProjectConfig
+				packageDir="@{targetDir}" />
+
+			<setConvertCommand />
+
+			<setLogLevel level="2" />
+
+			<sfdx 
+				command="${convert.command}">
+				<args>
+					<arg line="--rootdir=@{sourceDir}" />
+					<arg line="--outputdir=@{targetDir}" />
+				</args>
+			</sfdx>
+
+			<local name="convert.replacePackageXml" />
+			<condition property="convert.replacePackageXml" value="true" else="false">
+				<equals arg1="@{packageXmlAction}" arg2="replace" />
+			</condition>
+
+			<move file="@{sourceDir}/package.xml" tofile="${file.mainPackage}" if:true="@{convert.replacePackageXml}" />
+
+			<setLogLevel level="1" />
+
+			<deleteTempAndRestoreSfdxProjectConfig />
+
+			<cleanupTempDir />
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="convertSfdxToMd">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<attribute name="targetDir" default="${dir.sourceDir}" />
+		<sequential>
+			<echo>============================================</echo>
+			<echo>Convert from SFDX to Metadata...</echo>
+			<echo>============================================</echo>
+
+			<setLogLevel level="1" />
+
+			<local name="convert.sourceExists" />
+			<local name="convert.destructiveChangesPreExists" />
+			<local name="convert.destructiveChangesPostExists" />
+
+			<delete dir="@{targetDir}" />
+
+			<backupAndCreateTempSfdxProjectConfig
+				packageDir="@{sourceDir}" />
+
+			<setLogLevel level="2" />
+
+			<available file="@{sourceDir}" type="dir" property="convert.sourceExists" />
+
+			<sfdx 
+				command="force:source:convert"
+				if:true="${convert.sourceExists}">
+				<args>
+					<arg line="--rootdir=@{sourceDir}" />
+					<arg line="--outputdir=@{targetDir}" />
+				</args>
+			</sfdx>
+
+			<echo unless:true="${convert.sourceExists}">Warning: source directory (@{sourceDir}) doesn't exist!</echo>
+
+			<setLogLevel level="1" />
+
+			<available file="${file.destructiveChangesPre}"  property="convert.destructiveChangesPreExists"  />
+			<available file="${file.destructiveChangesPost}" property="convert.destructiveChangesPostExists" />
+
+			<copy file="${file.mainPackage}"            todir="@{targetDir}" overwrite="true" />			
+			<copy file="${file.destructiveChangesPre}"  todir="@{targetDir}" if:true="${convert.destructiveChangesPreExists}"  />
+			<copy file="${file.destructiveChangesPost}" todir="@{targetDir}" if:true="${convert.destructiveChangesPostExists}" />
+
+			<deleteTempAndRestoreSfdxProjectConfig />
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="checkAndUnpackResources">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<attribute name="resetDir"  default="true" />
+		<sequential>
+			<local name="convert.unpackResources" />
+			<condition property="convert.unpackResources" value="true" else="false">
+				<and>
+					<istrue value="${resources.enableResourceBundles}" />
+					<or>
+						<istrue value="${tooling.source.isHybrid}" />
+						<istrue value="${tooling.source.isMd}" />
+					</or>
+				</and>
+			</condition>
+			<unpackStaticResources sourceDir="@{sourceDir}" resetDir="@{resetDir}" if:true="${convert.unpackResources}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="checkAndPackResources">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<sequential>
+			<local name="convert.packResources" />
+			<condition property="convert.packResources" value="true" else="false">
+				<and>
+					<istrue value="${resources.enableResourceBundles}" />
+					<or>
+						<istrue value="${tooling.source.isHybrid}" />
+						<istrue value="${tooling.source.isMd}" />
+					</or>
+				</and>
+			</condition>
+			<packStaticResources sourceDir="@{sourceDir}" if:true="${convert.packResources}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="backupAndCreateTempSfdxProjectConfig">
+		<attribute name="packageDir" default="force-app" />
+		<sequential>
+			<local name="convert.sfdxConfg.exists" />
+
+			<condition property="convert.sfdxConfg.exists">
+				<available file="sfdx-project.json" type="file" />
+			</condition>
+
+			<move file="sfdx-project.json" tofile="sfdx-project.json.bk" if:true="${convert.sfdxConfg.exists}" />
+
+			<createTempSfdxProjectConfig packageDir="@{packageDir}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="createTempSfdxProjectConfig">
+		<attribute name="packageDir" default="force-app" />
+		<sequential>
+			<echo file="sfdx-project.json">{
+  "packageDirectories": [
+    {
+      "path": "@{packageDir}",
+      "default": true
+    }
+  ],
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "${sf.version}"
+}</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="deleteTempAndRestoreSfdxProjectConfig">
+		<sequential>
+			<local name="convert.sfdxConfg.exists" />
+
+			<delete 
+				file   = "sfdx-project.json" />
+
+			<condition property="convert.sfdxConfg.exists">
+				<available file="sfdx-project.json.bk" type="file" />
+			</condition>
+			
+			<move file="sfdx-project.json.bk" tofile="sfdx-project.json" if:true="${convert.sfdxConfg.exists}" />
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="setConvertCommand">
+		<sequential>
+			<sfdxCommandCheck
+				command         = "force:mdapi:legacy:convert"
+				successProperty = "convert.legacy.exists"
+				if:true         = "${convert.useLegacyCommand}" />
+
+			<condition property="convert.command" value="force:mdapi:legacy:convert" else="force:mdapi:convert">
+				<and>
+					<istrue value="${convert.useLegacyCommand}" />
+					<istrue value="${convert.legacy.exists}"    />
+				</and>
+			</condition>
+
+			<echo>Convert command: ${convert.command}</echo>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,4 @@
+
+Id,ExternalId__c,Name,AssetConversion__c,SBQQ__SubscriptionTerm__c,ParentProduct__c,SBQQ__ChargeType__c,SBQQ__BillingFrequency__c,SBQQ__SubscriptionPricing__c,SBQQ__BillingType__c,SBQQ__ConfigurationType__c
+C1,C1,APEX TEST - Child Item 1,Consolidated by product,12,B1,One-Time,,,,
+C2,C2,APEX TEST - Child Item 2,Consolidated by product,12,B1,Recurring,Monthly,Fixed price,Advance,

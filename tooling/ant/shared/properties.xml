@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-properties" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<target name="printProperties">
+		<echo>=========================================</echo>
+		<echo>Properties</echo>
+		<echo>=========================================</echo>
+
+		<hook target="hook-properties-print-properties-pre" />
+
+		<property name="prefix" value="" />
+		<property name="hideMultiLine" value="true" />
+		<property name="hideSecrets" value="true" />
+
+		<printProperties prefix="${prefix}" hideMultiLine="${hideMultiLine}" hideSecrets="${hideSecrets}" />
+
+		<hook target="hook-properties-print-properties-post" />
+	</target>
+
+	<target name="printEnvProperties">
+		<echo>=========================================</echo>
+		<echo>Env Properties</echo>
+		<echo>=========================================</echo>
+
+		<validateEnvironmentProperties />
+
+		<hook target="hook-properties-print-env-properties-pre" />
+
+		<echo>
+Properties:
+	- Environment:         ${sf_envName}
+	- Username:            ${sf_username}
+	- Server Url:          ${sf_serverUrl}
+	- Auth Mode:           ${sf_authMode}
+	- Test Level:          ${sf_testLevel}
+	- Check Only?          ${sf_checkOnly}
+	- Org Email:           ${orgEmail}
+	- Check Branch?        ${deploy.branchCheck.enabled}
+	- Allowed Branch(es):  ${deploy.branchCheck.allowedBranch}
+	- Track Deploy?        ${deploy.trackDeploy.enabled}
+	- Build Number:        ${deploy.trackDeploy.buildNumber}
+		</echo>
+		
+		<echo if:true="${sf_isAuthModeWeb}">
+SFDX Web:
+	- Alias:               ${sf_alias}
+		</echo>
+
+		<echo if:true="${sf_isAuthModeJwt}">
+SFDX JWT:
+	- Alias:               ${sf_alias}
+	- Client Id:           ${sf_clientId}
+	- Key File:            ${sf_keyFile}
+		</echo>
+
+		<sfdx 
+			command        = "force:org:display"
+			if:set         = "${sf_alias}">
+			<args>
+				<arg line="-u=${sf_alias}" />
+			</args>
+		</sfdx>
+
+		<hook target="hook-properties-print-env-properties-post" />
+	</target>
+
+	<scriptdef 
+		name        = "printProperties" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/printProperties.js">
+		<attribute name="prefix" />
+		<attribute name="hideMultiLine" />
+		<attribute name="hideSecrets" />
+	</scriptdef>
+
+	<macrodef name="validateEnvironmentProperties">
+		<sequential>
+			<fail unless:true="${properties.valid}">
+				${properties.validityMessage}
+			</fail>
+		</sequential>
+	</macrodef>
+
+	<scriptdef 
+		name        = "setupCurrentBranchProperty" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/setupCurrentBranchProperty.js" />
+
+	<macrodef name="setupBranchProperties">
+		<sequential>
+			<setupBranchPropertiesCore 
+				unless:true = "${git.setupBranchPropertiesDone}" />
+
+			<property 
+				name        = "git.setupBranchPropertiesDone" 
+				value       = "true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setupBranchPropertiesCore">
+		<sequential>
+			<setupGitBranchProperties if:true="${git.isGitRepo}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setupGitBranchProperties">
+		<sequential>
+			<git command="branch" options="-l" outputproperty="git.localBranches"  failerror="false" />
+			<git command="branch" options="-r" outputproperty="git.remoteBranches" failerror="false" />
+ 
+			<setupCurrentBranchProperty />
+		</sequential>
+	</macrodef>
+
+	<scriptdef 
+		name        = "setupStatsStatusProperties" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/setupStatsStatusProperties.js" />
+
+	<macrodef name="setupFileStatsProperties">
+		<sequential>
+			<setupFileStatsPropertiesCore 
+				unless:true = "${git.setupFileStatsPropertiesDone}" />
+
+			<property 
+				name        = "git.setupFileStatsPropertiesDone" 
+				value       = "true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setupFileStatsPropertiesCore">
+		<sequential>
+			<setupGitFileStatsProperties if:true="${git.isGitRepo}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setupGitFileStatsProperties">
+		<sequential>
+			<git command="diff"   options="--shortstat"                          outputproperty="git.stats.diff.unstaged"               failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=A"          outputproperty="git.stats.diff.unstaged.stat.added"    failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=M"          outputproperty="git.stats.diff.unstaged.stat.modified" failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=D"          outputproperty="git.stats.diff.unstaged.stat.deleted"  failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=R"          outputproperty="git.stats.diff.unstaged.stat.renamed"  failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=C"          outputproperty="git.stats.diff.unstaged.stat.copied"   failerror="false" />
+			<git command="diff"   options="--shortstat --cached"                 outputproperty="git.stats.diff.staged"                 failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=A --cached" outputproperty="git.stats.diff.staged.stat.added"      failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=M --cached" outputproperty="git.stats.diff.staged.stat.modified"   failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=D --cached" outputproperty="git.stats.diff.staged.stat.deleted"    failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=R --cached" outputproperty="git.stats.diff.staged.stat.renamed"    failerror="false" />
+			<git command="diff"   options="--shortstat --diff-filter=C --cached" outputproperty="git.stats.diff.staged.stat.copied"     failerror="false" />
+			<git command="status" options="--porcelain -u"                       outputproperty="git.stats.status"                      failerror="false" />
+
+			<setupStatsStatusProperties />
+		</sequential>
+	</macrodef>
+
+</project>

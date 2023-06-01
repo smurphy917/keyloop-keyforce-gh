@@ -1,0 +1,44 @@
+{
+    "status": 200,
+    "entry": {
+        "source": "ant",
+        "success": true,
+        "project": "Keyloop",
+        "versionTag": "4.0.x",
+        "toolingVersion": "4.0.9",
+        "targets": [
+            "freeze"
+        ],
+        "buildTime": 16.876,
+        "toolingMode": "sfdx",
+        "toolingBuild": "none",
+        "toolingPackage": "recommended",
+        "toolingEnableSfdcObjects": false,
+        "toolingDisableSignatureVerification": false,
+        "sfVersion": "55.0",
+        "osIsLinux": false,
+        "osIsMac": false,
+        "osIsWindowsIs32Bit": false,
+        "osIsWindowsIs64Bit": true,
+        "osIsWindows": true,
+        "osName": "Windows 10",
+        "osVersion": "10.0",
+        "antVersionParsed": "1.10.12",
+        "antVersion": "Apache Ant(TM) version 1.10.12 compiled on October 13 2021",
+        "javaVersion": "11.0.16",
+        "startTime": 1661236751793,
+        "stopTime": 1661236768669,
+        "metrics": {
+            "1661236751793": "installer-start",
+            "1661236751965": "installer-boot-tooling",
+            "1661236752106": "server-start",
+            "1661236752244": "server-stop",
+            "1661236752296": "load-start",
+            "1661236753477": "listener-start",
+            "1661236754466": "load-stop",
+            "1661236768147": "common-import-mpdx-start",
+            "1661236768173": "common-import-mpdx-stop",
+            "1661236768669": "listener-stop"
+        }
+    }
+}

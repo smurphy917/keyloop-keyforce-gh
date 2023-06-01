@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-modes-org">
+
+	<macrodef name="openOrg">
+		<sequential>
+			<login />
+
+			<sfdx command="force:org:open">
+				<args>
+					<arg line="--targetusername=${sf_alias}" />
+				</args>
+			</sfdx>
+		</sequential>
+	</macrodef>
+
+</project>

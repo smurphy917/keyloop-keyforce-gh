@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IP_Address__c</fullName>
+    <description>LTC-2: IP Address DACH Opt in collected from</description>
+    <externalId>false</externalId>
+    <inlineHelpText>IP Address DACH Opt in collected from</inlineHelpText>
+    <label>IP Address</label>
+    <length>12</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

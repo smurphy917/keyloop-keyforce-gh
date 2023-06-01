@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-ssl" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<target name="createCertificate">
+		<echo>=========================================</echo>
+		<echo>Create SSL Certificate</echo>
+		<echo>=========================================</echo>
+
+		<input
+			message      = "Enter certificate name:" 
+			addproperty  = "ssl.name"
+			unless:set   = "ssl.name" />
+
+		<createCertificate name="${ssl.name}" />
+		<printCertificateAndKeyInfo />
+	</target>
+
+	<macrodef name="createCertificate">
+		<attribute name="name" default="server" />
+
+		<sequential>
+			<mpdxScript name="createCertificateAndKey" includeSession="false">
+				<args>
+					<arg line="--arg-name &quot;@{name}&quot;" />
+					<arg line="--arg-directory &quot;${dir.certificates}&quot;" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="printCertificateAndKeyInfo">
+		<sequential>
+			<mpdxScript name="printCertificateAndKeyInfo" includeSession="false" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="decryptSslKey">
+		<attribute name="k"                                                    />
+		<attribute name="iv"                                                   />
+		<attribute name="in"      default="${dir.certificates}/server.key.enc" />
+		<attribute name="out"     default="${dir.certificates}/server.key"     />
+
+		<sequential>
+			<mpdxScript name="decryptKey" includeSession="false">
+				<args>
+					<arg line="--arg-encryptedKeyIn &quot;@{in}&quot;" />
+					<arg line="--arg-decryptedKeyOut &quot;@{out}&quot;" />
+					<arg line="--arg-key &quot;@{k}&quot;" />
+					<arg line="--arg-iv &quot;@{iv}&quot;" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="verifySslSignature">
+		<attribute name="publicKey" />
+		<attribute name="file" />
+		<attribute name="signature" />
+		<attribute name="base64ErrorCode" />
+		<attribute name="verifyErrorCode" />
+		<sequential>
+			<echo 
+				level          = "info"
+				message        = "Verify file signature..."/>
+
+			<openssl 
+				command        = "base64" 
+				options        = "-d -in '@{signature}' -out signature.sha256" 
+				outputcommand  = "false" 
+				failerror      = "false" 
+				resultproperty = "@{base64ErrorCode}" />
+
+			<openssl 
+				command        = "dgst" 
+				options        = "-sha256 -verify '@{publicKey}' -signature signature.sha256 '@{file}'" 
+				outputcommand  = "false" 
+				failerror      = "false" 
+				resultproperty = "@{verifyErrorCode}" />
+
+			<delete 
+				file           = "signature.sha256" 
+				quiet          = "true" />
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SQL__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>LTC-2: Check box to indicate a lead has been qualified by Sales</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Has the lead been qualified by Sales?</inlineHelpText>
+    <label>SQL</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-deploy" xmlns:if="ant:if">
+
+	<macrodef name="deployCommand">
+		<attribute name="checkOnly" />
+		<attribute name="src" />
+		<attribute name="zip" />
+		<attribute name="ignoreWarnings" />
+
+		<sequential>
+			<login />
+
+			<condition property="deploy.checkOnlyFlag" value="--checkonly" else="">
+				<equals arg1="true" arg2="@{checkOnly}" />
+			</condition>
+
+			<condition property="deploy.ignoreWarningsFlag" value="--ignorewarnings" else="">
+				<equals arg1="true" arg2="@{ignoreWarnings}" />
+			</condition>
+
+			<condition property="deploy.runSpecifiedTests" value="true" else="false">
+				<and>
+					<equals arg1="${sf_testLevel}" arg2="RunSpecifiedTests" />
+					<isset property="sf_testClasses" />
+				</and>
+			</condition>
+
+			<condition property="deploy.testClasses" value="--runtests=${sf_testClasses}" else="">
+				<and>
+					<istrue value="${deploy.runSpecifiedTests}" />
+				</and>
+			</condition>
+
+			<echo if:true="${deploy.runSpecifiedTests}">Tests:        ${sf_testClasses}</echo>
+
+			<setDeployCommand />
+
+			<sfdx command="${deploy.command}">
+				<args>
+					<arg line="--apiversion=${sf.version}" />
+					<arg line="--targetusername=${sf_alias}" />
+					<arg line="${deploy.checkOnlyFlag}" />
+					<arg line="--testlevel=${sf_testLevel}" />
+					<arg line="${deploy.testClasses}" />
+					<arg line="${deploy.ignoreWarningsFlag}" />
+					<arg line="--deploydir=@{src}" />
+					<arg line="--wait=-1" />
+				</args>
+			</sfdx>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="quickDeployCommand">
+		<sequential>
+			<login />
+
+			<setDeployCommand />
+
+			<sfdx command="${deploy.command}">
+				<args>
+					<arg line="--apiversion=${sf.version}" />
+					<arg line="--targetusername=${sf_alias}" />
+					<arg line="--wait=-1" />
+					<arg line="--validateddeployrequestid=${deploy.lastDeployId}" />
+				</args>
+			</sfdx>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setLastDeployId">
+		<sequential>
+			<setDeployCommand />
+
+			<sfdxJson 
+				command        = "${deploy.command}:report"
+				outputproperty = "deploy.report">
+				<args>
+					<arg line="--targetusername=${sf_alias}" />
+				</args>
+			</sfdxJson>
+
+			<jsonKeyToProperty
+				json           = "${deploy.report}"
+				key            = "result.id"
+				property       = "deploy.lastDeployId.updated" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setDeployCommand">
+		<sequential>
+			<sfdxCommandCheck
+				command         = "force:mdapi:legacy:deploy"
+				successProperty = "deploy.legacy.exists"
+				if:true         = "${deploy.useLegacyCommand}" />
+
+			<condition property="deploy.command" value="force:mdapi:legacy:deploy" else="force:mdapi:deploy">
+				<and>
+					<istrue value="${deploy.useLegacyCommand}" />
+					<istrue value="${deploy.legacy.exists}"    />
+				</and>
+			</condition>
+
+			<echo>Deploy command: ${deploy.command}</echo>
+		</sequential>
+	</macrodef>
+
+</project>

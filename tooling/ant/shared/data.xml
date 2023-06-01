@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-data" xmlns:if="ant:if">
+
+	<target name="sobeit">
+		<echo>============================================</echo>
+		<echo>SoBeIt</echo>
+		<echo>============================================</echo>
+
+		<sobeit config="${config}" />
+	</target>
+
+	<target name="dataExport">
+		<sobeitExport />
+	</target>
+
+	<target name="dataImport">
+		<sobeitImport />
+	</target>
+
+	<macrodef name="sobeitExport">
+		<sequential>
+			<echo>============================================</echo>
+			<echo>Data Export</echo>
+			<echo>============================================</echo>
+
+			<available 
+				property = "data.sobeit.export.exists"
+				file     = "${dir.sobeitConfigExport}" />
+
+			<sobeit
+				config  = "${dir.sobeitConfigExport}"
+				if:set  = "data.sobeit.export.exists" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sobeitImport">
+		<sequential>
+			<echo>============================================</echo>
+			<echo>Data Import</echo>
+			<echo>============================================</echo>
+
+			<available 
+				property = "data.sobeit.import.exists"
+				file     = "${dir.sobeitConfigImport}" />
+
+			<sobeit 
+				config   = "${dir.sobeitConfigImport}"
+				if:set   = "data.sobeit.import.exists" />
+		</sequential>
+	</macrodef>
+
+</project>

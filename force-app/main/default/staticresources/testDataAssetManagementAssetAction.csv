@@ -1,0 +1,7 @@
+AssetId,Category,CategoryEnum,ActionDate,Type,QuantityChange,MrrChange,Amount
+AS1,Initial Sale,Initial Sale,2024-01-01T00:00:00Z,Generate,1,8.33,1200
+AS2,Initial Sale,Initial Sale,2024-01-01T00:00:00Z,Generate,1,8.33,800
+AS3,Initial Sale,Initial Sale,2024-01-01T00:00:00Z,Generate,1,0,400
+ASA1,Other,Other,2024-01-01T00:00:00Z,Generate,1,8.33,1200
+ASA2,Other,Other,2024-01-01T00:00:00Z,Generate,1,8.33,800
+ASA3,Other,Other,2024-01-01T00:00:00Z,Generate,1,0,400

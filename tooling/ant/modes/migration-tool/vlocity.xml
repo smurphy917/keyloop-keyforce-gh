@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-vlocity" xmlns:if="ant:if">
+
+	<!-- Do not use directly - use vlocity macrodef in shared/vlocity.xml -->
+	<macrodef name="vlocityCommand">
+		<attribute name="command"                      />
+		<attribute name="job"          default=""      />
+		<attribute name="includeAlias" default="true"  />
+		<attribute name="failerror"    default="true"  />
+		<element   name="vlocityArgs"  optional="true" />
+		<sequential>
+			<fail>vlocity build tool integration is not supported in migration-tool mode.</fail>
+		</sequential>
+	</macrodef>
+
+</project>

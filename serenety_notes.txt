@@ -1,0 +1,39 @@
+ - for each root line (required by is false) 
+    - Gather root asset ids
+    - Where null, gather orderitem id (bundle root)
+
+ - for each root asset id
+    - if null, for each bundle root
+        generate BOM from order items
+    - else:
+        generate BOM from asset, merge in order items
+            flag lines on current order, to be handled later
+    
+    - roll-up values
+        - for each touched asset/line, calc total and flag parent for recalc; recurse
+    - aggregate:
+        for node.bottomUp() (assets)
+            - if has aggregate, retrieve and merge
+                - "has" can mean already staged for another asset
+                    - check for staged request by id (if present on node[asset]) or by 
+            - else create and link
+    - loop over node.all(), for each:
+        - create asset task:
+            - generate/change/cancel
+            - add post hook -> save response details (id) back to node
+            - add to queue
+
+ - add final task:
+    - for each root asset id:
+        - loop over node.all(), for each:
+            - set parent
+            - set order lookup
+
+
+
+
+ - fetch all assets and orderitems
+ - add as needed
+ - update as needed
+ - at end find all that need inserting and create tasks
+ 

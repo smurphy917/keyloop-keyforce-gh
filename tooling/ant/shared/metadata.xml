@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-metadata" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<target name="applyRetrieveModifications">
+		<applyRetrieveModifications />
+	</target>
+
+	<target name="applyDeployModifications">
+		<applyDeployModifications />
+	</target>
+
+	<target name="applyModifications">
+		<applyModifications group="${group}" />
+	</target>
+
+	<target name="listModificationDefinitions">
+		<listModificationDefinitions />
+	</target>
+
+	<macrodef name="applyRetrieveModifications">
+		<sequential>
+			<applyModifications group="retrieve" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="applyDeployModifications">
+		<sequential>
+			<applyModifications group="deploy" sourceDir="${dir.tempDeployMain}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="applyModifications">
+		<attribute name="group" />
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<sequential>
+			<local name="configExists" />
+
+			<available file="${file.modificationConfig}" type="file" property="configExists" />
+
+			<createLegacyModificationConfig unless:true="${configExists}" />
+
+			<mpdxScript name="applyModifications" includeSession="true" includeScriptArgs="true">
+				<args>
+					<arg line="--arg-toolingBase &quot;${dir.toolingBase}&quot;" />
+					<arg line="--arg-sourceDir &quot;@{sourceDir}&quot;" />
+					<arg line="--arg-configFile &quot;${file.modificationConfig}&quot;" />
+					<arg line="--arg-group @{group}" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="createLegacyModificationConfig">
+		<sequential>
+			<mpdxScript name="createLegacyModificationConfig" includeSession="false">
+				<args>
+					<arg line="--arg-toolingBase &quot;${dir.toolingBase}&quot;" />
+					<arg line="--arg-outputFile &quot;${file.modificationConfig}&quot;" />
+
+					<arg line="--arg-enableRemoveFalseEntriesFromPermissionSets"   if:true="${retrieve.enableRemoveFalseEntriesFromPermissionSets}" />
+					<arg line="--arg-enableRemoveFieldHistoryTracking"             if:true="${retrieve.enableRemoveFieldHistoryTracking}" />
+					<arg line="--arg-enableRemoveLayoutAssignments"                if:true="${retrieve.enableRemoveLayoutAssignments}" />
+					<arg line="--arg-enableRemoveListViews"                        if:true="${retrieve.enableRemoveListViews}" />
+					<arg line="--arg-enableRemoveLoginIPRangesFromProfiles"        if:true="${retrieve.enableRemoveLoginIPRangesFromProfiles}" />
+					<arg line="--arg-enableRemoveStandardApps"                     if:true="${retrieve.enableRemoveStandardApps}" />
+					<arg line="--arg-enableRemoveUserPermissions"                  if:true="${retrieve.enableRemoveUserPermissions}" />
+					<arg line="--arg-enableCompressPageLayouts"                    if:true="${retrieve.enableCompressPageLayouts}" />
+					<arg line="--arg-enableRemovePackageMembers"                   if:true="${deploy.enableRemovePackageMembers}" />
+
+					<arg line="--arg-removeFieldHistoryTrackingObjects &quot;${metadata.removeFieldHistoryTrackingObjects}&quot;" if:set="metadata.removeFieldHistoryTrackingObjects" />
+					<arg line="--arg-removeLayoutAssignments &quot;${metadata.removeLayoutAssignments}&quot;"                     if:set="metadata.removeLayoutAssignments" />
+					<arg line="--arg-removeUserPermissions &quot;${metadata.removeUserPermissions}&quot;"                         if:set="metadata.removeUserPermissions" />
+					<arg line="--arg-removeStandardAppsRegex &quot;${metadata.removeStandardAppsRegex}&quot;"                     if:set="metadata.removeStandardAppsRegex" />
+					<arg line="--arg-removeListViewFiles &quot;${metadata.removeListViewFiles}&quot;"                             if:set="metadata.removeListViewFiles" />
+					<arg line="--arg-removePackageMembersRegex &quot;${metadata.removePackageMembersRegex}&quot;"                 if:set="metadata.removePackageMembersRegex" />
+				</args>
+			</mpdxScript>
+
+			<propertyfile file="build.properties">
+				<entry operation="del" key="retrieve.enableRemoveFalseEntriesFromPermissionSets" />
+				<entry operation="del" key="retrieve.enableRemoveFieldHistoryTracking" />
+				<entry operation="del" key="retrieve.enableRemoveLayoutAssignments" />
+				<entry operation="del" key="retrieve.enableRemoveListViews" />
+				<entry operation="del" key="retrieve.enableRemoveLoginIPRangesFromProfiles" />
+				<entry operation="del" key="retrieve.enableRemoveStandardApps" />
+				<entry operation="del" key="retrieve.enableRemoveUserPermissions" />
+				<entry operation="del" key="retrieve.enableCompressPageLayouts" />
+				<entry operation="del" key="deploy.enableRemovePackageMembers" />
+				<entry operation="del" key="metadata.removeFieldHistoryTrackingObjects" />
+				<entry operation="del" key="metadata.removeLayoutAssignments" />
+				<entry operation="del" key="metadata.removeUserPermissions" />
+				<entry operation="del" key="metadata.removeStandardAppsRegex" />
+				<entry operation="del" key="metadata.removeListViewFiles" />
+				<entry operation="del" key="metadata.removePackageMembersRegex" />
+			</propertyfile>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="listModificationDefinitions">
+		<sequential>
+			<mpdxScript name="listModificationDefinitions" includeSession="false">
+				<args>
+					<arg line="--arg-toolingBase &quot;${dir.toolingBase}&quot;" />
+					<arg line="--arg-configFile &quot;${file.modificationConfig}&quot;" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>To_Status_Timestamp__c</fullName>
+    <description>timestamp used in formula on Lead Status Tracking to calculate the time in each status
+auto populated by LeadAutomation Flow, read only on PL</description>
+    <externalId>false</externalId>
+    <label>To Status Timestamp</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

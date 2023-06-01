@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-libraries-common" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<macrodef name="importMpdx">
+		<sequential>
+			<metricTimestamp name="common-import-mpdx-start" />
+
+			<checkAndFetchPackage
+				package      = "mpdx"
+				versionOrTag = "${mpdx.version}" />
+
+			<checkAndInstallPackage
+				package      = "mpdx"
+				version      = "${package.versions.mpdx.version}" />
+
+			<property
+				name         = "file.node.package.mpdx"
+				value        = "${dir.globalMPPackages}/mpdx/${package.versions.mpdx.version}/bin/mpdx" />
+
+			<metricTimestamp name="common-import-mpdx-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="importBoilerplate">
+		<sequential>
+			<metricTimestamp name="common-import-boilerplate-start" />
+
+			<checkAndFetchPackage
+				package      = "boilerplate"
+				versionOrTag = "${boilerplate.version}" />
+
+			<checkAndInstallPackage
+				package      = "boilerplate"
+				version      = "${package.versions.boilerplate.version}" />
+
+			<property
+				name         = "dir.boilerplateSource"
+				value        = "${dir.globalMPPackages}/boilerplate/${package.versions.boilerplate.version}" />
+
+			<metricTimestamp name="common-import-boilerplate-stop" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="salesforceTaskDef">
+		<attribute name="dir" />
+
+		<sequential>
+			<taskdef 
+				resource  = "com/salesforce/antlib.xml" 
+				uri       = "antlib:com.salesforce" 
+				classpath = "@{dir}/ant-salesforce-${sf.version}.jar" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="forceFlowTaskDef">
+		<attribute name="dir" />
+
+		<sequential>
+			<taskdef 
+				resource  = "antlib.xml" 
+				uri       = "antlib:com.spaceheroes" 
+				classpath = "@{dir}/mp-forceflow-${ff.version}.jar" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="antContribTaskDef">
+		<attribute name="dir" />
+
+		<sequential>
+			<taskdef 
+				resource  = "net/sf/antcontrib/antlib.xml" 
+				classpath = "@{dir}/ant-contrib-${antcontrib.version}.jar" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="useLocalNode">
+		<sequential>
+			<property 
+				name      = "file.exec.node"
+				value     = "node" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="checkAndFetchPackage">
+		<attribute name="package" />
+		<attribute name="versionOrTag" />
+
+		<sequential>
+			<local name="package.versionIsTag" />
+			<local name="package.exists" />
+			<local name="package.version" />
+
+			<condition property="package.versionIsTag" value="true" else="false">
+				<not>
+					<matches pattern="^[0-9]+.[0-9]+.[0-9]+$" string="@{versionOrTag}" />
+				</not>
+			</condition>
+
+			<fetchPackageTag
+				package = "@{package}"
+				tag     = "@{versionOrTag}"
+				if:true = "${package.versionIsTag}" />
+
+			<condition property="package.version" value="${package.versions.@{package}.@{versionOrTag}.version}" else="@{versionOrTag}" >
+				<istrue value="${package.versionIsTag}" />
+			</condition>
+
+			<property name="package.versions.@{package}.version" value="${package.version}" />
+
+			<condition property="package.exists">
+				<available file="${dir.globalMPPackages}/@{package}/${package.version}-bundle.tgz" type="file" />
+			</condition>
+
+			<fetchPackage 
+				package     = "@{package}"
+				version     = "${package.version}"
+				unless:true = "${package.exists}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="checkAndInstallPackage">
+		<attribute name="package" />
+		<attribute name="version" />
+
+		<sequential>
+			<local name="package.bundleFile" />
+			<local name="package.installDir" />
+			<local name="package.installed" />
+
+			<property 
+				name  = "package.bundleFile"
+				value = "${dir.globalMPPackages}/@{package}/@{version}-bundle.tgz" />
+
+			<property 
+				name  = "package.installDir"
+				value = "${dir.globalMPPackages}/@{package}/@{version}" />
+
+			<condition property="package.installed">
+				<available file="${package.installDir}" type="dir" />
+			</condition>
+
+			<installPackage
+				bundle      = "${package.bundleFile}"
+				dir         = "${package.installDir}"
+				unless:true = "${package.installed}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="installPackage">
+		<attribute name="bundle" />
+		<attribute name="dir" />
+
+		<sequential>
+			<setLogLevel level="1" />
+
+			<untar
+				src         = "@{bundle}"
+				dest        = "@{dir}"
+				compression = "gzip" />
+
+			<move todir     = "@{dir}">
+				<fileset 
+					dir     = "@{dir}/package"/>
+			</move>
+
+			<delete
+				dir         = "@{dir}/package" />
+
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="setPackageVersionsFromCache">
+		<attribute name="package" />
+		<attribute name="tag" />
+
+		<sequential>
+			<property name="package.versions.@{package}.@{tag}.version"   value="${version.package.@{package}.@{tag}.version}"   />
+			<property name="package.versions.@{package}.@{tag}.lastCheck" value="${version.package.@{package}.@{tag}.lastCheck}" />
+		</sequential>
+	</macrodef>
+
+</project>

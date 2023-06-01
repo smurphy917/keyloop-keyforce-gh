@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue><fullName>Albania</fullName><default>false</default><label>Albania</label></customValue>
+    <customValue><fullName>Algeria</fullName><default>false</default><label>Algeria</label></customValue>
+    <customValue><fullName>Andorra</fullName><default>false</default><label>Andorra</label></customValue>
+    <customValue><fullName>Angola</fullName><default>false</default><label>Angola</label></customValue>
+    <customValue><fullName>Argentina</fullName><default>false</default><label>Argentina</label></customValue>
+    <customValue><fullName>Australia</fullName><default>false</default><label>Australia</label></customValue>
+    <customValue><fullName>Austria</fullName><default>false</default><label>Austria</label></customValue>
+    <customValue><fullName>Bahrain</fullName><default>false</default><label>Bahrain</label></customValue>
+    <customValue><fullName>Bangladesh</fullName><default>false</default><label>Bangladesh</label></customValue>
+    <customValue><fullName>Belgium</fullName><default>false</default><label>Belgium</label></customValue>
+    <customValue><fullName>Benin</fullName><default>false</default><label>Benin</label></customValue>
+    <customValue><fullName>Bolivia, Plurinational State of</fullName><default>false</default><label>Bolivia, Plurinational State of</label></customValue>
+    <customValue><fullName>Botswana</fullName><default>false</default><label>Botswana</label></customValue>
+    <customValue><fullName>Brazil</fullName><default>false</default><label>Brazil</label></customValue>
+    <customValue><fullName>Brunei Darussalam</fullName><default>false</default><label>Brunei Darussalam</label></customValue>
+    <customValue><fullName>Bulgaria</fullName><default>false</default><label>Bulgaria</label></customValue>
+    <customValue><fullName>Burkina Faso</fullName><default>false</default><label>Burkina Faso</label></customValue>
+    <customValue><fullName>Cambodia</fullName><default>false</default><label>Cambodia</label></customValue>
+    <customValue><fullName>Canada</fullName><default>false</default><label>Canada</label></customValue>
+    <customValue><fullName>Chile</fullName><default>false</default><label>Chile</label></customValue>
+    <customValue><fullName>China</fullName><default>false</default><label>China</label></customValue>
+    <customValue><fullName>Chinese Taipei</fullName><default>false</default><label>Chinese Taipei</label></customValue>
+    <customValue><fullName>Colombia</fullName><default>false</default><label>Colombia</label></customValue>
+    <customValue><fullName>Costa Rica</fullName><default>false</default><label>Costa Rica</label></customValue>
+    <customValue><fullName>Cote d&apos;Ivoire</fullName><default>false</default><label>Cote d&apos;Ivoire</label></customValue>
+    <customValue><fullName>Czech Republic</fullName><default>false</default><label>Czech Republic</label></customValue>
+    <customValue><fullName>Denmark</fullName><default>false</default><label>Denmark</label></customValue>
+    <customValue><fullName>Djibouti</fullName><default>false</default><label>Djibouti</label></customValue>
+    <customValue><fullName>Ecuador</fullName><default>false</default><label>Ecuador</label></customValue>
+    <customValue><fullName>Egypt</fullName><default>false</default><label>Egypt</label></customValue>
+    <customValue><fullName>Estonia</fullName><default>false</default><label>Estonia</label></customValue>
+    <customValue><fullName>eSwatini</fullName><default>false</default><label>eSwatini</label></customValue>
+    <customValue><fullName>Ethiopia</fullName><default>false</default><label>Ethiopia</label></customValue>
+    <customValue><fullName>Finland</fullName><default>false</default><label>Finland</label></customValue>
+    <customValue><fullName>France</fullName><default>false</default><label>France</label></customValue>
+    <customValue><fullName>Germany</fullName><default>false</default><label>Germany</label></customValue>
+    <customValue><fullName>Ghana</fullName><default>false</default><label>Ghana</label></customValue>
+    <customValue><fullName>Gibraltar</fullName><default>false</default><label>Gibraltar</label></customValue>
+    <customValue><fullName>HONG KONG</fullName><default>false</default><label>HONG KONG</label></customValue>
+    <customValue><fullName>Hungary</fullName><default>false</default><label>Hungary</label></customValue>
+    <customValue><fullName>India</fullName><default>false</default><label>India</label></customValue>
+    <customValue><fullName>Indonesia</fullName><default>false</default><label>Indonesia</label></customValue>
+    <customValue><fullName>Ireland</fullName><default>false</default><label>Ireland</label></customValue>
+    <customValue><fullName>Italy</fullName><default>false</default><label>Italy</label></customValue>
+    <customValue><fullName>Japan</fullName><default>false</default><label>Japan</label></customValue>
+    <customValue><fullName>Jordan</fullName><default>false</default><label>Jordan</label></customValue>
+    <customValue><fullName>Kenya</fullName><default>false</default><label>Kenya</label></customValue>
+    <customValue><fullName>Korea</fullName><default>false</default><label>Korea</label></customValue>
+    <customValue><fullName>Kuwait</fullName><default>false</default><label>Kuwait</label></customValue>
+    <customValue><fullName>Lao People&apos;s Democratic Republic</fullName><default>false</default><label>Lao People&apos;s Democratic Republic</label></customValue>
+    <customValue><fullName>Latvia</fullName><default>false</default><label>Latvia</label></customValue>
+    <customValue><fullName>Lebanon</fullName><default>false</default><label>Lebanon</label></customValue>
+    <customValue><fullName>Lithuania</fullName><default>false</default><label>Lithuania</label></customValue>
+    <customValue><fullName>Luxembourg</fullName><default>false</default><label>Luxembourg</label></customValue>
+    <customValue><fullName>Malawi</fullName><default>false</default><label>Malawi</label></customValue>
+    <customValue><fullName>Malaysia</fullName><default>false</default><label>Malaysia</label></customValue>
+    <customValue><fullName>Mali</fullName><default>false</default><label>Mali</label></customValue>
+    <customValue><fullName>Mauritania</fullName><default>false</default><label>Mauritania</label></customValue>
+    <customValue><fullName>Mauritius</fullName><default>false</default><label>Mauritius</label></customValue>
+    <customValue><fullName>Mexico</fullName><default>false</default><label>Mexico</label></customValue>
+    <customValue><fullName>Mongolia</fullName><default>false</default><label>Mongolia</label></customValue>
+    <customValue><fullName>Morocco</fullName><default>false</default><label>Morocco</label></customValue>
+    <customValue><fullName>Mozambique</fullName><default>false</default><label>Mozambique</label></customValue>
+    <customValue><fullName>Myanmar</fullName><default>false</default><label>Myanmar</label></customValue>
+    <customValue><fullName>Namibia</fullName><default>false</default><label>Namibia</label></customValue>
+    <customValue><fullName>Nepal</fullName><default>false</default><label>Nepal</label></customValue>
+    <customValue><fullName>Netherlands</fullName><default>false</default><label>Netherlands</label></customValue>
+    <customValue><fullName>New Zealand</fullName><default>false</default><label>New Zealand</label></customValue>
+    <customValue><fullName>Nicaragua</fullName><default>false</default><label>Nicaragua</label></customValue>
+    <customValue><fullName>Nigeria</fullName><default>false</default><label>Nigeria</label></customValue>
+    <customValue><fullName>Norway</fullName><default>false</default><label>Norway</label></customValue>
+    <customValue><fullName>Oman</fullName><default>false</default><label>Oman</label></customValue>
+    <customValue><fullName>Pakistan</fullName><default>false</default><label>Pakistan</label></customValue>
+    <customValue><fullName>Palestinian Territory, Occupied</fullName><default>false</default><label>Palestinian Territory, Occupied</label></customValue>
+    <customValue><fullName>Panama</fullName><default>false</default><label>Panama</label></customValue>
+    <customValue><fullName>Paraguay</fullName><default>false</default><label>Paraguay</label></customValue>
+    <customValue><fullName>Peru</fullName><default>false</default><label>Peru</label></customValue>
+    <customValue><fullName>Philippines</fullName><default>false</default><label>Philippines</label></customValue>
+    <customValue><fullName>Poland</fullName><default>false</default><label>Poland</label></customValue>
+    <customValue><fullName>Portugal</fullName><default>false</default><label>Portugal</label></customValue>
+    <customValue><fullName>Qatar</fullName><default>false</default><label>Qatar</label></customValue>
+    <customValue><fullName>Romania</fullName><default>false</default><label>Romania</label></customValue>
+    <customValue><fullName>Russian Federation</fullName><default>false</default><label>Russian Federation</label></customValue>
+    <customValue><fullName>Rwanda</fullName><default>false</default><label>Rwanda</label></customValue>
+    <customValue><fullName>Saudi Arabia</fullName><default>false</default><label>Saudi Arabia</label></customValue>
+    <customValue><fullName>Senegal</fullName><default>false</default><label>Senegal</label></customValue>
+    <customValue><fullName>Serbia</fullName><default>false</default><label>Serbia</label></customValue>
+    <customValue><fullName>Seychelles</fullName><default>false</default><label>Seychelles</label></customValue>
+    <customValue><fullName>Singapore</fullName><default>false</default><label>Singapore</label></customValue>
+    <customValue><fullName>Slovenia</fullName><default>false</default><label>Slovenia</label></customValue>
+    <customValue><fullName>South Africa</fullName><default>false</default><label>South Africa</label></customValue>
+    <customValue><fullName>Spain</fullName><default>false</default><label>Spain</label></customValue>
+    <customValue><fullName>Sri Lanka</fullName><default>false</default><label>Sri Lanka</label></customValue>
+    <customValue><fullName>Sweden</fullName><default>false</default><label>Sweden</label></customValue>
+    <customValue><fullName>Switzerland</fullName><default>false</default><label>Switzerland</label></customValue>
+    <customValue><fullName>Taiwan</fullName><default>false</default><label>Taiwan</label></customValue>
+    <customValue><fullName>Tanzania</fullName><default>false</default><label>Tanzania</label></customValue>
+    <customValue><fullName>Tanzania, United Republic of</fullName><default>false</default><label>Tanzania, United Republic of</label></customValue>
+    <customValue><fullName>Thailand</fullName><default>false</default><label>Thailand</label></customValue>
+    <customValue><fullName>Timor-Leste</fullName><default>false</default><label>Timor-Leste</label></customValue>
+    <customValue><fullName>Togo</fullName><default>false</default><label>Togo</label></customValue>
+    <customValue><fullName>Tunisia</fullName><default>false</default><label>Tunisia</label></customValue>
+    <customValue><fullName>Turkey</fullName><default>false</default><label>Turkey</label></customValue>
+    <customValue><fullName>Uganda</fullName><default>false</default><label>Uganda</label></customValue>
+    <customValue><fullName>Ukraine</fullName><default>false</default><label>Ukraine</label></customValue>
+    <customValue><fullName>United Arab Emirates</fullName><default>false</default><label>United Arab Emirates</label></customValue>
+    <customValue><fullName>United Kingdom</fullName><default>false</default><label>United Kingdom</label></customValue>
+    <customValue><fullName>United States</fullName><default>false</default><label>United States</label></customValue>
+    <customValue><fullName>Uruguay</fullName><default>false</default><label>Uruguay</label></customValue>
+    <customValue><fullName>Viet Nam</fullName><default>false</default><label>Viet Nam</label></customValue>
+    <customValue><fullName>Zambia</fullName><default>false</default><label>Zambia</label></customValue>
+    <customValue><fullName>Zimbabwe</fullName><default>false</default><label>Zimbabwe</label></customValue>
+    <description>Global value set for use in Country pick lists</description>
+    <masterLabel>Country</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

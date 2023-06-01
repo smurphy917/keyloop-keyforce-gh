@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-git-hooks" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<macrodef name="updateCommitMsgHook">
+		<sequential>
+			<loadfile
+				property    = "git.hooks.commitMsg.template"
+				srcFile     = "${file.git.hooks.commitMsg.src}" />
+
+			<propertyReplace
+				property    = "git.hooks.commitMsg.finalRegex"
+				input       = "${git.hooks.commitMsg.ticketRegex}"
+				find        = "[KEY]"
+				replace     = "${git.hooks.commitMsg.projectKey}" />
+
+			<propertyReplace
+				property    = "git.hooks.commitMsg.step1"
+				input       = "${git.hooks.commitMsg.template}"
+				find        = "[REGEX]"
+				replace     = "${git.hooks.commitMsg.finalRegex}" />
+
+			<propertyReplace
+				property    = "git.hooks.commitMsg.final"
+				input       = "${git.hooks.commitMsg.step1}"
+				find        = "[MESSAGE]"
+				replace     = "${git.hooks.commitMsg.error}" />
+
+			<getSendMetricsHook 
+				if:true     = "${metrics.enable}" />
+
+			<property
+				name        = "git.hooks.sendMetrics.final"
+				value       = ""
+				unless:true = "${metrics.enable}" />
+
+			<property 
+				name = "git.hooks.commitMsg.combined" 
+				value="${git.hooks.commitMsg.final}${git.hooks.sendMetrics.final}" />
+
+			<condition property="git.hooks.commitMsg.isInstalled">
+				<available file="${file.git.hooks.commitMsg.dst}" type="file"/>
+			</condition>
+
+			<loadfile
+				property    = "git.hooks.commitMsg.installed"
+				srcFile     = "${file.git.hooks.commitMsg.dst}" 
+				failonerror = "false"
+				if:true     = "${git.hooks.commitMsg.isInstalled}" />
+
+			<condition property="git.hooks.commitMsg.upToDate" value="true">
+				<equals 
+					arg1    = "${git.hooks.commitMsg.combined}"
+					arg2    = "${git.hooks.commitMsg.installed}" />
+			</condition>
+
+			<updateGitHook
+				unless:true = "${git.hooks.commitMsg.upToDate}"
+				hookName    = "Commit Message"
+				file        = "${file.git.hooks.commitMsg.dst}"
+				script      = "${git.hooks.commitMsg.combined}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="getSendMetricsHook">
+		<sequential>
+			<loadfile
+				property    = "git.hooks.sendMetrics.template"
+				srcFile     = "${file.git.hooks.sendMetrics.src}" />
+
+			<propertyReplace
+				property    = "git.hooks.sendMetrics.step1"
+				input       = "${git.hooks.sendMetrics.template}"
+				find        = "[URL]"
+				replace     = "${metrics.baseUrl}/${metrics.path}" />
+
+			<propertyReplace
+				property    = "git.hooks.sendMetrics.final"
+				input       = "${git.hooks.sendMetrics.step1}"
+				find        = "[CREDS]"
+				replace     = "${tooling.username}:${tooling.password}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="updatePrePushHook">
+		<sequential>
+			<loadfile
+				property    = "git.hooks.prePush.template"
+				srcFile     = "${file.git.hooks.prePush.src}" />
+
+			<propertyReplace
+				property    = "git.hooks.prePush.step1"
+				input       = "${git.hooks.prePush.template}"
+				find        = "[REGEX]"
+				replace     = "${git.hooks.prePush.branchRegex}" />
+
+			<propertyReplace
+				property    = "git.hooks.prePush.final"
+				input       = "${git.hooks.prePush.step1}"
+				find        = "[MESSAGE]"
+				replace     = "${git.hooks.prePush.error}" />
+
+			<condition property="git.hooks.prePush.isInstalled">
+				<available file="${file.git.hooks.prePush.dst}" type="file"/>
+			</condition>
+
+			<loadfile
+				property    = "git.hooks.prePush.installed"
+				srcFile     = "${file.git.hooks.prePush.dst}" 
+				failonerror = "false"
+				if:true     = "${git.hooks.prePush.isInstalled}" />
+
+			<condition property="git.hooks.prePush.upToDate" value="true">
+				<equals 
+					arg1    = "${git.hooks.prePush.final}"
+					arg2    = "${git.hooks.prePush.installed}" />
+			</condition>
+
+			<updateGitHook
+				unless:true = "${git.hooks.prePush.upToDate}"
+				hookName    = "Pre Push"
+				file        = "${file.git.hooks.prePush.dst}"
+				script      = "${git.hooks.prePush.final}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="removeCommitMsgHook">
+		<sequential>
+			<condition property="git.hooks.commitMsg.isInstalled">
+				<available file="${file.git.hooks.commitMsg.dst}" type="file"/>
+			</condition>
+
+			<removeGitHook
+				if:true  = "${git.hooks.commitMsg.isInstalled}" 
+				hookName = "Commit Message"
+				file     = "${file.git.hooks.commitMsg.dst}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="removePrePushHook">
+		<sequential>
+			<condition property="git.hooks.prePush.isInstalled">
+				<available file="${file.git.hooks.prePush.dst}" type="file"/>
+			</condition>
+
+			<removeGitHook
+				if:true  = "${git.hooks.prePush.isInstalled}" 
+				hookName = "Pre Push"
+				file     = "${file.git.hooks.prePush.dst}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="updateGitHook">
+		<attribute name="hookName" />
+		<attribute name="file" />
+		<attribute name="script" />
+		<sequential>
+			<echo>Updating Git @{hookName} hook...</echo>
+
+			<echo file="@{file}">@{script}</echo>
+
+			<chmod 
+				file      = "@{file}" 
+				perm      = "+x" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="removeGitHook">
+		<attribute name="hookName" />
+		<attribute name="file" />
+		<sequential>
+			<echo>Removing Git @{hookName} hook...</echo>
+
+			<delete 
+				file     = "@{file}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="updateGitHooks">
+		<sequential>
+			<mkdir dir=".git/hooks" />
+
+			<updateCommitMsgHook if:true="${git.hooks.commitMsg.enable}" />
+			<updatePrePushHook   if:true="${git.hooks.prePush.enable}"   />
+
+			<removeCommitMsgHook unless:true="${git.hooks.commitMsg.enable}" />
+			<removePrePushHook   unless:true="${git.hooks.prePush.enable}"   />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="installOrUpdateGitHooks">
+		<sequential>
+			<updateGitHooks if:true="${git.isGitRepo}" />
+
+			<property name="git.hooks.updateCheckComplete" value="true" />
+		</sequential>
+	</macrodef>
+
+	<scriptdef
+		name     = "propertyReplace"
+		language = "javascript"
+		src      = "${dir.antScripts}/propertyReplace.js">
+
+		<attribute name="property"/>
+		<attribute name="input"/>
+		<attribute name="find"/>
+		<attribute name="replace"/>
+	</scriptdef>
+
+	<setLogLevel level="1" />
+
+	<installOrUpdateGitHooks unless:true="${git.hooks.updateCheckComplete}" />
+
+	<setLogLevel level="2" />
+
+</project>

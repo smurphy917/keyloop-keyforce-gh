@@ -1,0 +1,4 @@
+Id,OpportunityId,PricebookEntryId,Quantity,TotalPrice,SBQQ__QuoteLine__c
+OLI1,OP1,PBE1,1,10,QLI1
+OLI2,OP1,PBE2,1,10,QLI2
+OLI3,OP1,PBE3,1,10,QLI3

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Competitor__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>LTC-2: The competitor company with which we are in direct competition on this opportunity.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The competitor company with which we are in direct competition on this opportunity.</inlineHelpText>
+    <label>Competitor</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Leads (Competitor)</relationshipLabel>
+    <relationshipName>Leads1</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

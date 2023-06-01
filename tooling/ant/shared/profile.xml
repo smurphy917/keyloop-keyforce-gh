@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-profile" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<macrodef name="missingProfileHandler">
+		<sequential>
+			<mpdxScript name="missingProfileHandler" includeSession="true">
+				<args>
+					<arg line="--arg-deployDir &quot;${dir.tempDeployMain}&quot;" />
+					<arg line="--arg-action &quot;${deploy.missingProfileChecker}&quot;" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,123 @@
+{
+	"groups": {
+		"myModificationGroup": [
+			{
+				"reference": "exampleDelete",
+				"config" : {
+					"myConfigEntry" : "example delete config value"
+				}
+			},
+			{
+				"reference": "exampleModify",
+				"config" : {
+					"myConfigEntry" : "example modify config value"
+				}
+			},
+			{
+				"reference": "exampleAdvancedModify",
+				"config" : {
+					"myConfigEntry" : "example advanced modify config value"
+				}
+			},
+			{
+				"reference": "exampleModifyString",
+				"config" : {
+					"myConfigEntry" : "example modify string config value"
+				}
+			},
+			{
+				"reference": "exampleAdvancedModifyString",
+				"config" : {
+					"myConfigEntry" : "example advanced modify string config value"
+				}
+			}
+		]
+	},
+	"projectDefinitions" : [
+		{
+			"configOptions": [
+				{
+					"description": "My config entry",
+					"name": "My Config Entry",
+					"reference": "myConfigEntry"
+				}
+			],
+			"description": "Example delete",
+			"file": "example",
+			"patterns": [
+				"**/*.ext-meta.xml",
+				"**/*.ext"
+			],
+			"reference": "exampleDelete",
+			"type": "delete"
+		},
+		{
+			"configOptions": [
+				{
+					"description": "My config entry",
+					"name": "My Config Entry",
+					"reference": "myConfigEntry"
+				}
+			],
+			"description": "Example modify",
+			"file": "example",
+			"patterns": [
+				"**/*.ext-meta.xml",
+				"**/*.ext"
+			],
+			"reference": "exampleModify",
+			"type": "modify"
+		},
+		{
+			"configOptions": [
+				{
+					"description": "My config entry",
+					"name": "My Config Entry",
+					"reference": "myConfigEntry"
+				}
+			],
+			"description": "Example advanced modify",
+			"file": "example",
+			"patterns": [
+				"**/*.ext-meta.xml",
+				"**/*.ext"
+			],
+			"reference": "exampleAdvancedModify",
+			"type": "advanced-modify"
+		},
+		{
+			"configOptions": [
+				{
+					"description": "My config entry",
+					"name": "My Config Entry",
+					"reference": "myConfigEntry"
+				}
+			],
+			"description": "Example modify string",
+			"file": "example",
+			"patterns": [
+				"**/*.ext-meta.xml",
+				"**/*.ext"
+			],
+			"reference": "exampleModifyString",
+			"type": "modify-string"
+		},
+		{
+			"configOptions": [
+				{
+					"description": "My config entry",
+					"name": "My Config Entry",
+					"reference": "myConfigEntry"
+				}
+			],
+			"description": "Example advanced modify string",
+			"file": "example",
+			"patterns": [
+				"**/*.ext-meta.xml",
+				"**/*.ext"
+			],
+			"reference": "exampleAdvancedModifyString",
+			"type": "advanced-modify-string"
+		}
+	]
+}

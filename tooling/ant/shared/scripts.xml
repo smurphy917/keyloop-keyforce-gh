@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-scripts" xmlns:if="ant:if">
+
+	<target name="runApexScript">
+		<runApexScript />
+	</target>
+
+	<target name="runApexScriptsPre">
+		<runApexScriptsPre />
+	</target>
+
+	<target name="runApexScriptsPost">
+		<runApexScriptsPost />
+	</target>
+
+	<macrodef name="runApexScript">
+		<sequential>
+			<hook target="hook-scripts-run-pre" />
+
+			<runApexFile 
+				title       = "Run ${script.file}" 
+				sourceFile  = "${script.file}" />
+
+			<hook target="hook-scripts-run-post" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="runApexScriptsPre">
+		<sequential>
+			<hook target="hook-scripts-run-prescripts-pre" />
+
+			<available file="${dir.apexScriptsPre}" type="dir" property="scripts.apexScriptsPreDirExists" />
+			
+			<runApexFiles 
+				if:true     = "${scripts.apexScriptsPreDirExists}"
+				title       = "Run Apex Pre Scripts..." 
+				dir         = "${dir.apexScriptsPre}" />
+
+			<hook target="hook-scripts-run-prescripts-post" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="runApexScriptsPost">
+		<sequential>
+			<hook target="hook-scripts-run-postscripts-pre" />
+
+			<available file="${dir.apexScriptsPost}" type="dir" property="scripts.apexScriptsPostDirExists" />
+			
+			<runApexFiles 
+				if:true     = "${scripts.apexScriptsPostDirExists}"
+				title       = "Run Apex Post Scripts..." 
+				dir         = "${dir.apexScriptsPost}" />
+
+			<hook target="hook-scripts-run-postscripts-post" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="createUser">
+		<attribute name="username" />
+		<attribute name="firstName" />
+		<attribute name="lastName" />
+		<attribute name="email" />
+		<attribute name="alias" />
+		<attribute name="communityNickname" />
+		<attribute name="profile" default="Standard User" />
+		<attribute name="timezone" default="GMT" />
+		<attribute name="language" default="en_US" />
+		<attribute name="emailEncoding" default="UTF-8" />
+		<attribute name="locale" default="en_US" />
+
+		<sequential>
+			<runApex title="Create user @{username}...">
+				<![CDATA[
+					Boolean isSandbox = [SELECT IsSandbox FROM Organization LIMIT 1].IsSandbox;
+
+					String username = '@{username}';
+
+					if (isSandbox) {
+						username += '.' + UserInfo.getUserName().substringAfterLast('.');
+					}
+
+					List<User> users = [SELECT Id, ProfileId FROM User WHERE Username = :username];
+
+					if (users.size() == 0) {
+						Profile profile = [SELECT Id FROM Profile WHERE Name = '@{profile}' LIMIT 1];
+
+						insert new User(
+							FirstName = '@{firstName}',
+							LastName = '@{lastName}',
+							Email = '@{email}',
+							Alias = '@{alias}',
+							CommunityNickname = '@{communityNickname}',
+							Username = username,
+							ProfileId = profile.Id, 
+							TimeZoneSidKey = '@{timezone}',
+							LanguageLocaleKey = '@{language}',
+							EmailEncodingKey = '@{emailEncoding}',
+							LocaleSidKey = '@{locale}'
+						);
+
+						system.debug('User ' + username + ' created!');
+					} else {
+						system.debug('User already exists, no action required.');
+					}
+				]]>
+			</runApex>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="runApexFiles">
+		<attribute 
+			name        = "dir" />
+		<attribute 
+			name        = "title" 
+			default     = "Running Apex Script..." />
+
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>@{title}</echo>
+			<echo>=========================================</echo>
+
+			<!-- Do this outside of the foreach so that any authentication is only done once -->
+			<validateEnvironmentProperties />
+			<login />
+			
+			<importAntContribLibrary />
+			
+			<foreach target="runApexScript" param="script.file" inheritall="true">
+				<path>
+					<sort>
+						<fileset dir="@{dir}" includes="**/*.apex"/>
+					</sort>
+				</path>
+			</foreach>
+		</sequential>
+	</macrodef>
+
+</project>

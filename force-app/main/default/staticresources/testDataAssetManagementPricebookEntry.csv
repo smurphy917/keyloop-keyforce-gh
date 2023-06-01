@@ -1,0 +1,4 @@
+ID,Product2Id,UnitPrice,Pricebook2Id,CurrencyIsoCode,IsActive
+PBE1,B1,500,PB1,GBP,TRUE
+PBE2,C1,800,PB1,GBP,TRUE
+PBE3,C2,400,PB1,GBP,TRUE

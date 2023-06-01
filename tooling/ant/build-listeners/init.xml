@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-build-listeners-init" xmlns:if="ant:if">
+
+	<scriptdef
+		name     = "initBuildListener"
+		language = "javascript"
+		src      = "${dir.antScripts}/initBuildListener.js">
+	</scriptdef>
+
+	<macrodef name="buildFinished">
+		<attribute name="success" />
+		<attribute name="message" />
+		<attribute name="start"   />
+		<attribute name="stop"    />
+		<attribute name="time"    />
+		<sequential>
+			<setLogLevel level="0" />
+			<cleanupTempDir />
+			<logMetrics 
+				if:true = "${metrics.enable}"
+				success = "@{success}"
+				start   = "@{start}"
+				stop    = "@{stop}"
+				time    = "@{time}" />
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+    <initBuildListener if:true="${listener.enable}" />
+
+</project>

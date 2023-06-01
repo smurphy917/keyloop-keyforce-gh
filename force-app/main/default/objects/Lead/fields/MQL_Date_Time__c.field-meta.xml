@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MQL_Date_Time__c</fullName>
+    <description>LTC-2: Timestamp of when lead is qualified by Marketing.</description>
+    <externalId>false</externalId>
+    <label>MQL Date/Time</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-hooks">
+
+	<target name="hook">
+		<echo>=========================================</echo>
+		<echo>Running hooks at point ${name}...</echo>
+		<echo>=========================================</echo>
+
+		<hook target="${name}" />
+	</target>
+
+	<scriptdef 
+		name        = "hook" 
+		language    = "javascript" 
+		src         = "${dir.antScripts}/hook.js">
+		
+		<attribute name="target" />
+		<attribute name="deprecated" />
+	</scriptdef>
+
+</project>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-hooks-deploy">
+
+	<!--
+		!!! WARNING - this functionality may be removed or changed without usual deprecation/major version changes !!!
+
+		# New undocumented beta feature for integration of vlocity build tool
+
+		This is an example of how to write a build hook that executes a vlocity command - it is only an example and 
+		it is not tested!!
+	-->
+
+	<!-- 
+		Hook into the post deploy steps i.e. after the Salesforce deploy, after apex scripts and after sobeit data import.
+
+		Note - this will only run if sf_checkOnly=false, therefore it'll never run on ant test and only on ant deploy if sf_checkOnly=true
+	-->
+	<target name="hook-post-deploy-steps-post">
+		<vlocityDeploy />
+	</target>
+
+	<!-- 
+		Expose the export function on as a standalone ant target that can be run independently of ant deploy:
+		ant vlocityDeploy
+	-->
+	<target name="vlocityDeploy">
+		<vlocityDeploy />
+	</target>
+
+	<!-- Define the vlocity commands that should be run. Example provided -->
+	<macrodef name="vlocityDeploy">
+		<sequential>
+			<vlocity
+				command = "packDeploy"
+				job     = "jobs/example.yaml" />
+
+			<!--
+				Example of how to add extra arguments
+				<vlocity
+					command = "packDeploy"
+					job     = "jobs/example.yaml">
+					<args>
+						<arg line="-a value" />
+					</args>
+				</vlocity>
+			-->
+		</sequential>
+	</macrodef>
+	
+</project>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-scripts" xmlns:ff="antlib:com.spaceheroes">
+
+	<macrodef name="runApex">
+		<attribute 
+			name        = "title" 
+			default     = "Running Apex Script..." />
+		<text 
+			name        = "code" />
+
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>@{title}</echo>
+			<echo>=========================================</echo>
+
+			<validateEnvironmentProperties />
+
+			<importForceFlowLibrary />
+
+			<ff:apex 
+				username    = "${sf_username}" 
+				password    = "${sf_password}${sf_token}" 
+				serverurl   = "${sf_serverUrl}" 
+				enableDebug = "true">
+
+				@{code}
+			</ff:apex>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="runApexFile">
+		<attribute 
+			name        = "sourceFile" />
+		<attribute 
+			name        = "title" 
+			default     = "Running Apex Script..." />
+
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>@{title}</echo>
+			<echo>=========================================</echo>
+
+			<validateEnvironmentProperties />
+			
+			<importForceFlowLibrary />
+			
+			<ff:apex 
+				username    = "${sf_username}" 
+				password    = "${sf_password}${sf_token}" 
+				serverurl   = "${sf_serverUrl}" 
+				enableDebug = "true"
+				sourceFile  = "@{sourceFile}" />
+		</sequential>
+	</macrodef>
+
+</project>

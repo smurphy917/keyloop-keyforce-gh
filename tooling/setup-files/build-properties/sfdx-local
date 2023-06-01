@@ -1,0 +1,25 @@
+# User specific build properties
+
+example.sf_username=
+example.sf_alias=
+example.sf_serverUrl=https://test.salesforce.com
+example.sf_checkOnly=true
+example.sf_testLevel=RunLocalTests
+
+config.sf_username=
+config.sf_alias=
+
+ci.sf_username=
+ci.sf_alias=
+
+qa.sf_username=
+qa.sf_alias=
+
+uat.sf_username=
+uat.sf_alias=
+
+staging.sf_username=
+staging.sf_alias=
+
+prod.sf_username=
+prod.sf_alias=

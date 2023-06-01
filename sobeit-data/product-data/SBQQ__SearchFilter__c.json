@@ -1,0 +1,3 @@
+[
+{"CurrencyIsoCode":"GBP","Name":"Filter out TEL HWR","SBQQ__Action__c":"a0B3H0000013ykrUAA","SBQQ__DisplayOrder__c":"10.0","SBQQ__FilterSourceField__c":"","SBQQ__FilterSourceObject__c":"","SBQQ__FilterValue__c":"TEL HWR","SBQQ__HiddenSourceField__c":"","SBQQ__HiddenSourceObject__c":"","SBQQ__Hidden__c":"true","SBQQ__Operator__c":"not equals","SBQQ__TargetField__c":"MarketingCategory__c","SBQQ__TargetObject__c":"Product","Source_System_Id__c":"a153H000000SqxpQAC"}
+]

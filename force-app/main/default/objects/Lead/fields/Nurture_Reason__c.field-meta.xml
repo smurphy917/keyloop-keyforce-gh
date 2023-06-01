@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Nurture_Reason__c</fullName>
+    <description>LTC-2: Captures the reason the lead was moved into Nurture.</description>
+    <externalId>false</externalId>
+    <label>Nurture Reason</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Locked in Contract</fullName><default>false</default><label>Locked in Contract</label></value>
+            <value><fullName>Budget not available</fullName><default>false</default><label>Budget not available</label></value>
+            <value><fullName>Product missing feature</fullName><default>false</default><label>Product missing feature</label></value>
+            <value><fullName>Prospect is re-evaluating</fullName><default>false</default><label>Prospect is re-evaluating</label></value>
+            <value><fullName>Not a Decision Maker</fullName><default>false</default><label>Not a Decision Maker</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Declaration_Given_Inkl_Processing_Usage__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>LTC-2: Permission to contact given in DACH region</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Permission to contact given in DACH region</inlineHelpText>
+    <label>Declaration Given(Inkl.Processing+Usage)</label>
+    <type>Checkbox</type>
+</CustomField>

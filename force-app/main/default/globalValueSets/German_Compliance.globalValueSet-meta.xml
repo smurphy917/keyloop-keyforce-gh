@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue><fullName>Vorhanden</fullName><default>false</default><label>Vorhanden</label></customValue>
+    <customValue><fullName>Widerrufen / nicht gegeben</fullName><default>false</default><label>Widerrufen / nicht gegeben</label></customValue>
+    <description>Global value set for German compliance</description>
+    <masterLabel>German Compliance</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

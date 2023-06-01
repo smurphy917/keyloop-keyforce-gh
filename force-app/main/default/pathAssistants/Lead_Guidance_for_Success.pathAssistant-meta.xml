@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Lead</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>Lead Guidance for Success</masterLabel>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;&lt;strong style=&quot;font-size: 14px;&quot;&gt;Ensure a Disqualified reason is added.&lt;/strong&gt;&lt;/p&gt;</info>
+        <picklistValueName>Disqualified</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Title</fieldNames>
+        <fieldNames>Name</fieldNames>
+        <fieldNames>Company</fieldNames>
+        <fieldNames>Phone</fieldNames>
+        <fieldNames>Email</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Research and contact your new lead quickly.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Research your lead online.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Visit their website to learn about their business.&lt;/li&gt;&lt;li&gt;Look them up on social networks to determine how to best engage and connect.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Contact a new lead as soon as possible.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;The sooner you contact them, the higher the likelihood of converting them to a customer. &lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Verify that their contact information is correct.&lt;/p&gt;</info>
+        <picklistValueName>New</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;&lt;strong style=&quot;font-size: 14px;&quot;&gt;Assign the lead to the appropriate Nurture campaign for future engagement.&lt;/strong&gt;&lt;/p&gt;</info>
+        <picklistValueName>Nurture</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Total_Score__c</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;If the lead is fully qualified, convert them to an Account, Contact and Opportunity.  &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;This establishes them as a legitimate prospect and separates them from general leads.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;If the lead is not qualified, but might be someday, check the &amp;quot;Add to Nurture Campaign&amp;quot; box so our marketing team can engage them.&lt;/li&gt;&lt;li&gt;If the lead is not qualified and will never be, do nothing. These leads will be archived after a year. &lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;</info>
+        <picklistValueName>Qualified</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Decision_Maker__c</fieldNames>
+        <fieldNames>Project_Defined__c</fieldNames>
+        <fieldNames>Has_Budget__c</fieldNames>
+        <fieldNames>Decision_Timeframe__c</fieldNames>
+        <fieldNames>Total_Score__c</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Verify contact information and qualify lead.&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;If contacting via phone, follow up immediately after with a thank you email.&lt;/li&gt;&lt;li&gt;If contacting via email and they reply quickly, follow up immediately with a phone call&lt;/li&gt;&lt;li&gt;Complete the lead scoring fields to determine if they are a good prospect.&lt;/li&gt;&lt;li&gt;Rehearse your call script and qualification questions so you sound confident and the flow of your conversation is more natural.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;If qualified, change the status to “Qualified”.&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This establishes them as a legitimate prospect and separates them from general leads.&lt;/li&gt;&lt;li&gt;If this is not qualified, but might be someday, move to the the &amp;quot;Nurture” Status and fill in the “Nurture Reason” field so our marketing team can engage them in future campaigns. If it&amp;#39;s not qualified and will never be, move the lead to “Unqualified” and fill in the “Unqualified Reason” field. These will be archived after a year.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Qualifying</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>Standard_Lead</recordTypeName>
+</PathAssistant>

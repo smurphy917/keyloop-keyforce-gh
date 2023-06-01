@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-hooks-deploy" xmlns:if="ant:if">
+
+	<!-- 
+		Expose the function on as a standalone ant target that can be called from the command line:
+		ant deployMatchingRules
+	-->
+	<target name="deployMatchingRules">
+		<deployMatchingRules />
+	</target>
+
+	<!--
+		- validateEnvironmentProperties - will ensure all environment properties are correctly set
+		- validateBranch - will check the current branch matches the expected branch held in configuration
+		- deploy - will take care of calling SFDX/Force.com Migration Tool
+	 -->
+	<macrodef name="deployMatchingRules">
+		<sequential>
+			<validateEnvironmentProperties />
+			<validateBranch if:true="${deploy.branchCheck.enabled}" />
+			<deploy 
+				type            = "Matching Rules" 
+				checkOnly       = "${sf_checkOnly}" 
+				hookName        = "matching-rules" 
+				src             = "${dir.matchingRules}" 
+				zip             = "${file.matchingRulesZip}" 
+				ignoreWarnings  = "${deploy.matchingRulesIgnoreWarnings}" />
+		</sequential>
+	</macrodef>
+
+</project>

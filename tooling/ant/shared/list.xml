@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-list" xmlns:if="ant:if">
+
+	<target name="list">
+		<listMetadata />
+	</target>
+
+	<target name="listMetadata">
+		<listMetadata />
+	</target>
+
+	<macrodef name="listMetadata">
+		<sequential>
+			<echo>=========================================</echo>
+			<echo>List metadata...</echo>
+			<echo>=========================================</echo>
+
+			<validateEnvironmentProperties />
+
+			<hook target="hook-list-metadata-pre" />
+
+			<!-- Alias command parameters (will not be overwritten if already set) -->
+			<property name="sf_metadataType" value="${type}"   if:set="type"   />
+			<property name="sf_folder"       value="${folder}" if:set="folder" />
+
+			<listMetadataCommand />
+
+			<hook target="hook-list-metadata-post" />
+		</sequential>
+	</macrodef>
+
+</project>

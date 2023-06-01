@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Recalculate__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Recalculate the following: MRR, Amount and ASPs based on child assets; appropriate parent if none based on initial orderItem.</description>
+    <externalId>false</externalId>
+    <label>Recalculate</label>
+    <type>Checkbox</type>
+</CustomField>

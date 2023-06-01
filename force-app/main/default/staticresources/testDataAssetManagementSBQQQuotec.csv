@@ -1,0 +1,3 @@
+Id,SBQQ__Status__c,Close_Result__c,SBQQ__Opportunity2__c,SBQQ__Primary__c,SBQQ__StartDate__c,SBQQ__EndDate__c,SBQQ__Pricebook__c,SBQQ__PricebookId__c,CurrencyIsoCode
+Q01,Closed,Ordered,OP1,true,2023-01-01,2023-12-31,PB1,,GBP
+Q02,Closed,Ordered,OP2,true,2023-01-01,2023-12-31,PB1,,GBP

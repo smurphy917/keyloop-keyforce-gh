@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lead_Source_Team__c</fullName>
+    <description>LTC-2: The team who generates/creates the lead.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The team who generates/creates the lead.</inlineHelpText>
+    <label>Lead Source Team</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Sales</fullName><default>false</default><label>Sales</label></value>
+            <value><fullName>Marketing</fullName><default>false</default><label>Marketing</label></value>
+            <value><fullName>BDR Team</fullName><default>false</default><label>BDR Team</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

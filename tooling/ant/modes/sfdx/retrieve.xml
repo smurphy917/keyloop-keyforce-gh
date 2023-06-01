@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-mode-retrieve" xmlns:if="ant:if">
+
+	<macrodef name="retrieveCommand">
+		<attribute name="src" />
+		<attribute name="package" />
+
+		<sequential>
+			<login />
+
+			<sfdxCommandCheck
+				command         = "force:mdapi:legacy:retrieve"
+				successProperty = "retrieve.legacy.exists"
+				if:true         = "${retrieve.useLegacyCommand}" />
+
+			<condition property="retrieve.command" value="force:mdapi:legacy:retrieve" else="force:mdapi:retrieve">
+				<and>
+					<istrue value="${retrieve.useLegacyCommand}" />
+					<istrue value="${retrieve.legacy.exists}"    />
+				</and>
+			</condition>
+
+			<echo>Retrieve command: ${retrieve.command}</echo>
+
+			<sfdx command="${retrieve.command}">
+				<args>
+					<arg line="--apiversion=${sf.version}" />
+					<arg line="--retrievetargetdir=." />
+					<arg line="--targetusername=${sf_alias}" />
+					<arg line="--unpackaged=@{package}" />
+				</args>
+			</sfdx>
+
+			<setLogLevel level="1" />
+
+			<unzip src="unpackaged.zip" dest="." />
+
+			<move todir="@{src}" overwrite="true">
+				<fileset dir="unpackaged"/>
+			</move>
+
+			<delete file="unpackaged.zip" />
+
+			<setLogLevel level="2" />	
+		</sequential>
+	</macrodef>
+
+</project>

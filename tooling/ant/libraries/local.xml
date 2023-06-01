@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-libraries-local">
+
+	<macrodef name="importSalesforceLibrary">
+		<sequential>
+			<salesforceTaskDef dir="${dir.localLibs}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="importForceFlowLibrary">
+		<sequential>
+			<forceFlowTaskDef dir="${dir.localLibs}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="importAntContribLibrary">
+		<sequential>
+			<antContribTaskDef dir="${dir.localLibs}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="importNode">
+		<sequential>
+			<useLocalNode />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="fetchPackageTag">
+		<attribute name="package" />
+		<attribute name="tag" />
+
+		<sequential>
+			<setPackageVersionsFromCache package="@{package}" tag="@{tag}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="fetchPackage">
+		<attribute name="package" />
+		<attribute name="version" />
+
+		<sequential>
+			<setLogLevel level="1" />
+
+			<echo>Installing package @{package} v@{version}...</echo>
+
+			<copy
+				file  = "${dir.localMPPackages}/@{package}/@{version}-bundle.tgz"
+				todir = "${dir.globalMPPackages}/@{package}" />
+			
+			<setLogLevel level="2" />
+		</sequential>
+	</macrodef>
+
+</project>

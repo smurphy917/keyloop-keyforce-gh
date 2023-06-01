@@ -1,0 +1,13 @@
+name: UAT Deployment
+
+on:
+  push:
+    branches: [ "deploy/UAT" ]
+
+jobs:
+
+  UAT:
+    uses: ./.github/workflows/template-deployment.yml
+    with:
+      environment: UAT
+    secrets: inherit

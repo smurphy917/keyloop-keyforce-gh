@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-sf-build-shared-compress" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+	<target name="applyCompressions">
+		<applyCompressions />
+	</target>
+
+	<macrodef name="applyCompressions">
+		<attribute name="sourceDir" default="${dir.sourceDir}" />
+		<sequential>
+			<local name="configExists" />
+
+			<available file="${file.compressionConfig}" type="file" property="configExists" />
+
+			<createLegacyCompressionConfig unless:true="${configExists}" />
+
+			<mpdxScript name="applyCompressions" includeSession="false">
+				<args>
+					<arg line="--arg-sourceDir &quot;@{sourceDir}&quot;" />
+					<arg line="--arg-configFile &quot;${file.compressionConfig}&quot;" />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="createLegacyCompressionConfig">
+		<sequential>
+			<mpdxScript name="createLegacyCompressionConfig" includeSession="false">
+				<args>
+					<arg line="--arg-toolingBase &quot;${dir.toolingBase}&quot;" />
+					<arg line="--arg-outputFile &quot;${file.compressionConfig}&quot;" />
+
+					<arg line="--arg-enableCompressProfiles"          if:true="${retrieve.enableCompressProfiles}"          />
+					<arg line="--arg-enableCompressPageLayouts"       if:true="${retrieve.enableCompressPageLayouts}"       />
+					<arg line="--arg-enableCompressGlobalValueSets"   if:true="${retrieve.enableCompressGlobalValueSets}"   />
+					<arg line="--arg-enableCompressStandardValueSets" if:true="${retrieve.enableCompressStandardValueSets}" />
+					<arg line="--arg-enableCompressObjectPicklists"   if:true="${retrieve.enableCompressObjectPicklists}"   />
+					<arg line="--arg-enableCompressQuickActions"      if:true="${retrieve.enableCompressQuickActions}"      />
+					<arg line="--arg-enableCompressCustomMetaData"    if:true="${retrieve.enableCompressCustomMetaData}"    />
+					<arg line="--arg-enableCompressQueues"            if:true="${retrieve.enableCompressQueues}"            />
+				</args>
+			</mpdxScript>
+		</sequential>
+	</macrodef>
+
+</project>

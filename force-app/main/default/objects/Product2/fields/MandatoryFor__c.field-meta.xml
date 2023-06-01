@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MandatoryFor__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <label>Mandatory for</label>
+    <referenceTo>Product2</referenceTo>
+    <relationshipLabel>Products (MandatoryFor)</relationshipLabel>
+    <relationshipName>MandatoryFor</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>
